@@ -134,6 +134,19 @@ const QuizUI = (() => {
     document.getElementById("progress-fill").style.width = `${((index + 1) / total) * 100}%`;
     document.getElementById("timer-flash").classList.add("visually-hidden");
 
+    const optionsEl = document.getElementById("question-options");
+    if (optionsEl) {
+      optionsEl.innerHTML = "";
+      if (pregunta.opciones) {
+        Object.entries(pregunta.opciones).forEach(([letra, texto]) => {
+          const item = document.createElement("div");
+          item.className = "option-item";
+          item.innerHTML = `<span class="option-item__letter">${letra}</span><span class="option-item__text">${texto}</span>`;
+          optionsEl.appendChild(item);
+        });
+      }
+    }
+
     const nextBtn = document.getElementById("btn-siguiente");
     nextBtn.textContent = index + 1 === total ? "Terminar quiz →" : "Siguiente pregunta →";
   }
@@ -144,6 +157,27 @@ const QuizUI = (() => {
 
     const scoreBlock = document.getElementById("result-score-block");
     scoreBlock.style.display = config.mostrarPuntuacion ? "flex" : "none";
+  }
+
+  function renderAnswerKey(preguntas) {
+    const list = document.getElementById("answer-key-list");
+    if (!list) return;
+    list.innerHTML = preguntas
+      .map(
+        (p, i) =>
+          `<div class="answer-key__item">Pregunta ${String(i + 1).padStart(2, "0")}: <b>${p.respuestaCorrecta || "—"}</b></div>`
+      )
+      .join("");
+
+    const toggleBtn = document.getElementById("btn-toggle-answers");
+    if (toggleBtn) {
+      toggleBtn.onclick = () => {
+        const hidden = list.hasAttribute("hidden");
+        if (hidden) list.removeAttribute("hidden");
+        else list.setAttribute("hidden", "");
+        toggleBtn.textContent = hidden ? "📋 Ocultar hoja de respuestas" : "📋 Ver hoja de respuestas";
+      };
+    }
   }
 
   function updateManualScore(scoreData) {
@@ -157,5 +191,5 @@ const QuizUI = (() => {
     document.getElementById("result-message").textContent = QuizScore.mensajePorPorcentaje(scoreData.porcentaje);
   }
 
-  return { showStage, renderConfigStage, renderQuestion, renderResult, updateManualScore };
+  return { showStage, renderConfigStage, renderQuestion, renderResult, renderAnswerKey, updateManualScore };
 })();

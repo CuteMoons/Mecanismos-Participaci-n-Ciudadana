@@ -130,8 +130,10 @@
         <div>
           <span class="question-mech-tag" id="question-mech-tag">Tutela</span>
           <h2 class="question-text" id="question-text">¿Qué es la acción de tutela?</h2>
-          <p class="question-hint">Escribe tu respuesta en tu cuaderno o en una hoja.</p>
+          <p class="question-hint">Escribe el número de la pregunta y la letra de tu respuesta en tu cuaderno o en una hoja.</p>
         </div>
+
+        <div class="options-grid" id="question-options"></div>
 
         <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
 
@@ -176,6 +178,11 @@
           </div>
 
           <p class="text-muted" id="result-message" style="font-family: var(--font-display); font-weight:600; color: var(--text);"></p>
+
+          <div class="answer-key" id="answer-key-wrap">
+            <button class="btn btn-ghost" id="btn-toggle-answers" type="button">📋 Ver hoja de respuestas</button>
+            <div class="answer-key__list" id="answer-key-list" hidden></div>
+          </div>
         </div>
 
         <div class="question-actions">

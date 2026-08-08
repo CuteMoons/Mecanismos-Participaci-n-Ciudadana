@@ -80,6 +80,12 @@
     const config = QuizConfig.get();
     QuizUI.showStage("result");
     QuizUI.renderResult({ total: preguntasPartida.length }, config);
+    QuizUI.renderAnswerKey(preguntasPartida);
+
+    const answerList = document.getElementById("answer-key-list");
+    const toggleBtn = document.getElementById("btn-toggle-answers");
+    if (answerList) answerList.setAttribute("hidden", "");
+    if (toggleBtn) toggleBtn.textContent = "📋 Ver hoja de respuestas";
 
     let correctas = 0;
     const actualizar = () => {

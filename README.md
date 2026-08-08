@@ -113,11 +113,17 @@ no hay que tocar ningún componente.
 
 ---
 
-## 6. Cómo agregar preguntas
+## 6. Banco de preguntas
 
-Este proyecto se entrega con **pocas preguntas de prueba** (5 fáciles,
-4 medias, 3 difíciles) para validar que el motor del quiz funciona
-correctamente. Para ampliar el banco:
+El proyecto incluye el **banco oficial de 120 preguntas de opción
+múltiple** (15 por mecanismo: 5 fáciles, 5 medias, 5 difíciles), con
+4 opciones (A–D) y la respuesta correcta marcada. Los estudiantes
+escriben el número de la pregunta y la letra elegida en su cuaderno u
+hoja; la profesora puede consultar la **hoja de respuestas** que
+aparece (colapsada) en la pantalla final del quiz para calificar
+rápido.
+
+Para agregar más preguntas:
 
 1. Abre el archivo de la dificultad correspondiente:
    ```
@@ -128,11 +134,12 @@ correctamente. Para ampliar el banco:
 2. Agrega un objeto nuevo siguiendo esta estructura:
    ```javascript
    {
-     id: "facil-006",              // único en todo el proyecto
-     mecanismo: "tutela",          // debe coincidir con el id del mecanismo
-     dificultad: "facil",          // "facil" | "media" | "dificil"
+     id: "tutela-016",              // único en todo el proyecto
+     mecanismo: "tutela",           // debe coincidir con el id del mecanismo
+     dificultad: "facil",           // "facil" | "media" | "dificil"
      pregunta: "¿...?",
-     respuesta: "..."
+     opciones: { A: "...", B: "...", C: "...", D: "..." },
+     respuestaCorrecta: "B"
    }
    ```
 3. No necesitas tocar `js/quiz/quiz-engine.js`: el motor lee
@@ -162,9 +169,10 @@ depende de la posición en el arreglo.
 2. Elige modalidad (individual o grupos), número de preguntas,
    dificultad y tiempo por pregunta.
 3. Pulsa **🚀 Iniciar Quiz**.
-4. Cada pregunta se proyecta en pantalla grande con un temporizador
-   circular. Los estudiantes escriben su respuesta en el cuaderno o en
-   una hoja física — la página no recoge respuestas.
+4. Cada pregunta se proyecta en pantalla grande con sus 4 opciones
+   (A–D) y un temporizador circular. Los estudiantes escriben el
+   número de pregunta y la letra elegida en el cuaderno o en una hoja
+   — la página no recoge respuestas.
 5. Al terminar el tiempo (o si la profesora pulsa "Siguiente pregunta"),
    pasa automáticamente a la siguiente. No hay pantalla de revisión
    intermedia.

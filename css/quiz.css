@@ -207,6 +207,45 @@
   margin-top: var(--space-4);
 }
 
+/* ---- Opciones de respuesta (A-D), solo lectura para proyección ---- */
+.options-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(240px, 1fr));
+  gap: var(--space-3);
+  width: 100%;
+  max-width: 880px;
+}
+
+.option-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  text-align: left;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-4) var(--space-5);
+  font-size: var(--fs-md);
+  font-weight: 600;
+}
+
+.option-item__letter {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.option-item__text { color: var(--text); }
+
 /* ---- Resultado final ---- */
 .result-stage {
   align-items: center;
@@ -260,6 +299,33 @@
   gap: var(--space-3);
 }
 .manual-score__row + .manual-score__row { margin-top: var(--space-3); }
+
+/* ---- Hoja de respuestas (solo para la profesora, colapsable) ---- */
+.answer-key {
+  width: 100%;
+  max-width: 640px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+.answer-key__list {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: var(--space-2);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  text-align: left;
+}
+.answer-key__item {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--text-muted);
+}
+.answer-key__item b { color: var(--color-primary); font-family: var(--font-display); }
 .stepper {
   display: flex;
   align-items: center;
