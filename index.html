@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Participación Ciudadana · I.E. José Antonio Aguilera</title>
+  <meta name="description" content="Plataforma educativa interactiva sobre los mecanismos de participación ciudadana en Colombia. Proyecto SENA — I.E. José Antonio Aguilera." />
+
+  <link rel="stylesheet" href="css/variables.css" />
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="css/navbar.css" />
+  <link rel="stylesheet" href="css/hero.css" />
+  <link rel="stylesheet" href="css/cards.css" />
+  <link rel="stylesheet" href="css/sections.css" />
+  <link rel="stylesheet" href="css/modal.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
+  <link rel="stylesheet" href="css/themes.css" />
+</head>
+<body>
+
+  <div id="navbar-root" data-base=""></div>
+
+  <!-- ============ HERO ============ -->
+  <header class="hero">
+    <div class="container hero__inner">
+      <div class="hero__copy">
+        <span class="hero__eyebrow"><span class="dot"></span> Proyecto educativo SENA</span>
+        <h1 class="hero__title">Participación <span class="accent">Ciudadana</span></h1>
+        <p class="hero__subtitle">Conoce, participa y demuestra lo que sabes.</p>
+        <p class="hero__text">
+          Explora los mecanismos que la Constitución de 1991 les da a los colombianos
+          para participar activamente en las decisiones del país, y pon a prueba
+          lo aprendido en un quiz interactivo pensado para tu salón de clase.
+        </p>
+        <div class="hero__actions">
+          <a href="pages/quiz.html" class="btn btn-primary btn-lg">Comenzar</a>
+          <a href="pages/aprender.html" class="btn btn-secondary btn-lg">Explorar mecanismos</a>
+        </div>
+        <div class="hero__stats">
+          <div class="hero__stat"><b>8</b><span>Mecanismos</span></div>
+          <div class="hero__stat"><b>1991</b><span>Constitución</span></div>
+          <div class="hero__stat"><b>100%</b><span>En el aula</span></div>
+        </div>
+      </div>
+
+      <div class="hero__scene" aria-hidden="true">
+        <div class="civic-seal">
+          <div class="civic-seal__ring"></div>
+          <div class="civic-seal__ring civic-seal__ring--inner"></div>
+          <div class="civic-seal__core">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M12 3l7 3v6c0 4.6-3 8.2-7 9-4-0.8-7-4.4-7-9V6l7-3z" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="civic-seal__chip civic-seal__chip--1"><svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="3.5" width="17" height="17" rx="3" stroke-width="1.8"/><path d="M8 12l2.5 2.5L16 9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="civic-seal__chip civic-seal__chip--2"><svg viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3" stroke-width="1.8"/><path d="M3 20c0-3 2.7-5 6-5s6 2 6 5" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+          <div class="civic-seal__chip civic-seal__chip--3"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="2" stroke-width="1.8"/><path d="M4 7l8 6 8-6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="civic-seal__chip civic-seal__chip--4"><svg viewBox="0 0 24 24" fill="none"><path d="M5 21V4" stroke-width="1.8" stroke-linecap="round"/><path d="M5 5h11l-2.5 3.5L16 12H5" stroke-width="1.8" stroke-linejoin="round"/></svg></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ APRENDER (preview) ============ -->
+  <section class="section" id="aprender">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">Aprende</span>
+        <h2>Aprende sobre participación ciudadana</h2>
+        <p>Ocho mecanismos que la Constitución de 1991 pone en manos de la ciudadanía.</p>
+      </div>
+      <div class="cards-grid" id="mechanisms-preview"></div>
+      <div style="text-align:center; margin-top: var(--space-6);">
+        <a href="pages/aprender.html" class="btn btn-secondary">Ver los 8 mecanismos</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CÓMO FUNCIONA ============ -->
+  <section class="section section--alt">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">En clase</span>
+        <h2>Así funciona la actividad</h2>
+        <p>Diseñada para proyectarse en el salón; los estudiantes responden en papel.</p>
+      </div>
+      <div class="steps">
+        <div class="step reveal"><div class="step__num">01</div><h3>Configura</h3><p>Elige modalidad, número de preguntas, dificultad y tiempo.</p></div>
+        <div class="step reveal"><div class="step__num">02</div><h3>Proyecta</h3><p>Cada pregunta aparece grande, con un temporizador visible.</p></div>
+        <div class="step reveal"><div class="step__num">03</div><h3>Responden</h3><p>Los estudiantes escriben su respuesta en el cuaderno o en una hoja.</p></div>
+        <div class="step reveal"><div class="step__num">04</div><h3>Revisan</h3><p>Al final, registras manualmente los aciertos y ven el resultado.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ QUIZ CTA ============ -->
+  <section class="section">
+    <div class="container">
+      <div class="cta-band">
+        <h2>🎮 ¿Listos para el Quiz?</h2>
+        <p>Pon a prueba tus conocimientos en una actividad individual o por grupos.</p>
+        <a href="pages/quiz.html" class="btn btn-secondary btn-lg">🚀 Ir al Quiz</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <div class="footer__brand">
+        <img class="navbar__logo" src="assets/logo/logo-colegio.png" alt="" onerror="this.style.display='none'" />
+        <div class="footer__brand-text">
+          <b>Institución Educativa José Antonio Aguilera</b>
+          <span>Proyecto educativo — SENA · Mecanismos de Participación Ciudadana</span>
+        </div>
+      </div>
+      <div class="footer__meta">San Pedro, Valle del Cauca</div>
+    </div>
+  </footer>
+
+  <!-- Datos -->
+  <script src="data/mecanismos/tutela.js"></script>
+  <script src="data/mecanismos/derecho-peticion.js"></script>
+  <script src="data/mecanismos/referendo.js"></script>
+  <script src="data/mecanismos/plebiscito.js"></script>
+  <script src="data/mecanismos/consulta-popular.js"></script>
+  <script src="data/mecanismos/cabildo-abierto.js"></script>
+  <script src="data/mecanismos/iniciativa-popular.js"></script>
+  <script src="data/mecanismos/revocatoria-mandato.js"></script>
+  <script src="data/mecanismos/index.js"></script>
+  <script src="data/preguntas/preguntas-faciles.js"></script>
+  <script src="data/preguntas/preguntas-medias.js"></script>
+  <script src="data/preguntas/preguntas-dificiles.js"></script>
+  <script src="data/preguntas/preguntas.js"></script>
+
+  <!-- Componentes -->
+  <script src="js/components/icons.js"></script>
+  <script src="js/components/navbar.js"></script>
+  <script src="js/components/buttons.js"></script>
+  <script src="js/components/cards.js"></script>
+  <script src="js/components/animations.js"></script>
+
+  <!-- Núcleo -->
+  <script src="js/theme.js"></script>
+  <script src="js/navigation.js"></script>
+  <script src="js/modal.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

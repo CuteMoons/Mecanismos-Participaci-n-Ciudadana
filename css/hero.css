@@ -1,0 +1,169 @@
+/* ==========================================================================
+   HERO.CSS
+   Elemento firma: el "sello cívico" — anillo concéntrico inspirado en el
+   sol y el marco circular del escudo institucional. Este motivo de anillo
+   reaparece en las tarjetas de mecanismos, el temporizador del quiz y la
+   barra de progreso, dando identidad visual unificada al proyecto.
+   ========================================================================== */
+
+.hero {
+  position: relative;
+  overflow: hidden;
+  background: var(--hero-gradient);
+  padding-block: var(--space-8) var(--space-7);
+}
+
+.hero__inner {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: var(--space-7);
+  align-items: center;
+}
+
+.hero__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 0.4rem 0.9rem 0.4rem 0.5rem;
+  border-radius: var(--radius-full);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--space-5);
+}
+
+.hero__eyebrow .dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--color-accent);
+}
+
+.hero__title {
+  font-size: clamp(2.4rem, 5.4vw, 4rem);
+  margin-bottom: var(--space-4);
+}
+
+.hero__title .accent { color: var(--color-primary); }
+
+.hero__subtitle {
+  font-family: var(--font-display);
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: var(--space-3);
+}
+
+.hero__text {
+  font-size: var(--fs-md);
+  max-width: 46ch;
+  margin-bottom: var(--space-6);
+}
+
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.hero__stats {
+  display: flex;
+  gap: var(--space-6);
+  margin-top: var(--space-7);
+}
+
+.hero__stat b {
+  display: block;
+  font-family: var(--font-display);
+  font-size: var(--fs-2xl);
+  color: var(--text);
+}
+.hero__stat span {
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ---- Escena visual: sello cívico animado ---- */
+.hero__scene {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.civic-seal {
+  position: relative;
+  width: min(420px, 90%);
+  aspect-ratio: 1 / 1;
+}
+
+.civic-seal__ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px dashed color-mix(in srgb, var(--color-secondary) 45%, transparent);
+  animation: spin 40s linear infinite;
+}
+.civic-seal__ring--inner {
+  inset: 42px;
+  border: 2px solid color-mix(in srgb, var(--color-primary) 35%, transparent);
+  border-style: solid;
+  animation: spin 30s linear infinite reverse;
+}
+
+.civic-seal__core {
+  position: absolute;
+  inset: 90px;
+  border-radius: 50%;
+  background: linear-gradient(155deg, var(--color-accent), var(--color-primary) 65%, var(--color-primary-dark));
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.civic-seal__core svg { width: 46%; height: 46%; stroke: #fff; }
+
+.civic-seal__chip {
+  position: absolute;
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: float 6s ease-in-out infinite;
+}
+.civic-seal__chip svg { width: 26px; height: 26px; stroke: var(--color-primary); }
+.civic-seal__chip--1 { top: -8px; left: 4%; animation-delay: 0s; }
+.civic-seal__chip--2 { bottom: 8%; left: -14px; animation-delay: 1.4s; }
+.civic-seal__chip--3 { top: 12%; right: -18px; animation-delay: 2.6s; }
+.civic-seal__chip--4 { bottom: -10px; right: 12%; animation-delay: 0.7s; }
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .civic-seal__ring,
+  .civic-seal__ring--inner,
+  .civic-seal__chip { animation: none; }
+}
+
+@media (max-width: 940px) {
+  .hero__inner { grid-template-columns: 1fr; }
+  .hero__scene { order: -1; max-width: 340px; margin-inline: auto; }
+  .hero__stats { justify-content: space-between; }
+}

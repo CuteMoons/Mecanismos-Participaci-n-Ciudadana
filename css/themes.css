@@ -1,0 +1,37 @@
+/* ==========================================================================
+   THEMES.CSS
+   Ajustes finos que dependen del tema activo (más allá de las variables
+   definidas en variables.css). Ver también: js/theme.js
+   ========================================================================== */
+
+[data-theme="dark"] .hero__eyebrow,
+[data-theme="dark"] .filter-chip,
+[data-theme="dark"] .pill,
+[data-theme="dark"] .option-card {
+  box-shadow: none;
+}
+
+[data-theme="dark"] .mech-card,
+[data-theme="dark"] .modal,
+[data-theme="dark"] .result-stat,
+[data-theme="dark"] .manual-score {
+  box-shadow: var(--shadow-md);
+}
+
+[data-theme="dark"] .civic-seal__core {
+  box-shadow: 0 20px 60px -10px hsl(354 70% 30% / 0.5);
+}
+
+[data-theme="dark"] ::selection {
+  background: var(--color-primary);
+  color: #fff;
+}
+::selection {
+  background: var(--color-accent);
+  color: #1a1c22;
+}
+
+/* Transición global al cambiar de tema */
+body, .navbar, .modal, .mech-card, .surface, .option-card, .pill, .filter-chip {
+  transition: background var(--t-slow) var(--ease), border-color var(--t-slow) var(--ease), color var(--t-slow) var(--ease), box-shadow var(--t-slow) var(--ease);
+}

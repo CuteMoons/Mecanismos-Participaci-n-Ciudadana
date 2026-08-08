@@ -1,0 +1,124 @@
+/* ==========================================================================
+   CARDS.CSS
+   ========================================================================== */
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--space-5);
+}
+
+.mech-card {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--t-base) var(--ease), box-shadow var(--t-base) var(--ease), border-color var(--t-base) var(--ease);
+}
+
+.mech-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(140deg, var(--mech-color, var(--color-primary)), transparent 45%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity var(--t-base) var(--ease);
+}
+
+.mech-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-lg);
+  border-color: transparent;
+}
+.mech-card:hover::before { opacity: 1; }
+
+.mech-card__icon {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--mech-color, var(--color-primary)) 14%, transparent);
+  transition: transform var(--t-base) var(--ease);
+}
+.mech-card:hover .mech-card__icon { transform: scale(1.08) rotate(-4deg); }
+.mech-card__icon svg { width: 26px; height: 26px; stroke: var(--mech-color, var(--color-primary)); }
+
+.mech-card__title {
+  font-size: var(--fs-md);
+  margin-bottom: 0;
+}
+
+.mech-card__desc {
+  font-size: var(--fs-sm);
+  margin-bottom: 0;
+  flex-grow: 1;
+}
+
+.mech-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--space-2);
+}
+
+.mech-card__tag {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--mech-color, var(--color-primary));
+}
+
+.mech-card__explore {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--fs-sm);
+  color: var(--text);
+  background: none;
+  border: none;
+  padding: 0;
+}
+.mech-card__explore svg {
+  width: 16px; height: 16px;
+  transition: transform var(--t-fast) var(--ease);
+}
+.mech-card:hover .mech-card__explore svg { transform: translateX(4px); }
+
+/* ---- Tarjetas de configuración (individual / grupos, opciones de quiz) ---- */
+.option-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--space-3);
+}
+
+.option-card {
+  border: 2px solid var(--border);
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  text-align: center;
+  transition: border-color var(--t-fast) var(--ease), transform var(--t-fast) var(--ease), background var(--t-fast) var(--ease);
+}
+.option-card:hover { transform: translateY(-2px); }
+.option-card__icon { font-size: 1.8rem; margin-bottom: var(--space-2); }
+.option-card__label { font-family: var(--font-display); font-weight: 600; font-size: var(--fs-sm); }
+
+.option-card.is-selected {
+  border-color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 8%, var(--surface));
+}

@@ -1,0 +1,88 @@
+/* ==========================================================================
+   TIMER.CSS
+   Temporizador circular — reutiliza el motivo de "anillo cívico" del hero.
+   ========================================================================== */
+
+.timer {
+  position: relative;
+  width: 190px;
+  height: 190px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.timer__svg {
+  position: absolute;
+  inset: 0;
+  transform: rotate(-90deg);
+  width: 100%;
+  height: 100%;
+}
+
+.timer__track {
+  fill: none;
+  stroke: var(--border);
+  stroke-width: 8;
+}
+
+.timer__progress {
+  fill: none;
+  stroke: var(--color-secondary);
+  stroke-width: 8;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1s linear, stroke var(--t-base) var(--ease);
+}
+
+.timer.is-warning .timer__progress { stroke: var(--color-accent); }
+.timer.is-critical .timer__progress {
+  stroke: var(--color-danger);
+  animation: pulseRing 1s ease-in-out infinite;
+}
+
+.timer__label {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--fs-3xl);
+  font-variant-numeric: tabular-nums;
+}
+.timer.is-critical .timer__label { color: var(--color-danger); }
+
+@keyframes pulseRing {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+
+.timer-flash {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--fs-2xl);
+  color: var(--color-danger);
+  animation: flashIn 0.5s var(--ease);
+}
+
+@keyframes flashIn {
+  from { opacity: 0; transform: scale(0.85); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.timer-mute {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  margin-top: var(--space-2);
+}
+.timer-mute svg { width: 16px; height: 16px; stroke: currentColor; }
+
+@media (prefers-reduced-motion: reduce) {
+  .timer.is-critical .timer__progress { animation: none; }
+}
+
+@media (max-width: 700px) {
+  .timer { width: 140px; height: 140px; }
+  .timer__label { font-size: var(--fs-2xl); }
+}

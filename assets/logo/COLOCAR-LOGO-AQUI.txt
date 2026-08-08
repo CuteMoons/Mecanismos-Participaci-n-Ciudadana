@@ -1,0 +1,10 @@
+Coloca aquí el escudo real de la institución con el nombre exacto:
+
+    logo-colegio.png
+
+Mientras ese archivo no exista, el sitio usa automáticamente un
+placeholder con las iniciales "JAA" (ver js/components/navbar.js,
+manejador onerror de la etiqueta <img>). No es necesario tocar código:
+basta con agregar el archivo con ese nombre en esta carpeta.
+
+Formato recomendado: PNG con fondo transparente, cuadrado, mínimo 128x128px.

@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quiz · Participación Ciudadana · I.E. José Antonio Aguilera</title>
+  <meta name="description" content="Actividad interactiva en clase sobre los mecanismos de participación ciudadana." />
+
+  <link rel="stylesheet" href="../css/variables.css" />
+  <link rel="stylesheet" href="../css/main.css" />
+  <link rel="stylesheet" href="../css/navbar.css" />
+  <link rel="stylesheet" href="../css/cards.css" />
+  <link rel="stylesheet" href="../css/sections.css" />
+  <link rel="stylesheet" href="../css/quiz.css" />
+  <link rel="stylesheet" href="../css/modal.css" />
+  <link rel="stylesheet" href="../css/timer.css" />
+  <link rel="stylesheet" href="../css/progress.css" />
+  <link rel="stylesheet" href="../css/responsive.css" />
+  <link rel="stylesheet" href="../css/themes.css" />
+</head>
+<body>
+
+  <div id="navbar-root" data-base="../"></div>
+
+  <main class="quiz-shell">
+    <div class="container">
+
+      <!-- ============ ETAPA 1: CONFIGURACIÓN ============ -->
+      <section class="quiz-stage is-active" id="stage-config" data-stage="config">
+        <div class="section-head" style="margin-bottom: var(--space-6);">
+          <span class="eyebrow">🎮 Quiz</span>
+          <h1 id="config-title">Pon a prueba tus conocimientos</h1>
+          <p id="config-subtitle" class="text-muted">¿Cómo quieres realizar la actividad?</p>
+        </div>
+
+        <div class="config-card">
+
+          <div class="config-group">
+            <p class="config-group__title"><span class="step-badge">1</span> Modalidad</p>
+            <div class="option-grid" id="config-modalidad"></div>
+          </div>
+
+          <div class="config-group">
+            <p class="config-group__title"><span class="step-badge">2</span> Número de preguntas</p>
+            <div class="pill-group" id="config-numero"></div>
+            <div class="config-custom-input" id="config-numero-custom">
+              <label for="numero-personalizado" class="text-muted">Cantidad:</label>
+              <input type="number" id="numero-personalizado" min="1" max="60" value="10" />
+            </div>
+          </div>
+
+          <div class="config-group">
+            <p class="config-group__title"><span class="step-badge">3</span> Dificultad</p>
+            <div class="pill-group" id="config-dificultad"></div>
+          </div>
+
+          <div class="config-group">
+            <p class="config-group__title"><span class="step-badge">4</span> Tiempo por pregunta</p>
+            <div class="pill-group" id="config-tiempo"></div>
+          </div>
+
+          <div class="config-group">
+            <p class="config-group__title"><span class="step-badge">5</span> Opciones</p>
+
+            <div class="toggle-row">
+              <div>
+                <div class="toggle-row__label">Preguntas aleatorias</div>
+                <div class="toggle-row__hint">Cambia el orden y la selección en cada partida.</div>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="toggle-aleatorio" checked />
+                <span class="switch__track"></span>
+              </label>
+            </div>
+
+            <div class="toggle-row">
+              <div>
+                <div class="toggle-row__label">Mostrar puntuación al final</div>
+                <div class="toggle-row__hint">Habilita el registro manual de aciertos y el XP.</div>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="toggle-puntuacion" checked />
+                <span class="switch__track"></span>
+              </label>
+            </div>
+
+            <div class="toggle-row">
+              <div>
+                <div class="toggle-row__label">Sonido del temporizador</div>
+                <div class="toggle-row__hint">Aviso sonoro breve cuando el tiempo termina.</div>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="toggle-sonido" checked />
+                <span class="switch__track"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="config-launch">
+            <button class="btn btn-primary btn-lg" id="btn-iniciar-quiz">🚀 Iniciar Quiz</button>
+            <p class="text-muted" style="margin-top: var(--space-3); font-size: var(--fs-sm);" id="config-hint">
+              Recuerda: los estudiantes responden en su cuaderno o en una hoja.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ ETAPA 2: PREGUNTA ============ -->
+      <section class="quiz-stage question-stage" id="stage-question" data-stage="question">
+        <div class="question-topbar">
+          <div class="question-meta">
+            <span class="mode-badge" id="question-mode-badge">Individual</span>
+            <span id="question-diff-badge" class="question-diff question-diff--facil">Fácil</span>
+          </div>
+          <div class="question-counter">
+            Pregunta <span id="question-current">01</span> <span>/ <span id="question-total">10</span></span>
+          </div>
+        </div>
+
+        <div class="timer" id="timer-wrap">
+          <svg class="timer__svg" viewBox="0 0 190 190">
+            <circle class="timer__track" cx="95" cy="95" r="82"></circle>
+            <circle class="timer__progress" id="timer-ring" cx="95" cy="95" r="82"></circle>
+          </svg>
+          <span class="timer__label" id="timer-label">02:00</span>
+        </div>
+
+        <p class="timer-flash visually-hidden" id="timer-flash">⏰ ¡TIEMPO!</p>
+
+        <div>
+          <span class="question-mech-tag" id="question-mech-tag">Tutela</span>
+          <h2 class="question-text" id="question-text">¿Qué es la acción de tutela?</h2>
+          <p class="question-hint">Escribe tu respuesta en tu cuaderno o en una hoja.</p>
+        </div>
+
+        <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+
+        <div class="question-actions">
+          <button class="btn btn-ghost" id="btn-pausar">⏸ Pausar</button>
+          <button class="timer-mute" id="btn-mute" aria-pressed="false"></button>
+          <button class="btn btn-primary" id="btn-siguiente">Siguiente pregunta →</button>
+        </div>
+      </section>
+
+      <!-- ============ ETAPA 3: RESULTADO ============ -->
+      <section class="quiz-stage result-stage" id="stage-result" data-stage="result">
+        <div class="result-badge">🎉</div>
+        <h2>Actividad completada</h2>
+        <p class="text-muted" id="result-subtitle">10 / 10 preguntas completadas</p>
+
+        <div id="result-score-block" style="width:100%; display:flex; flex-direction:column; align-items:center; gap: var(--space-5);">
+          <div class="manual-score">
+            <p class="manual-score__title">Registra los aciertos de la actividad</p>
+            <p class="text-muted" style="font-size: var(--fs-sm); margin-bottom: var(--space-4);">
+              Como las respuestas se escribieron en papel, ingresa manualmente cuántas fueron correctas.
+            </p>
+            <div class="manual-score__row">
+              <span>Respuestas correctas</span>
+              <div class="stepper">
+                <button type="button" id="score-minus" aria-label="Restar">−</button>
+                <output id="score-value">0</output>
+                <button type="button" id="score-plus" aria-label="Sumar">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="result-stats" id="result-stats">
+            <div class="result-stat"><b id="stat-correctas">0</b><span>Correctas</span></div>
+            <div class="result-stat"><b id="stat-incorrectas">10</b><span>Incorrectas</span></div>
+            <div class="result-stat"><b id="stat-porcentaje">0%</b><span>Porcentaje</span></div>
+          </div>
+
+          <div class="xp-bar-wrap">
+            <div class="xp-bar-label"><span>⭐ XP obtenido</span><span id="xp-text">0 / 1000 XP</span></div>
+            <div class="progress-track"><div class="progress-fill" id="xp-fill"></div></div>
+          </div>
+
+          <p class="text-muted" id="result-message" style="font-family: var(--font-display); font-weight:600; color: var(--text);"></p>
+        </div>
+
+        <div class="question-actions">
+          <a class="btn btn-secondary" href="aprender.html">Volver a Aprender</a>
+          <button class="btn btn-primary" id="btn-nuevo-quiz">🔄 Nuevo Quiz</button>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <div class="footer__brand">
+        <img class="navbar__logo" src="../assets/logo/logo-colegio.png" alt="" onerror="this.style.display='none'" />
+        <div class="footer__brand-text">
+          <b>Institución Educativa José Antonio Aguilera</b>
+          <span>Proyecto educativo — SENA · Mecanismos de Participación Ciudadana</span>
+        </div>
+      </div>
+      <div class="footer__meta">San Pedro, Valle del Cauca</div>
+    </div>
+  </footer>
+
+  <!-- Datos -->
+  <script src="../data/mecanismos/tutela.js"></script>
+  <script src="../data/mecanismos/derecho-peticion.js"></script>
+  <script src="../data/mecanismos/referendo.js"></script>
+  <script src="../data/mecanismos/plebiscito.js"></script>
+  <script src="../data/mecanismos/consulta-popular.js"></script>
+  <script src="../data/mecanismos/cabildo-abierto.js"></script>
+  <script src="../data/mecanismos/iniciativa-popular.js"></script>
+  <script src="../data/mecanismos/revocatoria-mandato.js"></script>
+  <script src="../data/mecanismos/index.js"></script>
+  <script src="../data/preguntas/preguntas-faciles.js"></script>
+  <script src="../data/preguntas/preguntas-medias.js"></script>
+  <script src="../data/preguntas/preguntas-dificiles.js"></script>
+  <script src="../data/preguntas/preguntas.js"></script>
+
+  <!-- Componentes -->
+  <script src="../js/components/icons.js"></script>
+  <script src="../js/components/navbar.js"></script>
+  <script src="../js/components/buttons.js"></script>
+  <script src="../js/components/animations.js"></script>
+
+  <!-- Núcleo -->
+  <script src="../js/theme.js"></script>
+  <script src="../js/navigation.js"></script>
+  <script src="../js/modal.js"></script>
+
+  <!-- Quiz -->
+  <script src="../js/quiz/quiz-config.js"></script>
+  <script src="../js/quiz/quiz-engine.js"></script>
+  <script src="../js/quiz/quiz-timer.js"></script>
+  <script src="../js/quiz/quiz-score.js"></script>
+  <script src="../js/quiz/quiz-ui.js"></script>
+  <script src="../js/quiz/quiz.js"></script>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>

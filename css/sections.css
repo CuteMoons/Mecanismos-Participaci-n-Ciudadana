@@ -1,0 +1,118 @@
+/* ==========================================================================
+   SECTIONS.CSS
+   ========================================================================== */
+
+.page-header {
+  padding-block: var(--space-7) var(--space-6);
+  text-align: center;
+  background: var(--hero-gradient);
+}
+
+.page-header h1 { font-size: clamp(2rem, 4.4vw, 3rem); margin-bottom: var(--space-2); }
+
+.section--alt { background: var(--bg-alt); }
+
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  justify-content: center;
+  margin-bottom: var(--space-6);
+}
+
+.filter-chip {
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--text-muted);
+  transition: all var(--t-fast) var(--ease);
+}
+.filter-chip:hover { color: var(--text); border-color: var(--color-secondary); }
+.filter-chip.is-active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+}
+
+/* ---- CTA banda inferior ---- */
+.cta-band {
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+  color: #fff;
+  padding: var(--space-7);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.cta-band h2 { color: #fff; }
+.cta-band p { color: rgba(255,255,255,0.85); margin-inline: auto; max-width: 46ch; }
+.cta-band .btn-secondary { border-color: rgba(255,255,255,0.5); color: #fff; }
+.cta-band .btn-secondary:hover { background: rgba(255,255,255,0.12); border-color: #fff; }
+
+/* ---- Footer ---- */
+.footer {
+  border-top: 1px solid var(--border);
+  padding-block: var(--space-6);
+  margin-top: var(--space-7);
+}
+.footer__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+.footer__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.footer__brand-text b {
+  display: block;
+  font-family: var(--font-display);
+  font-size: var(--fs-sm);
+}
+.footer__brand-text span {
+  display: block;
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+}
+.footer__meta {
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+  text-align: right;
+}
+
+/* ---- Bloques "cómo funciona" ---- */
+.steps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-4);
+}
+.step {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+}
+.step__num {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--fs-lg);
+  color: var(--color-primary);
+  margin-bottom: var(--space-2);
+}
+.step h3 { font-size: var(--fs-base); margin-bottom: var(--space-1); }
+.step p { font-size: var(--fs-sm); margin-bottom: 0; }
+
+@media (max-width: 900px) {
+  .steps { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 560px) {
+  .steps { grid-template-columns: 1fr; }
+  .footer__inner { flex-direction: column; align-items: flex-start; }
+  .footer__meta { text-align: left; }
+}

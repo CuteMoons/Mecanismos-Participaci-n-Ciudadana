@@ -1,0 +1,100 @@
+/* ==========================================================================
+   VARIABLES.CSS
+   Sistema de diseño centralizado — Participación Ciudadana
+   I.E. José Antonio Aguilera
+
+   Paleta inspirada en el escudo institucional:
+   rojo del marco, azul del cielo, amarillo del sol, verde de las montañas.
+   Todo color y tipografía del proyecto se deriva de este archivo.
+   ========================================================================== */
+
+:root {
+  /* ---- Marca / acentos (fijos en ambos temas) ---- */
+  --color-primary: #C41E2E;        /* rojo escudo */
+  --color-primary-dark: #8E1420;
+  --color-primary-light: #E85D6B;
+  --color-secondary: #1E63B0;      /* azul cielo del escudo */
+  --color-secondary-light: #4E9BE0;
+  --color-accent: #F2B705;         /* amarillo sol */
+  --color-success: #2E9E5B;        /* verde montaña */
+  --color-danger: #D64545;
+
+  /* ---- Tipografía ---- */
+  --font-display: "Space Grotesk", "Segoe UI", sans-serif;
+  --font-body: "Manrope", "Segoe UI", sans-serif;
+
+  --fs-xs: 0.75rem;
+  --fs-sm: 0.875rem;
+  --fs-base: 1rem;
+  --fs-md: 1.125rem;
+  --fs-lg: 1.375rem;
+  --fs-xl: 1.75rem;
+  --fs-2xl: 2.25rem;
+  --fs-3xl: 3rem;
+  --fs-4xl: 4rem;
+  --fs-huge: clamp(2.5rem, 6vw, 5.5rem); /* pregunta en pantalla grande */
+
+  /* ---- Espaciado ---- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4.5rem;
+
+  /* ---- Forma ---- */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --radius-full: 999px;
+
+  /* ---- Capas / layout ---- */
+  --container-max: 1180px;
+  --navbar-height: 76px;
+
+  /* ---- Transiciones ---- */
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --t-fast: 150ms;
+  --t-base: 260ms;
+  --t-slow: 420ms;
+
+  /* ---- Z-index ---- */
+  --z-navbar: 100;
+  --z-modal: 500;
+  --z-toast: 600;
+}
+
+/* ============================= TEMA CLARO ============================= */
+:root,
+[data-theme="light"] {
+  --bg: #F3F5F8;
+  --bg-alt: #EAEDF3;
+  --surface: #FFFFFF;
+  --surface-2: #F7F8FB;
+  --text: #1A1C22;
+  --text-muted: #5B6270;
+  --border: #E1E5EC;
+  --shadow-color: 220 30% 40%;
+  --shadow-sm: 0 1px 2px hsl(var(--shadow-color) / 0.08);
+  --shadow-md: 0 8px 24px hsl(var(--shadow-color) / 0.10);
+  --shadow-lg: 0 20px 48px hsl(var(--shadow-color) / 0.16);
+  --hero-gradient: radial-gradient(120% 120% at 15% 0%, #FFF7DE 0%, #F3F5F8 45%, #F3F5F8 100%);
+}
+
+/* ============================= TEMA OSCURO ============================= */
+[data-theme="dark"] {
+  --bg: #101219;
+  --bg-alt: #171A23;
+  --surface: #1C1F2A;
+  --surface-2: #232734;
+  --text: #F1F2F6;
+  --text-muted: #9AA1B2;
+  --border: #2B2F3D;
+  --shadow-color: 220 60% 4%;
+  --shadow-sm: 0 1px 2px hsl(var(--shadow-color) / 0.5);
+  --shadow-md: 0 10px 28px hsl(var(--shadow-color) / 0.55);
+  --shadow-lg: 0 24px 56px hsl(var(--shadow-color) / 0.6);
+  --hero-gradient: radial-gradient(120% 120% at 15% 0%, #2A2308 0%, #101219 45%, #101219 100%);
+}
