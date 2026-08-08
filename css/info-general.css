@@ -1,0 +1,153 @@
+/* ==========================================================================
+   INFO-GENERAL.CSS
+   Bloques de información general: por qué importan, tabla comparativa,
+   derechos que protegen, datos curiosos y resumen.
+   ========================================================================== */
+
+/* ---- ¿Por qué son importantes? ---- */
+.importance-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-4);
+  max-width: 980px;
+  margin-inline: auto;
+}
+
+.importance-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--text);
+  box-shadow: var(--shadow-sm);
+}
+
+.importance-item__icon {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--color-secondary) 14%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.importance-item__icon svg { width: 20px; height: 20px; stroke: var(--color-secondary); }
+
+/* ---- Tabla comparativa ---- */
+.compare-table-wrap {
+  max-width: 880px;
+  margin-inline: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.compare-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.compare-table thead th {
+  text-align: left;
+  font-family: var(--font-display);
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  background: var(--surface-2);
+  padding: var(--space-3) var(--space-5);
+}
+
+.compare-table tbody td {
+  padding: var(--space-3) var(--space-5);
+  border-top: 1px solid var(--border);
+  font-size: var(--fs-sm);
+  color: var(--text);
+  vertical-align: middle;
+}
+
+.compare-table__mech {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-display);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.compare-table__mech svg { width: 18px; height: 18px; stroke: var(--mech-color, var(--color-primary)); flex-shrink: 0; }
+
+/* ---- Derechos que protegen ---- */
+.rights-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  justify-content: center;
+  max-width: 780px;
+  margin-inline: auto;
+}
+
+.right-chip {
+  padding: 0.55rem 1.1rem;
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--color-accent) 18%, transparent);
+  color: #8a6300;
+  font-weight: 700;
+  font-size: var(--fs-sm);
+}
+[data-theme="dark"] .right-chip { color: var(--color-accent); }
+
+/* ---- Datos curiosos ---- */
+.facts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--space-4);
+  max-width: 980px;
+  margin-inline: auto;
+}
+
+.fact-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-sm);
+}
+.fact-card__mark { font-size: 1.4rem; display: block; margin-bottom: var(--space-2); }
+.fact-card p { margin: 0; font-size: var(--fs-sm); color: var(--text); font-weight: 500; }
+
+/* ---- Bloques de texto simples (qué es, quiénes, resumen) ---- */
+.info-lead {
+  max-width: 780px;
+  margin-inline: auto;
+  text-align: center;
+  font-size: var(--fs-md);
+}
+
+.info-callout {
+  max-width: 780px;
+  margin-inline: auto;
+  background: var(--surface-2);
+  border-left: 3px solid var(--color-primary);
+  border-radius: var(--radius-sm);
+  padding: var(--space-5);
+  font-size: var(--fs-base);
+  color: var(--text);
+}
+
+@media (max-width: 640px) {
+  .compare-table thead { display: none; }
+  .compare-table, .compare-table tbody, .compare-table tr, .compare-table td {
+    display: block;
+    width: 100%;
+  }
+  .compare-table tr { padding: var(--space-3) 0; border-top: 1px solid var(--border); }
+  .compare-table tbody td { border-top: none; padding: var(--space-1) var(--space-5); }
+}

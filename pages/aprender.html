@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="../css/navbar.css" />
   <link rel="stylesheet" href="../css/cards.css" />
   <link rel="stylesheet" href="../css/sections.css" />
+  <link rel="stylesheet" href="../css/info-general.css" />
   <link rel="stylesheet" href="../css/modal.css" />
   <link rel="stylesheet" href="../css/responsive.css" />
   <link rel="stylesheet" href="../css/themes.css" />
@@ -30,10 +31,94 @@
     </div>
   </header>
 
+  <!-- ============ ¿QUÉ SON? ============ -->
   <section class="section">
     <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">¿Qué son?</span>
+        <h2>Herramientas para participar en las decisiones del país</h2>
+      </div>
+      <p class="info-lead" id="info-que-es"></p>
+    </div>
+  </section>
+
+  <!-- ============ ¿POR QUÉ SON IMPORTANTES? ============ -->
+  <section class="section section--alt">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">¿Por qué son importantes?</span>
+        <h2>Así fortalecen la democracia</h2>
+      </div>
+      <ul class="importance-list" id="info-importancia"></ul>
+    </div>
+  </section>
+
+  <!-- ============ TARJETAS DE MECANISMOS ============ -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">Los 8 mecanismos</span>
+        <h2>Explora cada uno en detalle</h2>
+      </div>
       <div class="filter-bar" id="filter-bar"></div>
       <div class="cards-grid" id="mechanisms-grid"></div>
+    </div>
+  </section>
+
+  <!-- ============ TABLA COMPARATIVA ============ -->
+  <section class="section section--alt">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">Diferencias</span>
+        <h2>¿Para qué sirve cada mecanismo?</h2>
+        <p>Una comparación rápida para no confundirlos.</p>
+      </div>
+      <div class="compare-table-wrap">
+        <table class="compare-table">
+          <thead>
+            <tr><th>Mecanismo</th><th>¿Para qué sirve?</th></tr>
+          </thead>
+          <tbody id="info-diferencias-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ DERECHOS QUE PROTEGEN + ¿QUIÉNES? ============ -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">Derechos que protegen</span>
+        <h2>Estos mecanismos defienden, entre otros</h2>
+      </div>
+      <div class="rights-wrap" id="info-derechos"></div>
+
+      <div class="section-head" style="margin-top: var(--space-8);">
+        <span class="eyebrow">¿Quiénes pueden utilizarlos?</span>
+        <h2>Un derecho de toda la ciudadanía</h2>
+      </div>
+      <p class="info-lead" id="info-quienes"></p>
+    </div>
+  </section>
+
+  <!-- ============ DATOS CURIOSOS ============ -->
+  <section class="section section--alt">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">Datos curiosos</span>
+        <h2>Para tener presente</h2>
+      </div>
+      <div class="facts-grid" id="info-datos-curiosos"></div>
+    </div>
+  </section>
+
+  <!-- ============ RESUMEN ============ -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">En resumen</span>
+      </div>
+      <p class="info-callout" id="info-resumen"></p>
     </div>
   </section>
 
@@ -61,6 +146,7 @@
   </footer>
 
   <!-- Datos -->
+  <script src="../data/general/info-general.js"></script>
   <script src="../data/mecanismos/tutela.js"></script>
   <script src="../data/mecanismos/derecho-peticion.js"></script>
   <script src="../data/mecanismos/referendo.js"></script>
@@ -81,6 +167,7 @@
   <script src="../js/components/buttons.js"></script>
   <script src="../js/components/cards.js"></script>
   <script src="../js/components/animations.js"></script>
+  <script src="../js/components/info-general.js"></script>
 
   <!-- Núcleo -->
   <script src="../js/theme.js"></script>

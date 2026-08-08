@@ -16,6 +16,7 @@ const ICONS = {
   users: '<circle cx="9" cy="8" r="3" fill="none" stroke-width="1.8"/><path d="M3 20c0-3 2.7-5 6-5s6 2 6 5" fill="none" stroke-width="1.8" stroke-linecap="round"/><path d="M16 4.2a3 3 0 0 1 0 5.8" fill="none" stroke-width="1.8" stroke-linecap="round"/><path d="M15 15.2c2.6.4 4.5 2.1 4.5 4.8" fill="none" stroke-width="1.8" stroke-linecap="round"/>',
   "edit-3": '<path d="M4 20h4L19 9l-4-4L4 16v4z" fill="none" stroke-width="1.8" stroke-linejoin="round"/><path d="M13 7l4 4" fill="none" stroke-width="1.8"/>',
   "user-x": '<circle cx="9" cy="8" r="3.5" fill="none" stroke-width="1.8"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6" fill="none" stroke-width="1.8" stroke-linecap="round"/><path d="M17 8l4 4M21 8l-4 4" fill="none" stroke-width="1.8" stroke-linecap="round"/>',
+  eye: '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z" fill="none" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" fill="none" stroke-width="1.8"/>',
   moon: '<path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z" fill="none" stroke-width="1.8" stroke-linejoin="round"/>',
   sun: '<circle cx="12" cy="12" r="4" fill="none" stroke-width="1.8"/><path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8l1.8-1.8M18 6l1.8-1.8" stroke-width="1.8" stroke-linecap="round"/>',
   arrow: '<path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>',

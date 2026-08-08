@@ -5,6 +5,10 @@
  * de negocio: solo conecta datos + componentes ya definidos.
  */
 
+(function initInfoGeneral() {
+  if (typeof renderInfoGeneral === "function") renderInfoGeneral();
+})();
+
 (function initHomePreview() {
   const grid = document.getElementById("mechanisms-preview");
   if (!grid) return;
