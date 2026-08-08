@@ -80,7 +80,7 @@
     const config = QuizConfig.get();
     QuizUI.showStage("result");
     QuizUI.renderResult({ total: preguntasPartida.length }, config);
-    QuizUI.renderAnswerKey(preguntasPartida);
+    QuizUI.renderAnswerKey(preguntasPartida, config);
 
     const answerList = document.getElementById("answer-key-list");
     const toggleBtn = document.getElementById("btn-toggle-answers");

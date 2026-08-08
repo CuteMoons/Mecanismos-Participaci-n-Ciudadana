@@ -41,7 +41,12 @@
           </div>
 
           <div class="config-group">
-            <p class="config-group__title"><span class="step-badge">2</span> Número de preguntas</p>
+            <p class="config-group__title"><span class="step-badge">2</span> Tipo de pregunta</p>
+            <div class="pill-group" id="config-tipo"></div>
+          </div>
+
+          <div class="config-group">
+            <p class="config-group__title"><span class="step-badge">3</span> Número de preguntas</p>
             <div class="pill-group" id="config-numero"></div>
             <div class="config-custom-input" id="config-numero-custom">
               <label for="numero-personalizado" class="text-muted">Cantidad:</label>
@@ -49,18 +54,18 @@
             </div>
           </div>
 
-          <div class="config-group">
-            <p class="config-group__title"><span class="step-badge">3</span> Dificultad</p>
+          <div class="config-group" id="config-dificultad-group">
+            <p class="config-group__title"><span class="step-badge">4</span> Dificultad</p>
             <div class="pill-group" id="config-dificultad"></div>
           </div>
 
           <div class="config-group">
-            <p class="config-group__title"><span class="step-badge">4</span> Tiempo por pregunta</p>
+            <p class="config-group__title"><span class="step-badge">5</span> Tiempo por pregunta</p>
             <div class="pill-group" id="config-tiempo"></div>
           </div>
 
           <div class="config-group">
-            <p class="config-group__title"><span class="step-badge">5</span> Opciones</p>
+            <p class="config-group__title"><span class="step-badge">6</span> Opciones</p>
 
             <div class="toggle-row">
               <div>
@@ -130,7 +135,7 @@
         <div>
           <span class="question-mech-tag" id="question-mech-tag">Tutela</span>
           <h2 class="question-text" id="question-text">¿Qué es la acción de tutela?</h2>
-          <p class="question-hint">Escribe el número de la pregunta y la letra de tu respuesta en tu cuaderno o en una hoja.</p>
+          <p class="question-hint" id="question-hint">Escribe el número de la pregunta y la letra de tu respuesta en tu cuaderno o en una hoja.</p>
         </div>
 
         <div class="options-grid" id="question-options"></div>
@@ -221,6 +226,9 @@
   <script src="../data/preguntas/preguntas-medias.js"></script>
   <script src="../data/preguntas/preguntas-dificiles.js"></script>
   <script src="../data/preguntas/preguntas.js"></script>
+  <script src="../data/preguntas-abiertas/banco-base.js"></script>
+  <script src="../data/preguntas-abiertas/banco-adicional.js"></script>
+  <script src="../data/preguntas-abiertas/index.js"></script>
 
   <!-- Componentes -->
   <script src="../js/components/icons.js"></script>

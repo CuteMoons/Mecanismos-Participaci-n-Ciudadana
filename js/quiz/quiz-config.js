@@ -7,8 +7,9 @@
 const QuizConfig = (() => {
   const DEFAULTS = {
     modalidad: "individual",  // "individual" | "grupos"
+    tipoPregunta: "multiple",  // "multiple" (opción múltiple) | "abierta" (respuesta libre)
     numPreguntas: 10,          // 5 | 10 | 15 | 20 | personalizado
-    dificultad: "mixto",       // "facil" | "media" | "dificil" | "mixto"
+    dificultad: "mixto",       // "facil" | "media" | "dificil" | "mixto" (solo aplica a "multiple")
     tiempoSegundos: 120,       // por pregunta
     aleatorio: true,
     mostrarPuntuacion: true,

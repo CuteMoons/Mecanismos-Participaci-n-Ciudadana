@@ -32,6 +32,14 @@ const QuizEngine = (() => {
    * @returns {Array} preguntas seleccionadas, sin duplicados
    */
   function construirPartida(config) {
+    if (config.tipoPregunta === "abierta") {
+      return construirPartidaAbierta(config);
+    }
+    return construirPartidaMultiple(config);
+  }
+
+  /** Selección para el banco de opción múltiple (con dificultad). */
+  function construirPartidaMultiple(config) {
     let universo = config.mecanismoFiltro
       ? obtenerPreguntasPorMecanismo(config.mecanismoFiltro)
       : BANCO_PREGUNTAS;
@@ -52,17 +60,29 @@ const QuizEngine = (() => {
       seleccionadas = pool.slice(0, config.numPreguntas);
     }
 
-    // Elimina posibles duplicados por id (seguridad adicional).
+    return finalizarSeleccion(seleccionadas, config);
+  }
+
+  /** Selección para el banco de preguntas abiertas (sin dificultad ni opciones). */
+  function construirPartidaAbierta(config) {
+    let universo = config.mecanismoFiltro
+      ? obtenerPreguntasAbiertasPorMecanismo(config.mecanismoFiltro)
+      : BANCO_PREGUNTAS_ABIERTAS;
+
+    const seleccionadas = shuffle(universo).slice(0, config.numPreguntas);
+    return finalizarSeleccion(seleccionadas, config);
+  }
+
+  /** Quita duplicados por id y aplica el orden aleatorio final si aplica. */
+  function finalizarSeleccion(seleccionadas, config) {
     const vistos = new Set();
-    seleccionadas = seleccionadas.filter((p) => {
+    let resultado = seleccionadas.filter((p) => {
       if (vistos.has(p.id)) return false;
       vistos.add(p.id);
       return true;
     });
-
-    if (config.aleatorio) seleccionadas = shuffle(seleccionadas);
-
-    return seleccionadas;
+    if (config.aleatorio) resultado = shuffle(resultado);
+    return resultado;
   }
 
   return { construirPartida, shuffle };

@@ -6,6 +6,10 @@
  */
 
 const QuizUI = (() => {
+  const TIPO_OPCIONES = [
+    { label: "🔤 Opción múltiple", value: "multiple" },
+    { label: "✍️ Preguntas abiertas", value: "abierta" }
+  ];
   const NUM_OPCIONES = [5, 10, 15, 20];
   const TIEMPO_OPCIONES = [
     { label: "30 s", value: 30 },
@@ -65,6 +69,17 @@ const QuizUI = (() => {
       modalidadEl.appendChild(div);
     });
 
+    // Tipo de pregunta (múltiple vs abierta)
+    const dificultadGroup = document.getElementById("config-dificultad-group");
+    function actualizarVisibilidadDificultad(tipo) {
+      dificultadGroup.style.display = tipo === "abierta" ? "none" : "block";
+    }
+    actualizarVisibilidadDificultad(config.tipoPregunta);
+    pillGroup(document.getElementById("config-tipo"), TIPO_OPCIONES, config.tipoPregunta, (value) => {
+      QuizConfig.set({ tipoPregunta: value });
+      actualizarVisibilidadDificultad(value);
+    });
+
     // Número de preguntas (+ personalizado)
     const numeroEl = document.getElementById("config-numero");
     const customWrap = document.getElementById("config-numero-custom");
@@ -116,20 +131,35 @@ const QuizUI = (() => {
   }
 
   function renderQuestion({ pregunta, index, total, config }) {
-    const mecanismo = obtenerMecanismoPorId(pregunta.mecanismo);
+    const mecanismo = pregunta.mecanismo ? obtenerMecanismoPorId(pregunta.mecanismo) : null;
 
     document.getElementById("question-mode-badge").textContent =
       config.modalidad === "individual" ? "👤 Individual" : "👥 Por grupos";
 
-    const diffLabelMap = { facil: "Fácil", media: "Media", dificil: "Difícil" };
     const diffBadge = document.getElementById("question-diff-badge");
-    diffBadge.textContent = diffLabelMap[pregunta.dificultad] || pregunta.dificultad;
-    diffBadge.className = `question-diff question-diff--${pregunta.dificultad}`;
+    if (config.tipoPregunta === "abierta") {
+      diffBadge.textContent = "Abierta";
+      diffBadge.className = "question-diff question-diff--media";
+    } else {
+      const diffLabelMap = { facil: "Fácil", media: "Media", dificil: "Difícil" };
+      diffBadge.textContent = diffLabelMap[pregunta.dificultad] || pregunta.dificultad;
+      diffBadge.className = `question-diff question-diff--${pregunta.dificultad}`;
+    }
 
     document.getElementById("question-current").textContent = String(index + 1).padStart(2, "0");
     document.getElementById("question-total").textContent = total;
-    document.getElementById("question-mech-tag").textContent = mecanismo ? mecanismo.nombre : "";
+
+    const mechTag = document.getElementById("question-mech-tag");
+    mechTag.textContent = mecanismo ? mecanismo.nombre : "General";
+    mechTag.style.color = mecanismo ? mecanismo.color : "";
+
     document.getElementById("question-text").textContent = pregunta.pregunta;
+
+    const hint = document.getElementById("question-hint");
+    hint.textContent =
+      config.tipoPregunta === "abierta"
+        ? "Escribe tu respuesta con tus propias palabras en el cuaderno o en una hoja."
+        : "Escribe el número de la pregunta y la letra de tu respuesta en tu cuaderno o en una hoja.";
 
     document.getElementById("progress-fill").style.width = `${((index + 1) / total) * 100}%`;
     document.getElementById("timer-flash").classList.add("visually-hidden");
@@ -159,9 +189,17 @@ const QuizUI = (() => {
     scoreBlock.style.display = config.mostrarPuntuacion ? "flex" : "none";
   }
 
-  function renderAnswerKey(preguntas) {
+  function renderAnswerKey(preguntas, config) {
+    const wrap = document.getElementById("answer-key-wrap");
     const list = document.getElementById("answer-key-list");
-    if (!list) return;
+    if (!wrap || !list) return;
+
+    if (config.tipoPregunta === "abierta") {
+      wrap.style.display = "none";
+      return;
+    }
+    wrap.style.display = "flex";
+
     list.innerHTML = preguntas
       .map(
         (p, i) =>

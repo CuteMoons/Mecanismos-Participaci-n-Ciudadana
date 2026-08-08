@@ -42,7 +42,8 @@ participacion-ciudadana/
 │   └── components/             → navbar, cards, buttons, animations, icons
 ├── data/
 │   ├── mecanismos/             → Un archivo por mecanismo + index.js agregador
-│   └── preguntas/               → Preguntas separadas por dificultad + agregador
+│   ├── preguntas/               → Banco de opción múltiple (por dificultad) + agregador
+│   └── preguntas-abiertas/      → Banco de preguntas abiertas (respuesta libre) + agregador
 ├── assets/
 │   ├── logo/                    → Aquí va logo-colegio.png (ver más abajo)
 │   ├── images/
@@ -115,38 +116,74 @@ no hay que tocar ningún componente.
 
 ## 6. Banco de preguntas
 
-El proyecto incluye el **banco oficial de 120 preguntas de opción
-múltiple** (15 por mecanismo: 5 fáciles, 5 medias, 5 difíciles), con
-4 opciones (A–D) y la respuesta correcta marcada. Los estudiantes
-escriben el número de la pregunta y la letra elegida en su cuaderno u
-hoja; la profesora puede consultar la **hoja de respuestas** que
-aparece (colapsada) en la pantalla final del quiz para calificar
-rápido.
+El proyecto incluye dos bancos de preguntas, seleccionables desde el
+paso 2 de la configuración del quiz ("Tipo de pregunta"):
+
+### a) Opción múltiple (120 preguntas)
+
+15 por mecanismo (5 fáciles, 5 medias, 5 difíciles), con 4 opciones
+(A–D) y la respuesta correcta marcada. Los estudiantes escriben el
+número de la pregunta y la letra elegida; la profesora puede consultar
+la **hoja de respuestas** (colapsada, botón "📋 Ver hoja de
+respuestas") en la pantalla final para calificar rápido.
+
+### b) Preguntas abiertas (409 preguntas)
+
+Preguntas de respuesta libre, sin opciones, para que los estudiantes
+respondan con sus propias palabras en el cuaderno o en una hoja. No
+tienen una única respuesta correcta (muchas son de reflexión, opinión
+o comparación), así que en este modo **no aparece** la hoja de
+respuestas automática — la profesora evalúa con su propio criterio y
+sigue usando el contador +/- para registrar cuántas respuestas
+considera satisfactorias.
+
+Cuando el texto de una pregunta abierta menciona claramente un
+mecanismo específico, queda etiquetada para poder practicarse de forma
+individual (botón "Practicar este mecanismo"); las preguntas
+comparativas o generales no tienen mecanismo asignado y solo aparecen
+en el pool general ("todos los mecanismos").
 
 Para agregar más preguntas:
 
-1. Abre el archivo de la dificultad correspondiente:
-   ```
-   data/preguntas/preguntas-faciles.js
-   data/preguntas/preguntas-medias.js
-   data/preguntas/preguntas-dificiles.js
-   ```
-2. Agrega un objeto nuevo siguiendo esta estructura:
-   ```javascript
-   {
-     id: "tutela-016",              // único en todo el proyecto
-     mecanismo: "tutela",           // debe coincidir con el id del mecanismo
-     dificultad: "facil",           // "facil" | "media" | "dificil"
-     pregunta: "¿...?",
-     opciones: { A: "...", B: "...", C: "...", D: "..." },
-     respuestaCorrecta: "B"
-   }
-   ```
-3. No necesitas tocar `js/quiz/quiz-engine.js`: el motor lee
-   automáticamente todo lo que exista en `data/preguntas/`.
+**Opción múltiple** — edita:
+```
+data/preguntas/preguntas-faciles.js
+data/preguntas/preguntas-medias.js
+data/preguntas/preguntas-dificiles.js
+```
+con esta estructura:
+```javascript
+{
+  id: "tutela-016",              // único en todo el proyecto
+  mecanismo: "tutela",           // debe coincidir con el id del mecanismo
+  dificultad: "facil",           // "facil" | "media" | "dificil"
+  pregunta: "¿...?",
+  opciones: { A: "...", B: "...", C: "...", D: "..." },
+  respuestaCorrecta: "B"
+}
+```
 
-**Importante:** el `id` de cada pregunta debe ser único; el sistema no
-depende de la posición en el arreglo.
+**Preguntas abiertas** — edita:
+```
+data/preguntas-abiertas/banco-base.js
+data/preguntas-abiertas/banco-adicional.js
+```
+con esta estructura:
+```javascript
+{
+  id: "abierta-410",             // único en todo el proyecto
+  mecanismo: "tutela",           // o null si es general/comparativa
+  tipo: "abierta",
+  pregunta: "¿...?"
+}
+```
+
+No necesitas tocar `js/quiz/quiz-engine.js` en ningún caso: el motor
+lee automáticamente todo lo que exista en `data/preguntas/` y
+`data/preguntas-abiertas/`.
+
+**Importante:** el `id` de cada pregunta debe ser único dentro de su
+propio banco; el sistema no depende de la posición en el arreglo.
 
 ---
 
