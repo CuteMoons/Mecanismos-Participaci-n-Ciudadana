@@ -8,6 +8,9 @@ const MECANISMO_REVOCATORIA_MANDATO = {
   icono: "user-x",
   color: "#C41E2E",
   descripcionCorta: "Permite a los ciudadanos dar por terminado el mandato de un gobernador o alcalde.",
+  resumenCarta:
+    "Mecanismo mediante el cual los ciudadanos pueden promover, cumpliendo los requisitos legales, la terminación anticipada del mandato de determinados funcionarios elegidos popularmente.",
+  ideaClave: "Control político",
   queEs:
     "Es el mecanismo mediante el cual los ciudadanos dan por terminado el mandato conferido a un gobernador o a un alcalde, antes de que finalice el período para el que fue elegido.",
   paraQueSirve:

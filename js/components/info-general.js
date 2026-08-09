@@ -10,21 +10,35 @@ function renderInfoGeneral() {
   const queEsEl = document.getElementById("info-que-es");
   if (queEsEl) queEsEl.textContent = INFO_GENERAL.queEs;
 
-  const importanciaEl = document.getElementById("info-importancia");
-  if (importanciaEl) {
-    importanciaEl.innerHTML = "";
-    INFO_GENERAL.importancia.forEach((item) => {
-      const li = document.createElement("li");
-      li.className = "importance-item reveal";
-      li.innerHTML = `
-        <span class="importance-item__icon">
-          <svg viewBox="0 0 24 24" fill="none">${svgIcon(item.icono)}</svg>
-        </span>
-        <span>${item.texto}</span>
-      `;
-      importanciaEl.appendChild(li);
+  const quickTagsEl = document.getElementById("info-quick-tags");
+  if (quickTagsEl) {
+    quickTagsEl.innerHTML = "";
+    INFO_GENERAL.importanciaRapida.forEach((item) => {
+      const tag = document.createElement("span");
+      tag.className = "quick-tag";
+      tag.innerHTML = `<span class="quick-tag__emoji">${item.emoji}</span> ${item.texto}`;
+      quickTagsEl.appendChild(tag);
     });
-    if (window.RCAnimations) RCAnimations.observe(importanciaEl.querySelectorAll(".reveal"));
+  }
+
+  // ---- Línea de tiempo del marco legal ----
+  const timelineEl = document.getElementById("info-marco-legal");
+  if (timelineEl) {
+    timelineEl.innerHTML = "";
+    INFO_GENERAL.marcoLegal.forEach((hito) => {
+      const item = document.createElement("div");
+      item.className = "timeline-item reveal";
+      item.innerHTML = `
+        <span class="timeline-item__year">${hito.anio}</span>
+        <span class="timeline-item__dot" aria-hidden="true"></span>
+        <div class="timeline-item__body">
+          <h3 class="timeline-item__title">${hito.titulo}</h3>
+          <p class="timeline-item__text">${hito.texto}</p>
+        </div>
+      `;
+      timelineEl.appendChild(item);
+    });
+    if (window.RCAnimations) RCAnimations.observe(timelineEl.querySelectorAll(".reveal"));
   }
 
   // ---- Tabla comparativa "¿Para qué sirve cada mecanismo?" ----
@@ -43,6 +57,7 @@ function renderInfoGeneral() {
           </span>
         </td>
         <td>${fila.paraQueSirve}</td>
+        <td>${fila.votacion}</td>
       `;
       tablaBody.appendChild(tr);
     });
@@ -63,6 +78,84 @@ function renderInfoGeneral() {
   // ---- ¿Quiénes pueden utilizarlos? ----
   const quienesEl = document.getElementById("info-quienes");
   if (quienesEl) quienesEl.textContent = INFO_GENERAL.quienesPuedenUsarlos;
+
+  // ---- Nota importante (precisión jurídica) ----
+  const notaEl = document.getElementById("info-nota-importante");
+  if (notaEl) notaEl.textContent = INFO_GENERAL.notaImportante;
+
+  // ---- Casos prácticos: "¿qué mecanismo usarías?" ----
+  const casosEl = document.getElementById("info-casos-practicos");
+  if (casosEl) {
+    casosEl.innerHTML = "";
+    INFO_GENERAL.casosPracticos.forEach((caso) => {
+      const mecanismo = obtenerMecanismoPorId(caso.mecanismo);
+      if (!mecanismo) return;
+      const item = document.createElement("button");
+      item.type = "button";
+      item.className = "case-card reveal";
+      item.style.setProperty("--mech-color", mecanismo.color);
+      item.innerHTML = `
+        <p class="case-card__situation">${caso.situacion}</p>
+        <span class="case-card__answer">
+          <svg viewBox="0 0 24 24" fill="none">${svgIcon(mecanismo.icono)}</svg>
+          ${mecanismo.nombre}
+        </span>
+      `;
+      item.addEventListener("click", () => RCModal.open(mecanismo));
+      casosEl.appendChild(item);
+    });
+    if (window.RCAnimations) RCAnimations.observe(casosEl.querySelectorAll(".reveal"));
+  }
+
+  // ---- Errores frecuentes ----
+  const erroresEl = document.getElementById("info-errores");
+  if (erroresEl) {
+    erroresEl.innerHTML = "";
+    INFO_GENERAL.erroresFrecuentes.forEach((error) => {
+      const li = document.createElement("li");
+      li.className = "check-list__item check-list__item--error";
+      li.textContent = error;
+      erroresEl.appendChild(li);
+    });
+  }
+
+  // ---- Participación responsable ----
+  const responsableEl = document.getElementById("info-responsable");
+  if (responsableEl) {
+    responsableEl.innerHTML = "";
+    INFO_GENERAL.participacionResponsable.forEach((item) => {
+      const li = document.createElement("li");
+      li.className = "check-list__item check-list__item--ok";
+      li.textContent = item;
+      responsableEl.appendChild(li);
+    });
+  }
+
+  // ---- Control social ----
+  const controlEl = document.getElementById("info-control-social");
+  if (controlEl) {
+    controlEl.innerHTML = "";
+    INFO_GENERAL.controlSocial.forEach((item) => {
+      const card = document.createElement("div");
+      card.className = "control-card";
+      card.innerHTML = `<h3>${item.titulo}</h3><p>${item.texto}</p>`;
+      controlEl.appendChild(card);
+    });
+  }
+
+  // ---- Glosario ----
+  const glosarioEl = document.getElementById("info-glosario");
+  if (glosarioEl) {
+    glosarioEl.innerHTML = "";
+    INFO_GENERAL.glosario.forEach((entrada) => {
+      const dt = document.createElement("dt");
+      dt.textContent = entrada.termino;
+      const dd = document.createElement("dd");
+      dd.textContent = entrada.definicion;
+      glosarioEl.appendChild(dt);
+      glosarioEl.appendChild(dd);
+    });
+  }
 
   // ---- Datos curiosos ----
   const curiososEl = document.getElementById("info-datos-curiosos");

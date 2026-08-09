@@ -32,7 +32,7 @@
   --fs-2xl: 2.25rem;
   --fs-3xl: 3rem;
   --fs-4xl: 4rem;
-  --fs-huge: clamp(2.5rem, 6vw, 5.5rem); /* pregunta en pantalla grande */
+  --fs-huge: clamp(1.9rem, 3.6vw, 3.1rem); /* pregunta en pantalla grande */
 
   /* ---- Espaciado ---- */
   --space-1: 0.25rem;

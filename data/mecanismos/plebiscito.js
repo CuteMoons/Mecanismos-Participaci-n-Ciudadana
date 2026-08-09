@@ -8,6 +8,9 @@ const MECANISMO_PLEBISCITO = {
   icono: "flag",
   color: "#F2B705",
   descripcionCorta: "El Presidente consulta al pueblo sobre una decisión trascendental de política nacional.",
+  resumenCarta:
+    "Mecanismo mediante el cual el pueblo se pronuncia sobre una decisión política del Gobierno, conforme a la Constitución y la ley.",
+  ideaClave: "Decisión política",
   queEs:
     "Es el mecanismo mediante el cual el Presidente de la República convoca al pueblo para que respalde o rechace una decisión de trascendencia nacional que le corresponde adoptar al Ejecutivo.",
   paraQueSirve:

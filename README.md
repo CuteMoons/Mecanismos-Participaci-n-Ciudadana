@@ -93,7 +93,76 @@ sitio (navbar, botones, tarjetas, quiz, modo claro y oscuro).
 
 ---
 
-## 5. Cómo agregar un nuevo mecanismo
+## 5. Sistema de tarjetas interactivas (flip 3D)
+
+Los 8 mecanismos se muestran como **tarjetas que giran en 3D** al hacer
+clic (efecto "card flip"): la portada muestra el ícono, el nombre y la
+idea clave; al girar aparece un resumen corto, la idea clave destacada
+y un botón **"Ver información completa"** que abre el mismo modal
+detallado de siempre (no se eliminó nada, solo se agregó una
+introducción visual antes de la información completa).
+
+- **Dónde viven los datos:** los campos `resumenCarta` e `ideaClave`
+  de cada tarjeta están en los mismos archivos de siempre
+  (`data/mecanismos/*.js`), junto a `nombre`, `icono` y `color`. No
+  hay un archivo de datos separado para las tarjetas.
+- **Cómo funciona el giro:** `js/components/cards.js` construye cada
+  tarjeta desde los datos y usa CSS 3D (`perspective`,
+  `transform-style: preserve-3d`, `backface-visibility: hidden`) para
+  el efecto, definido en `css/cards.css`.
+- **Accesibilidad:** cada tarjeta es un `div[role="button"]` enfocable
+  por teclado (Enter/Espacio la gira); si el usuario tiene activada la
+  reducción de movimiento (`prefers-reduced-motion`), el giro 3D se
+  reemplaza automáticamente por un cambio de opacidad más simple.
+- **Cómo cambiar el texto de una tarjeta:** edita `resumenCarta` o
+  `ideaClave` en el archivo del mecanismo correspondiente dentro de
+  `data/mecanismos/`.
+- **Cómo cambiar la duración o el estilo de la animación:** en
+  `css/cards.css`, la propiedad `transition` de `.flip-card__inner`
+  (por defecto `0.6s`, dentro del rango 0.5–0.7s recomendado).
+- **Se conserva la identidad visual:** las tarjetas reutilizan
+  `--mech-color` (definido por mecanismo) solo como acento sutil sobre
+  el fondo de tarjeta existente (`--surface`) — no se introdujeron
+  colores nuevos ni se rompió la paleta roja/dorada/azul del sitio.
+
+## 6. Información general (marco legal, comparativas, glosario)
+
+`pages/aprender.html` incluye una guía ampliada sobre participación
+política y ciudadana, además de la información de cada mecanismo
+individual (dentro del modal):
+
+- Qué son y por qué son importantes.
+- **Línea de tiempo del marco legal**: Constitución de 1991, Ley 134 de
+  1994, Ley 1755 de 2015 y Ley 1757 de 2015.
+- **Nota importante**: aclara que la acción de tutela y el derecho de
+  petición NO son dos de los seis mecanismos regulados directamente por
+  la Ley 1757 de 2015 (esos seis son: iniciativa popular, referendo,
+  consulta popular, revocatoria del mandato, plebiscito y cabildo
+  abierto), aunque se estudian junto a ellos por su relación con la
+  participación ciudadana.
+- Tabla comparativa "¿para qué sirve cada mecanismo?", incluyendo si
+  implica o no una votación popular.
+- **Casos prácticos** interactivos: "¿qué mecanismo usarías?" — cada
+  tarjeta abre el modal del mecanismo relacionado al hacer clic.
+- Derechos que protegen y quiénes pueden usarlos.
+- **Buenas prácticas vs. errores frecuentes** de participación.
+- Participación y control social (rendición de cuentas, veedurías).
+- Datos curiosos.
+- **Glosario** de términos básicos.
+- Resumen final.
+
+Todo ese contenido vive en un único archivo, separado de la interfaz:
+
+```
+data/general/info-general.js
+```
+
+Para editar cualquiera de esos textos (agregar un dato curioso, un
+término al glosario, un caso práctico, etc.) basta con modificar ese
+archivo. El componente `js/components/info-general.js` se encarga de
+pintarlo automáticamente en la página — no hay que tocar HTML.
+
+## 7. Cómo agregar un nuevo mecanismo
 
 1. Copia un archivo existente como plantilla, por ejemplo:
    ```
@@ -114,7 +183,7 @@ no hay que tocar ningún componente.
 
 ---
 
-## 6. Banco de preguntas
+## 8. Banco de preguntas
 
 El proyecto incluye dos bancos de preguntas, seleccionables desde el
 paso 2 de la configuración del quiz ("Tipo de pregunta"):
@@ -187,7 +256,7 @@ propio banco; el sistema no depende de la posición en el arreglo.
 
 ---
 
-## 7. Cómo cambiar la configuración del quiz
+## 9. Cómo cambiar la configuración del quiz
 
 - **Tiempo predeterminado:** en `js/quiz/quiz-config.js`, cambia
   `tiempoSegundos: 120` (está en segundos).
@@ -200,7 +269,7 @@ propio banco; el sistema no depende de la posición en el arreglo.
 
 ---
 
-## 8. Cómo funciona la actividad en clase
+## 10. Cómo funciona la actividad en clase
 
 1. La profesora abre `index.html` (o entra directo a **Quiz**).
 2. Elige modalidad (individual o grupos), número de preguntas,
@@ -223,7 +292,7 @@ También se puede practicar un solo mecanismo: desde su tarjeta en
 
 ---
 
-## 9. Modo claro / oscuro
+## 11. Modo claro / oscuro
 
 El botón del navbar cambia el tema y lo guarda en `localStorage`, así
 que la preferencia se mantiene si se vuelve a abrir la página. Ningún
@@ -231,7 +300,7 @@ dato personal se guarda: solo la preferencia de tema.
 
 ---
 
-## 10. Privacidad
+## 12. Privacidad
 
 El sitio no recopila nombres, correos ni ningún dato personal de los
 estudiantes. No usa analítica externa, no crea cuentas y no depende de
@@ -242,7 +311,7 @@ por fuentes del sistema quitando el `@import` de ese archivo).
 
 ---
 
-## 11. Desplegar en un hosting estático gratuito
+## 13. Desplegar en un hosting estático gratuito
 
 Al ser un sitio 100% estático, puede subirse tal cual a:
 
@@ -255,7 +324,7 @@ No requiere build, `npm install` ni configuración adicional.
 
 ---
 
-## 12. Créditos
+## 14. Créditos
 
 Proyecto educativo desarrollado para la **Institución Educativa José
 Antonio Aguilera**, en el marco de un proyecto de formación del SENA

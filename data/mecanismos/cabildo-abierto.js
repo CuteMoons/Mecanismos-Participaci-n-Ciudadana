@@ -8,6 +8,9 @@ const MECANISMO_CABILDO_ABIERTO = {
   icono: "users",
   color: "#1E63B0",
   descripcionCorta: "Reunión pública de los concejos o juntas donde la comunidad participa directamente.",
+  resumenCarta:
+    "Espacio público de participación en el que los ciudadanos pueden intervenir para discutir asuntos de interés comunitario ante las corporaciones correspondientes.",
+  ideaClave: "Debate comunitario",
   queEs:
     "Es la reunión pública de los concejos distritales, municipales o de las juntas administradoras locales, en la cual los habitantes pueden participar directamente para discutir asuntos de interés para la comunidad.",
   paraQueSirve:

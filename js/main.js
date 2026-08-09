@@ -12,7 +12,7 @@
 (function initHomePreview() {
   const grid = document.getElementById("mechanisms-preview");
   if (!grid) return;
-  renderTarjetasMecanismos("#mechanisms-preview", MECANISMOS.slice(0, 4));
+  renderTarjetasMecanismos("#mechanisms-preview", MECANISMOS);
 })();
 
 (function initAprenderPage() {

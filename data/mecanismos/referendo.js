@@ -8,6 +8,9 @@ const MECANISMO_REFERENDO = {
   icono: "check-square",
   color: "#2E9E5B",
   descripcionCorta: "Convoca al pueblo para que apruebe o rechace un proyecto de norma o una norma vigente.",
+  resumenCarta:
+    "Mecanismo mediante el cual el pueblo puede aprobar o rechazar propuestas normativas, o decidir sobre la derogación de una norma, según la modalidad.",
+  ideaClave: "Decidir sobre normas",
   queEs:
     "Es la convocatoria que se hace al pueblo para que apruebe o rechace un proyecto de norma jurídica (referendo aprobatorio) o derogue una norma ya vigente (referendo derogatorio), total o parcialmente.",
   paraQueSirve:

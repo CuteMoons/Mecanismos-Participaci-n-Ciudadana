@@ -8,6 +8,9 @@ const MECANISMO_CONSULTA_POPULAR = {
   icono: "message-circle",
   color: "#8E1420",
   descripcionCorta: "El pueblo responde una pregunta de carácter general sobre un asunto de importancia.",
+  resumenCarta:
+    "Mecanismo mediante el cual una pregunta sobre un asunto de trascendencia se somete a consideración del pueblo, según el ámbito y procedimiento correspondiente.",
+  ideaClave: "Opinión ciudadana",
   queEs:
     "Es la pregunta de carácter general que se somete a consideración del pueblo, en el ámbito nacional, departamental, municipal, distrital o local, para que se pronuncie formalmente al respecto.",
   paraQueSirve:

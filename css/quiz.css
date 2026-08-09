@@ -181,23 +181,32 @@
 .question-diff--dificil { background: color-mix(in srgb, var(--color-danger) 16%, transparent); color: var(--color-danger); }
 
 .question-mech-tag {
-  display: inline-block;
-  font-size: var(--fs-sm);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-display);
+  font-size: var(--fs-2xl);
   font-weight: 700;
-  color: var(--color-secondary);
-  margin-bottom: var(--space-2);
+  color: var(--mech-color, var(--color-secondary));
+  margin-bottom: var(--space-3);
+}
+.question-mech-tag svg {
+  width: 28px;
+  height: 28px;
+  stroke: var(--mech-color, var(--color-secondary));
+  flex-shrink: 0;
 }
 
 .question-text {
   font-family: var(--font-display);
   font-size: var(--fs-huge);
   font-weight: 700;
-  max-width: 1000px;
-  line-height: 1.15;
+  max-width: 900px;
+  line-height: 1.2;
 }
 
 .question-hint {
-  font-size: var(--fs-md);
+  font-size: var(--fs-sm);
   color: var(--text-muted);
 }
 
@@ -210,10 +219,10 @@
 /* ---- Opciones de respuesta (A-D), solo lectura para proyección ---- */
 .options-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(240px, 1fr));
+  grid-template-columns: repeat(2, minmax(220px, 1fr));
   gap: var(--space-3);
   width: 100%;
-  max-width: 880px;
+  max-width: 720px;
 }
 
 .option-item {
@@ -222,17 +231,18 @@
   gap: var(--space-3);
   text-align: left;
   background: var(--surface);
-  border: 2px solid var(--border);
+  border: 1.5px solid var(--border);
   border-radius: var(--radius-md);
-  padding: var(--space-4) var(--space-5);
-  font-size: var(--fs-md);
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--fs-sm);
   font-weight: 600;
+  line-height: 1.3;
 }
 
 .option-item__letter {
   flex-shrink: 0;
-  width: 38px;
-  height: 38px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   background: var(--surface-2);
   border: 1px solid var(--border);
@@ -241,6 +251,7 @@
   justify-content: center;
   font-family: var(--font-display);
   font-weight: 700;
+  font-size: var(--fs-xs);
   color: var(--color-primary);
 }
 

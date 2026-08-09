@@ -150,8 +150,13 @@ const QuizUI = (() => {
     document.getElementById("question-total").textContent = total;
 
     const mechTag = document.getElementById("question-mech-tag");
-    mechTag.textContent = mecanismo ? mecanismo.nombre : "General";
-    mechTag.style.color = mecanismo ? mecanismo.color : "";
+    if (mecanismo) {
+      mechTag.style.setProperty("--mech-color", mecanismo.color);
+      mechTag.innerHTML = `<svg viewBox="0 0 24 24" fill="none">${svgIcon(mecanismo.icono)}</svg> ${mecanismo.nombre}`;
+    } else {
+      mechTag.style.removeProperty("--mech-color");
+      mechTag.innerHTML = "General";
+    }
 
     document.getElementById("question-text").textContent = pregunta.pregunta;
 

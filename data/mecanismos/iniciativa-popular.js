@@ -8,6 +8,9 @@ const MECANISMO_INICIATIVA_POPULAR = {
   icono: "edit-3",
   color: "#2E9E5B",
   descripcionCorta: "Permite a los ciudadanos presentar proyectos de ley o de norma ante las corporaciones públicas.",
+  resumenCarta:
+    "Derecho político que permite a un grupo de ciudadanos presentar propuestas normativas para que sean debatidas por la corporación pública competente.",
+  ideaClave: "Propuesta ciudadana",
   queEs:
     "Es el derecho político de un grupo de ciudadanos de presentar un proyecto de acto legislativo, de ley, de ordenanza, de acuerdo o de resolución local ante la corporación pública correspondiente, para que esta lo tramite y decida sobre él.",
   paraQueSirve:

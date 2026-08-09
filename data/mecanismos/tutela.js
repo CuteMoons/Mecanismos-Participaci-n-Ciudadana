@@ -11,6 +11,9 @@ const MECANISMO_TUTELA = {
   icono: "shield",
   color: "#C41E2E",
   descripcionCorta: "Protege de forma inmediata los derechos fundamentales cuando son vulnerados o amenazados.",
+  resumenCarta:
+    "Mecanismo judicial destinado a proteger derechos fundamentales cuando estos son vulnerados o amenazados, de acuerdo con los requisitos constitucionales y legales.",
+  ideaClave: "Protección de derechos",
   queEs:
     "Es un mecanismo judicial de protección inmediata al que puede acudir cualquier persona cuando considera que uno de sus derechos fundamentales está siendo vulnerado o amenazado por la acción o la omisión de una autoridad pública, y en algunos casos de particulares.",
   paraQueSirve:

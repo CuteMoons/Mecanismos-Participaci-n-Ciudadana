@@ -8,6 +8,9 @@ const MECANISMO_DERECHO_PETICION = {
   icono: "mail",
   color: "#1E63B0",
   descripcionCorta: "Permite solicitar información o pedir a las autoridades que resuelvan un asunto.",
+  resumenCarta:
+    "Derecho fundamental que permite presentar peticiones respetuosas a autoridades y obtener una respuesta conforme a las reglas legales.",
+  ideaClave: "Solicitar respuestas",
   queEs:
     "Es el derecho fundamental que tiene toda persona de presentar solicitudes respetuosas a las autoridades, y en ciertos casos a organizaciones privadas, y a obtener una respuesta pronta y de fondo.",
   paraQueSirve:

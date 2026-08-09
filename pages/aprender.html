@@ -23,6 +23,11 @@
   <header class="page-header">
     <div class="container">
       <span class="eyebrow" style="justify-content:center;">Aprende</span>
+      <div class="page-header__icons" aria-hidden="true">
+        <span class="page-header__icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3" stroke-width="1.8"/><path d="M3 20c0-3 2.7-5 6-5s6 2 6 5" stroke-width="1.8" stroke-linecap="round"/><path d="M16 4.2a3 3 0 0 1 0 5.8" stroke-width="1.8" stroke-linecap="round"/></svg></span>
+        <span class="page-header__icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 21V9l8-5 8 5v12" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 21v-6h6v6" stroke-width="1.8" stroke-linejoin="round"/></svg></span>
+        <span class="page-header__icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7l8 6 8-6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><rect x="3" y="5" width="18" height="14" rx="2" stroke-width="1.8"/></svg></span>
+      </div>
       <h1>Mecanismos de Participación Ciudadana</h1>
       <p class="text-muted" style="max-width:56ch; margin-inline:auto;">
         Consagrados principalmente en los artículos 40 y 103 de la Constitución Política de 1991
@@ -31,25 +36,26 @@
     </div>
   </header>
 
-  <!-- ============ ¿QUÉ SON? ============ -->
-  <section class="section">
+  <!-- ============ ¿QUÉ SON Y POR QUÉ IMPORTAN? ============ -->
+  <section class="section section--tight">
     <div class="container">
       <div class="section-head">
         <span class="eyebrow">¿Qué son?</span>
         <h2>Herramientas para participar en las decisiones del país</h2>
       </div>
       <p class="info-lead" id="info-que-es"></p>
+      <div class="quick-tags" id="info-quick-tags"></div>
     </div>
   </section>
 
-  <!-- ============ ¿POR QUÉ SON IMPORTANTES? ============ -->
-  <section class="section section--alt">
+  <!-- ============ MARCO LEGAL ============ -->
+  <section class="section section--tight section--alt">
     <div class="container">
       <div class="section-head">
-        <span class="eyebrow">¿Por qué son importantes?</span>
-        <h2>Así fortalecen la democracia</h2>
+        <span class="eyebrow">Marco legal</span>
+        <h2>La línea de tiempo de la participación en Colombia</h2>
       </div>
-      <ul class="importance-list" id="info-importancia"></ul>
+      <div class="timeline" id="info-marco-legal"></div>
     </div>
   </section>
 
@@ -65,64 +71,114 @@
     </div>
   </section>
 
-  <!-- ============ TABLA COMPARATIVA ============ -->
-  <section class="section section--alt">
+  <!-- ============ NOTA IMPORTANTE + TABLA COMPARATIVA ============ -->
+  <section class="section section--tight section--alt">
     <div class="container">
-      <div class="section-head">
-        <span class="eyebrow">Diferencias</span>
-        <h2>¿Para qué sirve cada mecanismo?</h2>
-        <p>Una comparación rápida para no confundirlos.</p>
+      <div class="inner-block">
+        <div class="section-head">
+          <span class="eyebrow">Nota importante</span>
+          <h2>No todos pertenecen a la misma categoría jurídica</h2>
+        </div>
+        <p class="info-callout" id="info-nota-importante"></p>
       </div>
-      <div class="compare-table-wrap">
-        <table class="compare-table">
-          <thead>
-            <tr><th>Mecanismo</th><th>¿Para qué sirve?</th></tr>
-          </thead>
-          <tbody id="info-diferencias-body"></tbody>
-        </table>
+
+      <div class="inner-block">
+        <div class="section-head">
+          <span class="eyebrow">Diferencias</span>
+          <h2>¿Para qué sirve cada mecanismo?</h2>
+        </div>
+        <div class="compare-table-wrap">
+          <table class="compare-table">
+            <thead>
+              <tr><th>Mecanismo</th><th>¿Para qué sirve?</th><th>¿Implica votación popular?</th></tr>
+            </thead>
+            <tbody id="info-diferencias-body"></tbody>
+          </table>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- ============ DERECHOS QUE PROTEGEN + ¿QUIÉNES? ============ -->
-  <section class="section">
+  <!-- ============ CASOS PRÁCTICOS ============ -->
+  <section class="section section--tight">
     <div class="container">
       <div class="section-head">
-        <span class="eyebrow">Derechos que protegen</span>
-        <h2>Estos mecanismos defienden, entre otros</h2>
+        <span class="eyebrow">Ponlo en práctica</span>
+        <h2>¿Qué mecanismo usarías?</h2>
+        <p>Haz clic en una situación para ver el mecanismo relacionado.</p>
       </div>
-      <div class="rights-wrap" id="info-derechos"></div>
-
-      <div class="section-head" style="margin-top: var(--space-8);">
-        <span class="eyebrow">¿Quiénes pueden utilizarlos?</span>
-        <h2>Un derecho de toda la ciudadanía</h2>
-      </div>
-      <p class="info-lead" id="info-quienes"></p>
+      <div class="cases-grid" id="info-casos-practicos"></div>
     </div>
   </section>
 
-  <!-- ============ DATOS CURIOSOS ============ -->
-  <section class="section section--alt">
+  <!-- ============ DERECHOS + ¿QUIÉNES? + BUENAS PRÁCTICAS ============ -->
+  <section class="section section--tight section--alt">
     <div class="container">
-      <div class="section-head">
-        <span class="eyebrow">Datos curiosos</span>
-        <h2>Para tener presente</h2>
+      <div class="inner-block">
+        <div class="section-head">
+          <span class="eyebrow">Derechos que protegen</span>
+          <h2>Estos mecanismos defienden, entre otros</h2>
+        </div>
+        <div class="rights-wrap" id="info-derechos"></div>
+        <p class="info-lead" id="info-quienes" style="margin-top: var(--space-4);"></p>
       </div>
-      <div class="facts-grid" id="info-datos-curiosos"></div>
+
+      <div class="inner-block">
+        <div class="section-head">
+          <span class="eyebrow">Para tener en cuenta</span>
+          <h2>Cómo participar de manera responsable</h2>
+        </div>
+        <div class="check-columns">
+          <div>
+            <h3>✓ Buenas prácticas</h3>
+            <ul class="check-list" id="info-responsable"></ul>
+          </div>
+          <div>
+            <h3>✕ Errores frecuentes</h3>
+            <ul class="check-list" id="info-errores"></ul>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
-  <!-- ============ RESUMEN ============ -->
-  <section class="section">
+  <!-- ============ CONTROL SOCIAL + DATOS CURIOSOS + GLOSARIO + RESUMEN ============ -->
+  <section class="section section--tight">
     <div class="container">
-      <div class="section-head">
-        <span class="eyebrow">En resumen</span>
+      <div class="inner-block">
+        <div class="section-head">
+          <span class="eyebrow">Más allá del voto</span>
+          <h2>Participación y control social</h2>
+        </div>
+        <div class="control-grid" id="info-control-social"></div>
       </div>
-      <p class="info-callout" id="info-resumen"></p>
+
+      <div class="inner-block">
+        <div class="section-head">
+          <span class="eyebrow">Datos curiosos</span>
+          <h2>Para tener presente</h2>
+        </div>
+        <div class="facts-grid" id="info-datos-curiosos"></div>
+      </div>
+
+      <div class="inner-block">
+        <div class="section-head">
+          <span class="eyebrow">Glosario</span>
+          <h2>Términos básicos</h2>
+        </div>
+        <dl class="glossary" id="info-glosario"></dl>
+      </div>
+
+      <div class="inner-block">
+        <div class="section-head">
+          <span class="eyebrow">En resumen</span>
+        </div>
+        <p class="info-callout" id="info-resumen"></p>
+      </div>
     </div>
   </section>
 
-  <section class="section section--alt">
+  <section class="section section--tight">
     <div class="container">
       <div class="cta-band">
         <h2>🎮 ¿Ya estudiaron los mecanismos?</h2>
