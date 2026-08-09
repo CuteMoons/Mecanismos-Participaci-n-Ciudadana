@@ -34,11 +34,32 @@ const RCAnimations = (() => {
     elements.forEach((el) => obs.observe(el));
   }
 
+  /**
+   * Hace aparecer elementos inyectados dinámicamente (tarjetas, listas
+   * generadas desde datos, etc.) con una animación de entrada breve,
+   * SIN depender de que el usuario haga scroll ni de IntersectionObserver.
+   * Se usa para contenido que se crea después de la carga inicial de la
+   * página, donde "aparecer al hacer scroll" no es fiable: el elemento
+   * puede insertarse ya visible en pantalla y el observer nunca disparar.
+   */
+  function revealNow(elements, staggerMs = 35) {
+    const list = Array.from(elements);
+    if (prefersReduced) {
+      list.forEach((el) => el.classList.add("is-visible"));
+      return;
+    }
+    list.forEach((el, i) => {
+      requestAnimationFrame(() => {
+        setTimeout(() => el.classList.add("is-visible"), i * staggerMs);
+      });
+    });
+  }
+
   function init() {
     observe(document.querySelectorAll(".reveal"));
   }
 
-  return { init, observe };
+  return { init, observe, revealNow };
 })();
 
 RCAnimations.init();

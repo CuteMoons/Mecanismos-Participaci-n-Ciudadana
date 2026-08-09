@@ -13,10 +13,25 @@ function renderInfoGeneral() {
   const quickTagsEl = document.getElementById("info-quick-tags");
   if (quickTagsEl) {
     quickTagsEl.innerHTML = "";
+    // Cada etiqueta lleva a la sección de la página con la que se relaciona.
+    const destinos = {
+      "Participación": "mecanismos",
+      "Derechos": "derechos",
+      "Democracia": "marco-legal",
+      "Ciudadanía": "casos-practicos"
+    };
     INFO_GENERAL.importanciaRapida.forEach((item) => {
-      const tag = document.createElement("span");
+      const tag = document.createElement("button");
+      tag.type = "button";
       tag.className = "quick-tag";
       tag.innerHTML = `<span class="quick-tag__emoji">${item.emoji}</span> ${item.texto}`;
+      const destinoId = destinos[item.texto];
+      if (destinoId) {
+        tag.addEventListener("click", () => {
+          const el = document.getElementById(destinoId);
+          if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
       quickTagsEl.appendChild(tag);
     });
   }
@@ -38,7 +53,7 @@ function renderInfoGeneral() {
       `;
       timelineEl.appendChild(item);
     });
-    if (window.RCAnimations) RCAnimations.observe(timelineEl.querySelectorAll(".reveal"));
+    if (window.RCAnimations) RCAnimations.revealNow(timelineEl.querySelectorAll(".reveal"));
   }
 
   // ---- Tabla comparativa "¿Para qué sirve cada mecanismo?" ----
@@ -49,6 +64,9 @@ function renderInfoGeneral() {
       const mecanismo = obtenerMecanismoPorId(fila.mecanismo);
       if (!mecanismo) return;
       const tr = document.createElement("tr");
+      tr.tabIndex = 0;
+      tr.setAttribute("role", "button");
+      tr.setAttribute("aria-label", `Ver información completa de ${mecanismo.nombre}`);
       tr.innerHTML = `
         <td>
           <span class="compare-table__mech" style="--mech-color:${mecanismo.color}">
@@ -59,6 +77,11 @@ function renderInfoGeneral() {
         <td>${fila.paraQueSirve}</td>
         <td>${fila.votacion}</td>
       `;
+      const abrir = () => RCModal.open(mecanismo);
+      tr.addEventListener("click", abrir);
+      tr.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); abrir(); }
+      });
       tablaBody.appendChild(tr);
     });
   }
@@ -104,7 +127,7 @@ function renderInfoGeneral() {
       item.addEventListener("click", () => RCModal.open(mecanismo));
       casosEl.appendChild(item);
     });
-    if (window.RCAnimations) RCAnimations.observe(casosEl.querySelectorAll(".reveal"));
+    if (window.RCAnimations) RCAnimations.revealNow(casosEl.querySelectorAll(".reveal"));
   }
 
   // ---- Errores frecuentes ----
@@ -143,17 +166,18 @@ function renderInfoGeneral() {
     });
   }
 
-  // ---- Glosario ----
+  // ---- Glosario (acordeón interactivo: clic para ver la definición) ----
   const glosarioEl = document.getElementById("info-glosario");
   if (glosarioEl) {
     glosarioEl.innerHTML = "";
     INFO_GENERAL.glosario.forEach((entrada) => {
-      const dt = document.createElement("dt");
-      dt.textContent = entrada.termino;
-      const dd = document.createElement("dd");
-      dd.textContent = entrada.definicion;
-      glosarioEl.appendChild(dt);
-      glosarioEl.appendChild(dd);
+      const details = document.createElement("details");
+      details.className = "glossary-item";
+      details.innerHTML = `
+        <summary>${entrada.termino}</summary>
+        <p>${entrada.definicion}</p>
+      `;
+      glosarioEl.appendChild(details);
     });
   }
 
@@ -167,7 +191,7 @@ function renderInfoGeneral() {
       card.innerHTML = `<span class="fact-card__mark">💡</span><p>${dato}</p>`;
       curiososEl.appendChild(card);
     });
-    if (window.RCAnimations) RCAnimations.observe(curiososEl.querySelectorAll(".reveal"));
+    if (window.RCAnimations) RCAnimations.revealNow(curiososEl.querySelectorAll(".reveal"));
   }
 
   // ---- Resumen ----

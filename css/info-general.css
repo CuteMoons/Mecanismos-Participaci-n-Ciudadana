@@ -39,6 +39,15 @@
   vertical-align: middle;
 }
 
+.compare-table tbody tr {
+  cursor: pointer;
+  transition: background var(--t-fast) var(--ease);
+}
+.compare-table tbody tr:hover,
+.compare-table tbody tr:focus-visible {
+  background: var(--surface-2);
+}
+
 .compare-table__mech {
   display: inline-flex;
   align-items: center;
@@ -108,7 +117,14 @@
   font-family: var(--font-display);
   font-weight: 700;
   font-size: var(--fs-sm);
+  color: var(--text);
   box-shadow: var(--shadow-sm);
+  transition: transform var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease);
+}
+.quick-tag:hover {
+  transform: translateY(-2px);
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-md);
 }
 .quick-tag__emoji { font-size: 1.1rem; }
 
@@ -287,23 +303,41 @@
 }
 .control-card p { font-size: var(--fs-sm); margin-bottom: 0; }
 
-/* ---- Glosario ---- */
-.glossary {
+/* ---- Glosario: acordeón interactivo (clic para ver la definición) ---- */
+.glossary-item {
   max-width: 780px;
-  margin-inline: auto;
-  display: grid;
-  grid-template-columns: 1fr;
-  row-gap: var(--space-1);
+  margin: 0 auto var(--space-2);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
 }
-.glossary dt {
+.glossary-item summary {
+  cursor: pointer;
+  list-style: none;
+  padding: var(--space-3) var(--space-4);
   font-family: var(--font-display);
   font-weight: 700;
   font-size: var(--fs-base);
   color: var(--text);
-  margin-top: var(--space-3);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: background var(--t-fast) var(--ease);
 }
-.glossary dd {
+.glossary-item summary::-webkit-details-marker { display: none; }
+.glossary-item summary::after {
+  content: "+";
+  font-size: var(--fs-lg);
+  color: var(--color-primary);
+  transition: transform var(--t-fast) var(--ease);
+}
+.glossary-item[open] summary::after { transform: rotate(45deg); }
+.glossary-item summary:hover { background: var(--surface-2); }
+.glossary-item summary:focus-visible { outline: 3px solid var(--color-secondary); outline-offset: -3px; }
+.glossary-item p {
   margin: 0;
+  padding: 0 var(--space-4) var(--space-4);
   font-size: var(--fs-sm);
   color: var(--text-muted);
 }

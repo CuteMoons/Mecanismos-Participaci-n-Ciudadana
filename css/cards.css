@@ -229,9 +229,8 @@
 }
 .flip-card__back-return:hover { color: var(--text); }
 
-/* Entrada progresiva (ya usada por RCAnimations vía .reveal) */
-.flip-card.reveal { opacity: 0; transform: translateY(18px); }
-.flip-card.reveal.is-visible { opacity: 1; transform: translateY(0); }
+/* La entrada progresiva de las tarjetas usa la animación 100% CSS
+   definida en main.css (.reveal) — no requiere JavaScript. */
 
 @media (prefers-reduced-motion: reduce) {
   .flip-card__inner { transition: opacity var(--t-base) var(--ease); }

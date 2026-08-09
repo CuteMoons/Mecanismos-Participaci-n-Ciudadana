@@ -159,11 +159,19 @@ select:focus-visible {
 }
 
 /* ---- Animaciones de entrada ---- */
+/* Entrada progresiva 100% CSS: no depende de JavaScript ni de scroll.
+   Si por cualquier motivo el script de animación falla o se carga
+   desde caché antigua, el contenido SIEMPRE queda visible: la
+   animación es un extra, nunca una condición para poder verlo. */
 .reveal {
-  opacity: 0;
-  transform: translateY(18px);
-  transition: opacity var(--t-slow) var(--ease), transform var(--t-slow) var(--ease);
+  animation: revealFadeIn var(--t-slow) var(--ease) both;
 }
+@keyframes revealFadeIn {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+/* Clase heredada por compatibilidad: ya no es necesaria para mostrar
+   el contenido (ver arriba), se mantiene por si algún script la usa. */
 .reveal.is-visible {
   opacity: 1;
   transform: translateY(0);

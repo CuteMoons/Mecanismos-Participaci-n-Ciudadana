@@ -116,5 +116,5 @@ function renderTarjetasMecanismos(containerSelector, lista = MECANISMOS) {
     }
   });
 
-  if (window.RCAnimations) RCAnimations.observe(container.querySelectorAll(".reveal"));
+  if (window.RCAnimations) RCAnimations.revealNow(container.querySelectorAll(".reveal"));
 }
