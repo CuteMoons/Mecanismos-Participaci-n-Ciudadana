@@ -1,0 +1,128 @@
+/* ==========================================================================
+   CROSSWORD-CARDS.CSS
+   Colección de tarjetas de mecanismos sobre el tablero: selector
+   visual con estado activo/inactivo, y la pequeña tarjeta
+   contextual que aparece debajo al seleccionar una.
+   ========================================================================== */
+
+.mech-selector {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-3);
+  max-width: 900px;
+  margin: 0 auto var(--space-4);
+}
+
+.mech-select-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  text-align: center;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-2);
+  transition: transform var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease), opacity var(--t-fast) var(--ease);
+}
+
+.mech-select-card__icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--mech-color, var(--color-primary)) 14%, transparent);
+  transition: transform var(--t-fast) var(--ease);
+}
+.mech-select-card__icon svg { width: 20px; height: 20px; stroke: var(--mech-color, var(--color-primary)); }
+
+.mech-select-card__name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.72rem;
+  line-height: 1.2;
+  color: var(--text);
+}
+
+/* Estado normal: discreto */
+.mech-selector.has-active .mech-select-card:not(.is-active) {
+  opacity: 0.55;
+}
+
+/* Hover */
+.mech-select-card:hover {
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--mech-color, var(--color-primary)) 45%, var(--border));
+  box-shadow: var(--shadow-md);
+}
+.mech-select-card:hover .mech-select-card__icon { transform: scale(1.08); }
+
+/* Estado activo: se ilumina */
+.mech-select-card.is-active {
+  opacity: 1;
+  border-color: var(--mech-color, var(--color-primary));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--mech-color, var(--color-primary)) 22%, transparent), var(--shadow-md);
+  transform: translateY(-2px) scale(1.04);
+}
+.mech-select-card.is-active .mech-select-card__icon {
+  background: color-mix(in srgb, var(--mech-color, var(--color-primary)) 26%, transparent);
+  transform: scale(1.1);
+}
+
+/* ---- Tarjeta contextual (info del mecanismo activo) ---- */
+.mech-context {
+  max-width: 640px;
+  margin: 0 auto var(--space-6);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--mech-color, var(--color-primary));
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  animation: contextIn var(--t-base) var(--ease);
+}
+.mech-context[hidden] { display: none; }
+
+@keyframes contextIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.mech-context__icon {
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--mech-color, var(--color-primary)) 16%, transparent);
+}
+.mech-context__icon svg { width: 22px; height: 22px; stroke: var(--mech-color, var(--color-primary)); }
+
+.mech-context__title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--fs-sm);
+  color: var(--mech-color, var(--color-primary));
+  margin-bottom: 2px;
+}
+.mech-context__text {
+  font-size: var(--fs-sm);
+  color: var(--text);
+  margin: 0;
+}
+
+@media (max-width: 700px) {
+  .mech-selector {
+    grid-template-columns: repeat(4, minmax(84px, 1fr));
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    padding-bottom: var(--space-2);
+  }
+  .mech-select-card { scroll-snap-align: start; }
+}

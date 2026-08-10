@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Crucigrama · Participación Ciudadana · I.E. José Antonio Aguilera</title>
+  <meta name="description" content="Minijuego educativo de crucigrama sobre los mecanismos de participación ciudadana en Colombia." />
+  <link rel="icon" type="image/png" href="../assets/logo/favicon.png" />
+  <link rel="icon" href="../assets/logo/favicon.ico" sizes="any" />
+  <link rel="apple-touch-icon" href="../assets/logo/favicon.png" />
+
+  <link rel="stylesheet" href="../css/variables.css" />
+  <link rel="stylesheet" href="../css/main.css" />
+  <link rel="stylesheet" href="../css/navbar.css" />
+  <link rel="stylesheet" href="../css/cards.css" />
+  <link rel="stylesheet" href="../css/sections.css" />
+  <link rel="stylesheet" href="../css/quiz.css" />
+  <link rel="stylesheet" href="../css/modal.css" />
+  <link rel="stylesheet" href="../css/crossword.css" />
+  <link rel="stylesheet" href="../css/crossword-cards.css" />
+  <link rel="stylesheet" href="../css/crossword-board.css" />
+  <link rel="stylesheet" href="../css/responsive.css" />
+  <link rel="stylesheet" href="../css/themes.css" />
+</head>
+<body>
+
+  <div id="navbar-root" data-base="../"></div>
+
+  <main class="crossword-shell" id="crossword-shell">
+    <div class="container">
+
+      <!-- ============ ETAPA 1: INTRODUCCIÓN ============ -->
+      <section class="crossword-stage is-active" data-stage="intro">
+        <div class="crossword-intro reveal">
+          <span class="crossword-intro__icon">🧩</span>
+          <h1>Crucigrama</h1>
+          <p class="crossword-intro__lead">Pon a prueba lo que aprendiste.</p>
+          <p class="text-muted">
+            Resuelve las pistas, completa las palabras y demuestra cuánto sabes
+            sobre la participación ciudadana.
+          </p>
+          <button class="btn btn-primary btn-lg" id="btn-comenzar-crucigrama">Comenzar crucigrama</button>
+        </div>
+      </section>
+
+      <!-- ============ ETAPA 2: CONFIGURACIÓN ============ -->
+      <section class="crossword-stage" data-stage="config">
+        <div class="section-head" style="margin-bottom: var(--space-6);">
+          <span class="eyebrow">🧩 Crucigrama</span>
+          <h1>Configura la actividad</h1>
+        </div>
+
+        <div class="config-card">
+          <div class="config-group">
+            <p class="config-group__title"><span class="step-badge">1</span> Modo de juego</p>
+            <div class="option-grid" id="cw-config-modalidad"></div>
+          </div>
+
+          <div class="config-group">
+            <p class="config-group__title"><span class="step-badge">2</span> Tiempo</p>
+            <div class="pill-group" id="cw-config-tiempo"></div>
+          </div>
+
+          <div class="config-group">
+            <p class="config-group__title"><span class="step-badge">3</span> Dificultad</p>
+            <div class="pill-group" id="cw-config-dificultad"></div>
+          </div>
+
+          <div class="config-launch">
+            <button class="btn btn-primary btn-lg" id="btn-iniciar-crucigrama">🚀 Iniciar crucigrama</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ ETAPA 3: JUEGO ============ -->
+      <section class="crossword-stage" data-stage="game">
+        <div class="crossword-game-head">
+          <span class="eyebrow" style="justify-content:center;">🧩 Crucigrama</span>
+          <h2>Pon a prueba lo aprendido</h2>
+        </div>
+
+        <div class="mech-selector" id="cw-mech-cards"></div>
+        <div class="mech-context" id="cw-mech-context" hidden></div>
+
+        <div class="crossword-stats">
+          <span class="crossword-stat crossword-stat--timer" id="cw-timer">⏱️ --:--</span>
+          <span class="crossword-stat crossword-stat--score" id="cw-score">⭐ 0 puntos</span>
+          <span class="crossword-stat" id="cw-mode-badge">👥 Grupos</span>
+        </div>
+
+        <div class="crossword-layout">
+          <div class="crossword-board-wrap">
+            <div class="cw-board" id="cw-board"></div>
+
+            <div class="crossword-actions">
+              <button class="btn btn-ghost" id="btn-ayuda" aria-haspopup="true" aria-expanded="false">💡 Ayuda</button>
+              <div class="help-menu" id="cw-help-menu">
+                <button type="button" id="btn-revelar-letra">
+                  Revelar letra
+                  <small>−20 puntos</small>
+                </button>
+                <button type="button" id="btn-revelar-palabra">
+                  Revelar palabra
+                  <small>−50 puntos</small>
+                </button>
+              </div>
+              <button class="btn btn-secondary" id="btn-comprobar">✓ Comprobar</button>
+              <button class="timer-mute" id="btn-cw-mute" aria-pressed="false"></button>
+            </div>
+
+            <p class="crossword-feedback" id="cw-feedback" aria-live="polite"></p>
+          </div>
+
+          <div class="crossword-clues">
+            <div class="clue-group">
+              <h3>Horizontales</h3>
+              <ul id="cw-clues-across"></ul>
+            </div>
+            <div class="clue-group">
+              <h3>Verticales</h3>
+              <ul id="cw-clues-down"></ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ ETAPA 4: RESULTADO ============ -->
+      <section class="crossword-stage result-stage" data-stage="result">
+        <div class="result-badge">🎉</div>
+        <h2>¡Crucigrama completado!</h2>
+
+        <div class="result-stats">
+          <div class="result-stat"><b id="cw-result-score">0</b><span>Puntuación</span></div>
+          <div class="result-stat"><b id="cw-result-words">0 / 0</b><span>Palabras</span></div>
+          <div class="result-stat"><b id="cw-result-time">00:00</b><span>Tiempo</span></div>
+        </div>
+
+        <div class="question-actions">
+          <a class="btn btn-secondary" href="../index.html">🏠 Volver</a>
+          <button class="btn btn-primary" id="btn-cw-nuevo">🔄 Jugar de nuevo</button>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <div class="footer__brand">
+        <img class="navbar__logo" src="../assets/logo/logo-colegio.png" alt="" onerror="this.style.display='none'" />
+        <div class="footer__brand-text">
+          <b>Institución Educativa José Antonio Aguilera</b>
+          <span>Proyecto educativo — SENA · Mecanismos de Participación Ciudadana</span>
+        </div>
+      </div>
+      <div class="footer__meta">San Pedro, Valle del Cauca</div>
+    </div>
+  </footer>
+
+  <!-- Datos -->
+  <script src="../data/mecanismos/tutela.js"></script>
+  <script src="../data/mecanismos/derecho-peticion.js"></script>
+  <script src="../data/mecanismos/referendo.js"></script>
+  <script src="../data/mecanismos/plebiscito.js"></script>
+  <script src="../data/mecanismos/consulta-popular.js"></script>
+  <script src="../data/mecanismos/cabildo-abierto.js"></script>
+  <script src="../data/mecanismos/iniciativa-popular.js"></script>
+  <script src="../data/mecanismos/revocatoria-mandato.js"></script>
+  <script src="../data/mecanismos/index.js"></script>
+  <script src="../data/crossword/crossword-data.js"></script>
+
+  <!-- Componentes -->
+  <script src="../js/components/icons.js"></script>
+  <script src="../js/components/navbar.js"></script>
+  <script src="../js/components/buttons.js"></script>
+  <script src="../js/components/animations.js"></script>
+
+  <!-- Núcleo -->
+  <script src="../js/theme.js"></script>
+  <script src="../js/navigation.js"></script>
+  <script src="../js/modal.js"></script>
+
+  <!-- Reutilizado del quiz: shuffle de arreglos -->
+  <script src="../js/quiz/quiz-engine.js"></script>
+
+  <!-- Crucigrama -->
+  <script src="../js/crossword/crossword-generator.js"></script>
+  <script src="../js/crossword/crossword-game.js"></script>
+  <script src="../js/crossword/crossword-ui.js"></script>
+  <script src="../js/crossword/crossword.js"></script>
+</body>
+</html>

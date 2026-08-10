@@ -31,7 +31,8 @@ participacion-ciudadana/
 ├── index.html              → Página principal
 ├── pages/
 │   ├── aprender.html        → Los 8 mecanismos con filtros
-│   └── quiz.html             → Configuración + actividad del quiz
+│   ├── quiz.html             → Configuración + actividad del quiz
+│   └── crucigrama.html        → Minijuego de crucigrama
 ├── css/                      → Un archivo por responsabilidad (ver abajo)
 ├── js/
 │   ├── main.js                → Conecta datos con componentes por página
@@ -39,13 +40,16 @@ participacion-ciudadana/
 │   ├── navigation.js          → Navbar activo + menú hamburguesa
 │   ├── modal.js                → Modal de información de un mecanismo
 │   ├── quiz/                   → Motor del quiz (config, engine, timer, score, ui, orquestador)
-│   └── components/             → navbar, cards, buttons, animations, icons
+│   ├── crossword/               → Motor del crucigrama (generator, game, ui, orquestador)
+│   └── components/             → navbar, cards, buttons, animations, icons, info-general
 ├── data/
 │   ├── mecanismos/             → Un archivo por mecanismo + index.js agregador
 │   ├── preguntas/               → Banco de opción múltiple (por dificultad) + agregador
-│   └── preguntas-abiertas/      → Banco de preguntas abiertas (respuesta libre) + agregador
+│   ├── preguntas-abiertas/      → Banco de preguntas abiertas (respuesta libre) + agregador
+│   ├── crossword/                → Banco de palabras y pistas del crucigrama
+│   └── general/                   → Información general (marco legal, glosario, etc.)
 ├── assets/
-│   ├── logo/                    → Aquí va logo-colegio.png (ver más abajo)
+│   ├── logo/                    → Escudo institucional + favicon
 │   ├── images/
 │   └── icons/
 └── README.md
@@ -292,7 +296,67 @@ También se puede practicar un solo mecanismo: desde su tarjeta en
 
 ---
 
-## 11. Modo claro / oscuro
+## 11. Crucigrama (minijuego educativo)
+
+`pages/crucigrama.html` es un minijuego de crucigrama generado
+automáticamente a partir de un banco de palabras y pistas, con
+tarjetas de los 8 mecanismos que se activan solas según la palabra
+seleccionada.
+
+**Cómo funciona (arquitectura):**
+
+```
+data/crossword/crossword-data.js     -> banco de palabras + pistas (contenido)
+js/crossword/crossword-generator.js  -> arma la cuadricula y cruza las palabras
+js/crossword/crossword-game.js       -> puntuacion, respuestas, ayudas, comprobacion
+js/crossword/crossword-ui.js         -> pinta tablero, tarjetas, pistas y estados
+js/crossword/crossword.js            -> controlador: conecta todo lo anterior
+css/crossword.css                    -> layout general (intro, stats, tablero+pistas)
+css/crossword-cards.css              -> tarjetas de mecanismos y tarjeta contextual
+css/crossword-board.css              -> cuadricula, casillas y panel de pistas
+```
+
+La configuración (modalidad/tiempo/dificultad) y la pantalla de
+resultado reutilizan los mismos estilos del quiz (`config-card`,
+`option-grid`, `pill-group`, `result-stage` de `css/quiz.css`), para
+mantener una sola identidad visual en todo el proyecto.
+
+**Cómo agregar una palabra nueva:** abre
+`data/crossword/crossword-data.js` y agrega un objeto:
+
+```javascript
+{
+  word: "EJEMPLO",        // MAYUSCULAS, sin tildes ni espacios, unica
+  clue: "Pista que vera el estudiante.",
+  mechanism: "tutela",    // id de data/mecanismos, o null si es general
+  difficulty: "facil"     // "facil" | "media" | "dificil"
+}
+```
+
+No hay que tocar el generador ni la interfaz: ambos leen
+automáticamente todo lo que exista en ese archivo.
+
+**Cómo cambia cada partida:** al iniciar se toma una muestra aleatoria
+del banco (más palabras cuanto mayor la dificultad) y el generador
+intenta cruzarlas; el resultado varía en cada partida, incluso con la
+misma dificultad.
+
+**Relación palabra -> mecanismo -> tarjeta:** cada palabra puede tener
+un `mechanism` (o `null` si es un término general). Al seleccionar esa
+palabra en el tablero o en las pistas, la tarjeta correspondiente se
+activa sola; al hacer clic manualmente en una tarjeta, se resaltan
+todas las palabras relacionadas con ese mecanismo.
+
+**Puntuación:** +100 por palabra correcta, -20 por revelar una letra,
+-50 por revelar una palabra completa, -10 por cada palabra marcada
+como incorrecta al comprobar (nunca baja de 0).
+
+**Nota jurídica:** igual que en el resto del proyecto, la tutela y el
+derecho de petición aparecen como palabras/derechos relacionados con
+la participación, pero no se presentan como dos de los seis
+mecanismos que regula directamente la Ley 1757 de 2015.
+
+## 12. Modo claro / oscuro
 
 El botón del navbar cambia el tema y lo guarda en `localStorage`, así
 que la preferencia se mantiene si se vuelve a abrir la página. Ningún
@@ -300,7 +364,7 @@ dato personal se guarda: solo la preferencia de tema.
 
 ---
 
-## 12. Privacidad
+## 13. Privacidad
 
 El sitio no recopila nombres, correos ni ningún dato personal de los
 estudiantes. No usa analítica externa, no crea cuentas y no depende de
@@ -311,7 +375,7 @@ por fuentes del sistema quitando el `@import` de ese archivo).
 
 ---
 
-## 13. Desplegar en un hosting estático gratuito
+## 14. Desplegar en un hosting estático gratuito
 
 Al ser un sitio 100% estático, puede subirse tal cual a:
 
@@ -324,7 +388,7 @@ No requiere build, `npm install` ni configuración adicional.
 
 ---
 
-## 14. Créditos
+## 15. Créditos
 
 Proyecto educativo desarrollado para la **Institución Educativa José
 Antonio Aguilera**, en el marco de un proyecto de formación del SENA
