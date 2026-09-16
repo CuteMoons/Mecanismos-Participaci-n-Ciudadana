@@ -33,6 +33,55 @@
 
 .section--alt { background: var(--bg-alt); }
 
+/* ---- Tarjetas de la página de Juegos (enlaces simples, no flip) ---- */
+.games-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--space-5);
+  max-width: 1080px;
+  margin-inline: auto;
+}
+.game-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease);
+}
+.game-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-lg);
+  border-color: color-mix(in srgb, var(--color-primary) 40%, var(--border));
+}
+.game-card__icon {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  background: color-mix(in srgb, var(--color-primary) 14%, transparent);
+}
+.game-card__title { font-size: var(--fs-md); margin-bottom: 0; }
+.game-card__desc { font-size: var(--fs-sm); flex-grow: 1; margin-bottom: 0; }
+.game-card__cta {
+  align-self: flex-start;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--fs-sm);
+  color: var(--color-primary);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+.game-card:hover .game-card__cta svg { transform: translateX(4px); }
+.game-card__cta svg { width: 15px; height: 15px; transition: transform var(--t-fast) var(--ease); }
+
 /* ---- Vitrina de mecanismos en la home: fondo decorativo sutil ---- */
 .mechanisms-showcase {
   position: relative;
@@ -118,7 +167,12 @@
 .footer__brand {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  gap: var(--space-4);
+}
+.footer__brand .navbar__logo,
+.footer__brand .navbar__logo-placeholder {
+  width: 72px;
+  height: 72px;
 }
 .footer__brand-text b {
   display: block;
@@ -131,7 +185,8 @@
   color: var(--text-muted);
 }
 .footer__meta {
-  font-size: var(--fs-xs);
+  font-size: var(--fs-md);
+  font-weight: 600;
   color: var(--text-muted);
   text-align: right;
 }

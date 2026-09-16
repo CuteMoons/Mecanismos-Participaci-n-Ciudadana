@@ -52,7 +52,7 @@
 
   /* ---- Capas / layout ---- */
   --container-max: 1180px;
-  --navbar-height: 76px;
+  --navbar-height: 84px;
 
   /* ---- Transiciones ---- */
   --ease: cubic-bezier(0.22, 1, 0.36, 1);

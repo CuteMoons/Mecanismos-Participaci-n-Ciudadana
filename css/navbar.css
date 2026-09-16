@@ -34,17 +34,16 @@
 }
 
 .navbar__logo {
-  width: 42px;
-  height: 42px;
+  width: 54px;
+  height: 54px;
   border-radius: var(--radius-sm);
-  object-fit: cover;
+  object-fit: contain;
   flex-shrink: 0;
-  background: #000;
 }
 
 .navbar__logo-placeholder {
-  width: 42px;
-  height: 42px;
+  width: 54px;
+  height: 54px;
   border-radius: var(--radius-sm);
   flex-shrink: 0;
   background: linear-gradient(160deg, var(--color-secondary), var(--color-primary));

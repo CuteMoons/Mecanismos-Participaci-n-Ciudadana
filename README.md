@@ -30,9 +30,12 @@ y luego abre `http://localhost:8000` en el navegador.
 participacion-ciudadana/
 ├── index.html              → Página principal
 ├── pages/
-│   ├── aprender.html        → Los 8 mecanismos con filtros
-│   ├── quiz.html             → Configuración + actividad del quiz
-│   └── crucigrama.html        → Minijuego de crucigrama
+│   ├── aprender.html          → Los 8 mecanismos con filtros
+│   ├── quiz.html               → Configuración + actividad del quiz
+│   ├── juegos.html              → Hub: enlaza los 3 juegos siguientes
+│   ├── crucigrama.html          → Crucigrama original
+│   ├── crucigrama-nombres.html  → Crucigrama de nombres completos (independiente)
+│   └── relacionar.html          → Relaciona los mecanismos (drag & drop)
 ├── css/                      → Un archivo por responsabilidad (ver abajo)
 ├── js/
 │   ├── main.js                → Conecta datos con componentes por página
@@ -40,13 +43,16 @@ participacion-ciudadana/
 │   ├── navigation.js          → Navbar activo + menú hamburguesa
 │   ├── modal.js                → Modal de información de un mecanismo
 │   ├── quiz/                   → Motor del quiz (config, engine, timer, score, ui, orquestador)
-│   ├── crossword/               → Motor del crucigrama (generator, game, ui, orquestador)
+│   ├── crossword/               → Motor de AMBOS crucigramas (generator/game/ui genéricos
+│   │                               + un controlador propio por crucigrama)
+│   ├── matching/                 → Motor de "Relaciona los mecanismos"
 │   └── components/             → navbar, cards, buttons, animations, icons, info-general
 ├── data/
 │   ├── mecanismos/             → Un archivo por mecanismo + index.js agregador
 │   ├── preguntas/               → Banco de opción múltiple (por dificultad) + agregador
 │   ├── preguntas-abiertas/      → Banco de preguntas abiertas (respuesta libre) + agregador
-│   ├── crossword/                → Banco de palabras y pistas del crucigrama
+│   ├── crossword/                → Bancos de palabras/pistas de ambos crucigramas
+│   ├── matching/                  → Significados (medio/difícil) del juego de relación
 │   └── general/                   → Información general (marco legal, glosario, etc.)
 ├── assets/
 │   ├── logo/                    → Escudo institucional + favicon
@@ -94,6 +100,12 @@ sitio (navbar, botones, tarjetas, quiz, modo claro y oscuro).
 3. Listo — el navbar y el footer lo detectan automáticamente. Si el
    archivo no existe, el sitio muestra un placeholder con las iniciales
    "JAA" para que nunca se vea un ícono roto.
+
+El logo se muestra a 54px en el navbar (72px en el footer) con
+`object-fit: contain` y fondo transparente (se ve bien en ambos temas).
+Si quieres ajustar el tamaño, edita `.navbar__logo` en `css/navbar.css`
+— la altura de la barra de navegación (`--navbar-height` en
+`css/variables.css`) se ajusta con el resto del sitio automáticamente.
 
 ---
 
@@ -296,14 +308,21 @@ También se puede practicar un solo mecanismo: desde su tarjeta en
 
 ---
 
-## 11. Crucigrama (minijuego educativo)
+## 11. Juegos: crucigramas y relación
 
-`pages/crucigrama.html` es un minijuego de crucigrama generado
+Hay tres actividades tipo juego, reunidas en `pages/juegos.html` y
+enlazadas desde el ítem "Juegos" del navbar (que queda activo en las
+cuatro páginas de juegos, no solo en el hub).
+
+### 11.1. Crucigrama (original)
+
+`pages/crucigrama.html`. Minijuego de crucigrama generado
 automáticamente a partir de un banco de palabras y pistas, con
 tarjetas de los 8 mecanismos que se activan solas según la palabra
 seleccionada.
 
-**Cómo funciona (arquitectura):**
+**Arquitectura (todo esto es GENÉRICO y lo reutiliza también el
+segundo crucigrama — ver 11.2):**
 
 ```
 data/crossword/crossword-data.js     -> banco de palabras + pistas (contenido)
@@ -318,8 +337,7 @@ css/crossword-board.css              -> cuadricula, casillas y panel de pistas
 
 La configuración (modalidad/tiempo/dificultad) y la pantalla de
 resultado reutilizan los mismos estilos del quiz (`config-card`,
-`option-grid`, `pill-group`, `result-stage` de `css/quiz.css`), para
-mantener una sola identidad visual en todo el proyecto.
+`option-grid`, `pill-group`, `result-stage` de `css/quiz.css`).
 
 **Cómo agregar una palabra nueva:** abre
 `data/crossword/crossword-data.js` y agrega un objeto:
@@ -333,28 +351,109 @@ mantener una sola identidad visual en todo el proyecto.
 }
 ```
 
-No hay que tocar el generador ni la interfaz: ambos leen
-automáticamente todo lo que exista en ese archivo.
-
-**Cómo cambia cada partida:** al iniciar se toma una muestra aleatoria
-del banco (más palabras cuanto mayor la dificultad) y el generador
-intenta cruzarlas; el resultado varía en cada partida, incluso con la
-misma dificultad.
-
-**Relación palabra -> mecanismo -> tarjeta:** cada palabra puede tener
-un `mechanism` (o `null` si es un término general). Al seleccionar esa
-palabra en el tablero o en las pistas, la tarjeta correspondiente se
-activa sola; al hacer clic manualmente en una tarjeta, se resaltan
-todas las palabras relacionadas con ese mecanismo.
-
 **Puntuación:** +100 por palabra correcta, -20 por revelar una letra,
 -50 por revelar una palabra completa, -10 por cada palabra marcada
 como incorrecta al comprobar (nunca baja de 0).
 
-**Nota jurídica:** igual que en el resto del proyecto, la tutela y el
-derecho de petición aparecen como palabras/derechos relacionados con
-la participación, pero no se presentan como dos de los seis
-mecanismos que regula directamente la Ley 1757 de 2015.
+**Casillas resueltas quedan bloqueadas de verdad:** en cuanto una
+palabra queda correcta (o se revela), sus casillas pasan a
+`input.readOnly = true` — no se pueden editar, borrar ni pegar texto
+sobre ellas, ni con backspace/delete. Si esa casilla también pertenece
+a otra palabra cruzada que aún no se ha resuelto, esa otra palabra
+sigue siendo editable en sus demás casillas; solo la letra compartida
+queda protegida (`celdaBloqueada()` en `crossword-game.js`). Si al
+pulsar "Comprobar" una palabra completa resulta incorrecta, sus
+letras se borran automáticamente (excepto las que ya pertenecen a un
+cruce resuelto) para que pueda volver a intentarse.
+
+**Nota jurídica:** la tutela y el derecho de petición aparecen como
+palabras/derechos relacionados con la participación, pero no se
+presentan como dos de los seis mecanismos que regula directamente la
+Ley 1757 de 2015.
+
+### 11.2. Crucigrama de Nombres Completos (segundo crucigrama)
+
+`pages/crucigrama-nombres.html`. Es un crucigrama **independiente**
+del original: mismo motor genérico (generador/estado/interfaz de
+arriba), pero con su propio banco de datos y su propio controlador,
+pensado para los nombres completos de los mecanismos ("Revocatoria
+del Mandato", "Derecho de Petición", etc.) en una cuadrícula más
+grande.
+
+```
+data/crossword/crossword-full-data.js -> banco de nombres completos
+js/crossword/crossword-full.js         -> controlador independiente (su propia dificultad/config)
+```
+
+Cada palabra guarda dos formas:
+
+```javascript
+{
+  word: "REVOCATORIADELMANDATO", // para la cuadrícula: sin espacios ni tildes
+  display: "Revocatoria del Mandato", // nombre completo y correcto
+  clue: "...",
+  mechanism: "revocatoria-mandato",
+  difficulty: "dificil"
+}
+```
+
+El nombre completo y correctamente escrito (`display`, con espacios y
+tildes) es lo que se muestra en las pistas — nunca la versión interna
+sin espacios, que solo se usa para construir la cuadrícula. Para
+agregar una palabra nueva a este segundo crucigrama, edita
+`data/crossword/crossword-full-data.js` con esa misma estructura; no
+hace falta tocar el generador (ya soporta nombres largos: el lienzo
+interno de trabajo es de 41×41, ver `GRID_SIZE` en
+`crossword-generator.js`).
+
+### 11.3. Relaciona los Mecanismos (arrastrar y soltar)
+
+`pages/relacionar.html`. Juego de relación: cada fila muestra el
+significado de un mecanismo; el estudiante arrastra la ficha del
+mecanismo correcto hasta esa fila. También funciona por clic/toque
+(tocar una ficha y luego tocar la fila), para pantallas táctiles.
+
+```
+data/matching/matching-data.js  -> significados (medio/difícil) por mecanismo
+js/matching/matching-game.js    -> colocar/quitar fichas, bloqueo, calificación
+js/matching/matching-ui.js      -> pinta filas y fichas arrastrables
+js/matching/matching.js         -> controlador: configuración, temporizador, flujo
+css/matching.css                -> filas, casillas de destino y fichas
+```
+
+El nombre, ícono y color de cada mecanismo se toman de
+`data/mecanismos` (no se duplican); `matching-data.js` solo aporta los
+dos significados:
+
+```javascript
+{
+  id: "referendo",              // debe coincidir con un id de data/mecanismos
+  significadoMedio: "...",      // definición clara y educativa
+  significadoDificil: "..."     // más técnica/jurídica, sin nombrar el mecanismo
+}
+```
+
+**Reglas de colocación:** una relación correcta queda bloqueada de
+inmediato (no se puede volver a mover). Una relación incorrecta se
+marca en rojo y puede corregirse — arrastrando otra ficha sobre esa
+fila, o tocándola para liberarla — y la ficha vuelve a estar
+disponible en la bolsa de opciones.
+
+**Calificación (1.0 a 5.0):** `calcularCalificacion(correctas, total)`
+en `matching-game.js` usa `1 + (correctas/total) × 4`, redondeada a
+un decimal — 0% da exactamente 1.0 y 100% da exactamente 5.0.
+
+**Tiempo:** sin límite (cuenta hacia arriba) o 10/15/20 minutos
+(cuenta regresiva; al llegar a 00:00 finaliza automáticamente con lo
+que se alcanzó a responder).
+
+### 11.4. Página de Juegos (navegación)
+
+`pages/juegos.html` reúne los tres juegos en tarjetas simples. El
+navbar solo muestra un ítem "Juegos" (para no saturarlo); ese enlace
+queda marcado como activo en las cuatro páginas de esta sección,
+gracias a que `data-page` en `js/components/navbar.js` acepta varias
+páginas separadas por `|`, y `js/navigation.js` las reconoce todas.
 
 ## 12. Modo claro / oscuro
 

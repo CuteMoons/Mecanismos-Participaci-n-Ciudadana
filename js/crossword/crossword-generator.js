@@ -19,7 +19,7 @@
  */
 
 const CrosswordGenerator = (() => {
-  const GRID_SIZE = 25; // lienzo de trabajo amplio; se recorta al final
+  const GRID_SIZE = 41; // lienzo de trabajo amplio (soporta nombres largos); se recorta al final
   const CENTER = Math.floor(GRID_SIZE / 2);
 
   function crearGridVacio() {

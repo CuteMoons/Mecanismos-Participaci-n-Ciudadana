@@ -25,6 +25,18 @@ function crearPartidaCrucigrama(resultadoGenerador) {
     return r >= 0 && r < rows && c >= 0 && c < cols && grid[r][c];
   }
 
+  /**
+   * Una celda queda bloqueada en cuanto CUALQUIER palabra que pase por
+   * ella esté resuelta (correcta o revelada). Esto protege la letra
+   * aunque la celda también pertenezca a otra palabra cruzada que
+   * todavía esté sin completar: esa otra palabra sigue siendo
+   * editable en sus DEMÁS celdas, solo esta intersección queda fija.
+   */
+  function celdaBloqueada(r, c) {
+    if (!celdaValida(r, c)) return false;
+    return grid[r][c].words.some((idx) => wordState[idx].solved);
+  }
+
   function letraCorrecta(r, c) {
     return grid[r][c] ? grid[r][c].letter : null;
   }
@@ -32,6 +44,7 @@ function crearPartidaCrucigrama(resultadoGenerador) {
   /** Escribe una letra en (r,c) y revisa si eso completa alguna palabra. */
   function escribirLetra(r, c, letra) {
     if (!celdaValida(r, c)) return [];
+    if (celdaBloqueada(r, c)) return []; // letra protegida: ya pertenece a una palabra resuelta
     answers[r][c] = letra ? letra.toUpperCase() : "";
     cellStatus[r][c] = null; // al escribir, se limpia cualquier marca previa de "incorrecta"
     return revisarPalabrasQueUsanCelda(r, c);
@@ -39,6 +52,7 @@ function crearPartidaCrucigrama(resultadoGenerador) {
 
   function borrarLetra(r, c) {
     if (!celdaValida(r, c)) return;
+    if (celdaBloqueada(r, c)) return; // letra protegida: ya pertenece a una palabra resuelta
     answers[r][c] = "";
     cellStatus[r][c] = null;
   }
@@ -115,7 +129,13 @@ function crearPartidaCrucigrama(resultadoGenerador) {
     estado.solved = true;
   }
 
-  /** Comprueba todas las palabras y marca estado visual correcto/incorrecto. */
+  /**
+   * Comprueba todas las palabras. Las correctas quedan resueltas
+   * (y por lo tanto bloqueadas). Las incorrectas se marcan en rojo
+   * y sus letras se borran de inmediato para que puedan reintentarse
+   * — excepto las celdas que ya pertenecen a otra palabra resuelta
+   * en el cruce, que permanecen protegidas (esa letra ya es correcta).
+   */
   function comprobarTodo() {
     let correctas = 0;
     placements.forEach((placement, idx) => {
@@ -124,18 +144,28 @@ function crearPartidaCrucigrama(resultadoGenerador) {
       if (!palabraCompleta(placement)) return; // sin completar: no se evalúa aún
 
       const esCorrecta = palabraCorrectaCompleta(placement);
-      for (let i = 0; i < placement.length; i++) {
-        const r = placement.dir === "down" ? placement.row + i : placement.row;
-        const c = placement.dir === "across" ? placement.col + i : placement.col;
-        cellStatus[r][c] = esCorrecta ? "correct" : "incorrect";
-      }
+
       if (esCorrecta) {
         estado.solved = true;
         correctas++;
         sumarPuntos(PUNTOS.palabraCorrecta);
-      } else if (!estado.penalizedIncorrect) {
-        estado.penalizedIncorrect = true;
-        sumarPuntos(PUNTOS.respuestaIncorrecta);
+        for (let i = 0; i < placement.length; i++) {
+          const r = placement.dir === "down" ? placement.row + i : placement.row;
+          const c = placement.dir === "across" ? placement.col + i : placement.col;
+          cellStatus[r][c] = "correct";
+        }
+      } else {
+        if (!estado.penalizedIncorrect) {
+          estado.penalizedIncorrect = true;
+          sumarPuntos(PUNTOS.respuestaIncorrecta);
+        }
+        for (let i = 0; i < placement.length; i++) {
+          const r = placement.dir === "down" ? placement.row + i : placement.row;
+          const c = placement.dir === "across" ? placement.col + i : placement.col;
+          if (celdaBloqueada(r, c)) continue; // letra protegida por otra palabra ya resuelta
+          cellStatus[r][c] = "incorrect";
+          answers[r][c] = "";
+        }
       }
     });
     return { correctas, total: placements.length };
@@ -151,7 +181,7 @@ function crearPartidaCrucigrama(resultadoGenerador) {
 
   return {
     grid, numbers, placements, rows, cols, answers, cellStatus, wordState,
-    escribirLetra, borrarLetra, revelarLetra, revelarPalabra,
+    escribirLetra, borrarLetra, revelarLetra, revelarPalabra, celdaBloqueada,
     comprobarTodo, estaCompleto, palabrasResueltas,
     getScore: () => score
   };

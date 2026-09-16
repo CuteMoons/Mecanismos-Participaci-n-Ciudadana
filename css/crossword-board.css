@@ -15,6 +15,16 @@
   aspect-ratio: var(--cw-cols, 10) / var(--cw-rows, 10);
 }
 
+.cw-board--wide {
+  max-width: 760px;
+}
+.cw-board--wide .cw-cell__input {
+  font-size: clamp(0.5rem, 1.6vw, 0.85rem);
+}
+.cw-board--wide .cw-cell__number {
+  font-size: clamp(0.42rem, 1vw, 0.55rem);
+}
+
 .cw-cell {
   position: relative;
   background: var(--surface);
@@ -87,6 +97,14 @@
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-success) 55%, transparent);
 }
 
+.cw-cell--locked .cw-cell__input {
+  cursor: default;
+  font-weight: 700;
+}
+.cw-cell--locked {
+  background: color-mix(in srgb, var(--color-success) 10%, var(--surface));
+}
+
 .cw-cell.is-mech-highlight:not(.is-active-word):not(.is-selected) {
   background: color-mix(in srgb, var(--color-accent) 20%, var(--surface));
 }
@@ -113,28 +131,73 @@
   margin-bottom: var(--space-2);
 }
 
-.clue-group ul { display: flex; flex-direction: column; gap: 2px; }
+.clue-group ul { display: flex; flex-direction: column; gap: var(--space-2); }
 
 .clue-item {
   display: flex;
-  align-items: baseline;
-  gap: var(--space-2);
+  align-items: flex-start;
+  gap: var(--space-3);
   width: 100%;
   text-align: left;
-  padding: 0.45rem 0.6rem;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease);
+}
+.clue-item:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: color-mix(in srgb, var(--mech-color, var(--color-secondary)) 40%, var(--border));
+}
+
+.clue-item__badge {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
   border-radius: var(--radius-sm);
-  background: none;
-  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--mech-color, var(--color-secondary)) 16%, transparent);
+}
+.clue-item__badge svg { width: 17px; height: 17px; stroke: var(--mech-color, var(--color-secondary)); }
+.clue-item__num {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--fs-sm);
+  color: var(--mech-color, var(--color-secondary));
+}
+
+.clue-item__body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.clue-item__meta {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+}
+.clue-item__text {
   font-size: var(--fs-sm);
   color: var(--text);
+  line-height: 1.35;
 }
-.clue-item:hover { background: var(--surface-2); }
-.clue-item__num { font-family: var(--font-display); font-weight: 700; color: var(--color-primary); flex-shrink: 0; min-width: 1.4em; }
 
-.clue-item.is-active { background: color-mix(in srgb, var(--color-secondary) 14%, transparent); font-weight: 600; }
-.clue-item.is-solved { color: var(--text-muted); text-decoration: line-through; text-decoration-color: var(--color-success); }
-.clue-item.is-solved .clue-item__num { color: var(--color-success); }
-.clue-item.is-mech-highlight:not(.is-active) { background: color-mix(in srgb, var(--color-accent) 14%, transparent); }
+.clue-item.is-active {
+  background: color-mix(in srgb, var(--mech-color, var(--color-secondary)) 14%, var(--surface));
+  border-color: var(--mech-color, var(--color-secondary));
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--mech-color, var(--color-secondary)) 25%, transparent), var(--shadow-md);
+}
+.clue-item.is-solved { opacity: 0.6; }
+.clue-item.is-solved .clue-item__text { text-decoration: line-through; text-decoration-color: var(--color-success); }
+.clue-item.is-solved .clue-item__badge { background: color-mix(in srgb, var(--color-success) 20%, transparent); }
+.clue-item.is-solved .clue-item__badge svg,
+.clue-item.is-solved .clue-item__num { color: var(--color-success); stroke: var(--color-success); }
+.clue-item.is-mech-highlight:not(.is-active) {
+  border-color: color-mix(in srgb, var(--color-accent) 55%, var(--border));
+  background: color-mix(in srgb, var(--color-accent) 10%, var(--surface-2));
+}
 
 @media (max-width: 980px) {
   .crossword-clues { max-height: none; }

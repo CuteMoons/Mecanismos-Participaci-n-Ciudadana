@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Relaciona los Mecanismos · Participación Ciudadana · I.E. José Antonio Aguilera</title>
+  <meta name="description" content="Juego de relación (arrastrar y soltar) entre los mecanismos de participación ciudadana y su significado." />
+  <link rel="icon" type="image/png" href="../assets/logo/favicon.png" />
+  <link rel="icon" href="../assets/logo/favicon.ico" sizes="any" />
+  <link rel="apple-touch-icon" href="../assets/logo/favicon.png" />
+
+  <link rel="stylesheet" href="../css/variables.css" />
+  <link rel="stylesheet" href="../css/main.css" />
+  <link rel="stylesheet" href="../css/navbar.css" />
+  <link rel="stylesheet" href="../css/sections.css" />
+  <link rel="stylesheet" href="../css/quiz.css" />
+  <link rel="stylesheet" href="../css/matching.css" />
+  <link rel="stylesheet" href="../css/responsive.css" />
+  <link rel="stylesheet" href="../css/themes.css" />
+</head>
+<body>
+
+  <div id="navbar-root" data-base="../"></div>
+
+  <main class="matching-shell" id="matching-shell">
+    <div class="container">
+
+      <!-- ============ ETAPA 1: INTRODUCCIÓN ============ -->
+      <section class="matching-stage is-active" data-stage="intro">
+        <div class="matching-intro reveal">
+          <span class="matching-intro__icon">🔗</span>
+          <h1>Relaciona los Mecanismos</h1>
+          <p class="matching-intro__lead">Une cada mecanismo con su significado correcto.</p>
+          <p class="text-muted">
+            Arrastra cada mecanismo hasta el significado que le corresponde.
+            En pantallas táctiles también puedes tocar un mecanismo y luego
+            tocar la casilla donde quieras colocarlo.
+          </p>
+          <button class="btn btn-primary btn-lg" id="btn-comenzar-match">Comenzar</button>
+        </div>
+      </section>
+
+      <!-- ============ ETAPA 2: CONFIGURACIÓN ============ -->
+      <section class="matching-stage" data-stage="config">
+        <div class="section-head" style="margin-bottom: var(--space-6);">
+          <span class="eyebrow">🔗 Relaciona los Mecanismos</span>
+          <h1>Configura la actividad</h1>
+        </div>
+
+        <div class="config-card">
+          <div class="config-group">
+            <p class="config-group__title"><span class="step-badge">1</span> Dificultad</p>
+            <div class="pill-group" id="mg-config-dificultad"></div>
+            <p class="text-muted" style="font-size: var(--fs-sm); margin-top: var(--space-2);">
+              "Difícil" usa un lenguaje más técnico/jurídico para describir cada mecanismo.
+            </p>
+          </div>
+
+          <div class="config-group">
+            <p class="config-group__title"><span class="step-badge">2</span> Tiempo</p>
+            <div class="pill-group" id="mg-config-tiempo"></div>
+          </div>
+
+          <div class="config-launch">
+            <button class="btn btn-primary btn-lg" id="btn-iniciar-match">🚀 Iniciar</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ ETAPA 3: JUEGO ============ -->
+      <section class="matching-stage" data-stage="game">
+        <div class="matching-game-head">
+          <span class="eyebrow" style="justify-content:center;">🔗 Relaciona los Mecanismos</span>
+          <h2>Arrastra cada mecanismo hasta su significado</h2>
+        </div>
+
+        <div class="match-stats">
+          <span class="match-stat" id="mg-timer">⏱️ --:--</span>
+          <span class="match-stat" id="mg-progreso">0 / 8 relacionadas</span>
+        </div>
+
+        <div class="match-board" id="mg-filas"></div>
+
+        <div class="match-pool-wrap">
+          <h3>Opciones de respuesta</h3>
+          <div class="match-pool" id="mg-pool"></div>
+        </div>
+      </section>
+
+      <!-- ============ ETAPA 4: RESULTADO ============ -->
+      <section class="matching-stage result-stage" data-stage="result">
+        <div class="result-badge">🎉</div>
+        <h2>Actividad completada</h2>
+        <p class="text-muted" id="mg-result-note"></p>
+
+        <div class="result-stats">
+          <div class="result-stat"><b id="mg-result-grade">0.0</b><span>Calificación / 5.0</span></div>
+          <div class="result-stat"><b id="mg-result-correct">0 / 0</b><span>Correctas</span></div>
+          <div class="result-stat"><b id="mg-result-incorrect">0</b><span>Incorrectas</span></div>
+          <div class="result-stat"><b id="mg-result-time">00:00</b><span>Tiempo</span></div>
+        </div>
+
+        <div class="question-actions">
+          <a class="btn btn-secondary" href="juegos.html">🏠 Volver a Juegos</a>
+          <button class="btn btn-primary" id="btn-mg-nuevo">🔄 Jugar de nuevo</button>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <div class="footer__brand">
+        <img class="navbar__logo" src="../assets/logo/logo-colegio.png" alt="" onerror="this.style.display='none'" />
+        <div class="footer__brand-text">
+          <b>Institución Educativa José Antonio Aguilera</b>
+          <span>Proyecto educativo — SENA · Mecanismos de Participación Ciudadana</span>
+        </div>
+      </div>
+      <div class="footer__meta">San Pedro, Valle del Cauca</div>
+    </div>
+  </footer>
+
+  <!-- Datos -->
+  <script src="../data/mecanismos/tutela.js"></script>
+  <script src="../data/mecanismos/derecho-peticion.js"></script>
+  <script src="../data/mecanismos/referendo.js"></script>
+  <script src="../data/mecanismos/plebiscito.js"></script>
+  <script src="../data/mecanismos/consulta-popular.js"></script>
+  <script src="../data/mecanismos/cabildo-abierto.js"></script>
+  <script src="../data/mecanismos/iniciativa-popular.js"></script>
+  <script src="../data/mecanismos/revocatoria-mandato.js"></script>
+  <script src="../data/mecanismos/index.js"></script>
+  <script src="../data/matching/matching-data.js"></script>
+
+  <!-- Componentes -->
+  <script src="../js/components/icons.js"></script>
+  <script src="../js/components/navbar.js"></script>
+  <script src="../js/components/animations.js"></script>
+
+  <!-- Núcleo -->
+  <script src="../js/theme.js"></script>
+  <script src="../js/navigation.js"></script>
+
+  <!-- Juego de relación -->
+  <script src="../js/matching/matching-game.js"></script>
+  <script src="../js/matching/matching-ui.js"></script>
+  <script src="../js/matching/matching.js"></script>
+</body>
+</html>

@@ -147,14 +147,27 @@ const CrosswordUI = (() => {
       cellEl.classList.toggle("is-correct", status === "correct");
       cellEl.classList.toggle("is-incorrect", status === "incorrect");
       cellEl.classList.toggle("is-solved-word", resuelta);
+      cellEl.classList.toggle("cw-cell--locked", resuelta);
 
       const input = cellEl.querySelector(".cw-cell__input");
-      if (input && document.activeElement !== input) input.value = partida.answers[r][c] || "";
+      if (input) {
+        // La celda bloqueada es de solo lectura de verdad (no solo
+        // visualmente): el navegador impide escribir, borrar o pegar
+        // texto sobre ella. La lógica del juego (crossword-game.js)
+        // ya rechaza cualquier cambio aquí; esto es una protección
+        // adicional a nivel de interfaz.
+        input.readOnly = resuelta;
+        input.setAttribute("aria-readonly", String(resuelta));
+        if (resuelta || document.activeElement !== input) input.value = partida.answers[r][c] || "";
+      }
     });
   }
 
   // ---------------------------------------------------------------
-  // Pistas
+  // Pistas — presentadas como pequeños "carteles" (tarjetas), no como
+  // texto plano: cada una lleva el ícono del mecanismo relacionado
+  // (o un número genérico si es un término sin mecanismo) y un
+  // acento de color, igual que el resto de tarjetas del proyecto.
   // ---------------------------------------------------------------
   function renderClues(acrossEl, downEl, partida, callbacks) {
     acrossEl.innerHTML = "";
@@ -163,12 +176,33 @@ const CrosswordUI = (() => {
     const ordenadas = [...partida.placements].sort((a, b) => a.number - b.number);
     ordenadas.forEach((p) => {
       const idx = partida.placements.indexOf(p);
+      const mecanismo = p.entry.mechanism ? obtenerMecanismoPorId(p.entry.mechanism) : null;
+      // El nombre completo y correctamente escrito (con tildes/espacios)
+      // se muestra una sola vez: se prefiere "display" (usado por el
+      // segundo crucigrama, de nombres completos) y si no existe se
+      // usa el nombre del mecanismo asociado.
+      const nombreMostrar = p.entry.display || (mecanismo ? mecanismo.nombre : null);
       const li = document.createElement("li");
       const btn = document.createElement("button");
       btn.type = "button";
       btn.className = "clue-item";
       btn.dataset.placementIndex = String(idx);
-      btn.innerHTML = `<span class="clue-item__num">${p.number}.</span><span>${p.entry.clue}</span>`;
+      if (mecanismo) btn.style.setProperty("--mech-color", mecanismo.color);
+      btn.innerHTML = `
+        <span class="clue-item__badge">
+          ${
+            mecanismo
+              ? `<svg viewBox="0 0 24 24" fill="none">${svgIcon(mecanismo.icono)}</svg>`
+              : `<span class="clue-item__num">${p.number}</span>`
+          }
+        </span>
+        <span class="clue-item__body">
+          <span class="clue-item__meta">
+            Nº ${p.number} · ${p.dir === "across" ? "Horizontal" : "Vertical"}${nombreMostrar ? " · " + nombreMostrar : ""}
+          </span>
+          <span class="clue-item__text">${p.entry.clue}</span>
+        </span>
+      `;
       btn.addEventListener("click", () => callbacks.onClueClick(idx));
       li.appendChild(btn);
       (p.dir === "across" ? acrossEl : downEl).appendChild(li);

@@ -7,8 +7,9 @@ const RCNavigation = (() => {
   function markActiveLink() {
     const path = window.location.pathname.split("/").pop() || "index.html";
     document.querySelectorAll(".navbar__link").forEach((link) => {
-      const target = link.getAttribute("data-page");
-      link.classList.toggle("is-active", target === path);
+      const target = link.getAttribute("data-page") || "";
+      const paginas = target.split("|");
+      link.classList.toggle("is-active", paginas.includes(path));
     });
   }
 
