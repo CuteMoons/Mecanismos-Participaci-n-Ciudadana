@@ -31,7 +31,7 @@ participacion-ciudadana/
 ├── index.html              → Página principal
 ├── pages/
 │   ├── aprender.html          → Los 8 mecanismos con filtros
-│   ├── quiz.html               → Configuración + actividad del quiz
+│   ├── quiz.html               → Rol, configuración, cuestionario y resultados
 │   ├── juegos.html              → Hub: enlaza los 3 juegos siguientes
 │   ├── crucigrama.html          → Crucigrama original
 │   ├── crucigrama-nombres.html  → Crucigrama de nombres completos (independiente)
@@ -274,34 +274,83 @@ propio banco; el sistema no depende de la posición en el arreglo.
 
 ## 9. Cómo cambiar la configuración del quiz
 
-- **Tiempo predeterminado:** en `js/quiz/quiz-config.js`, cambia
-  `tiempoSegundos: 120` (está en segundos).
-- **Cantidades de preguntas disponibles (5/10/15/20):** en
-  `js/quiz/quiz-ui.js`, arreglo `NUM_OPCIONES`.
-- **Opciones de tiempo disponibles:** mismo archivo, arreglo
-  `TIEMPO_OPCIONES`.
-- **XP por respuesta correcta:** en `js/quiz/quiz-score.js`, constante
-  `XP_POR_ACIERTO` (por defecto 100).
+- **Tiempo predeterminado (maestro):** `js/quiz/quiz-config.js`, `tiempoSegundos: 120`
+  (en segundos). El maestro también puede escribir un tiempo personalizado (10 a 1800 s).
+- **Tiempo fijo del alumno:** `js/quiz/quiz-ui.js`, constante `TIEMPO_ALUMNO`
+  (por defecto 120 s en opción múltiple y 300 s en preguntas abiertas).
+- **Cantidades de preguntas (5/10/15/20):** `js/quiz/quiz-ui.js`, arreglo `NUM_OPCIONES`.
+  El maestro puede además escribir una cantidad personalizada (1 a 60; límite en `QuizConfig.MAX_PREGUNTAS`).
+- **Opciones de tiempo:** mismo archivo, arreglo `TIEMPO_OPCIONES`.
+- **Máximo de grupos:** `QuizConfig.MAX_GRUPOS` (8). Las opciones del selector están en `NUM_GRUPOS_OPCIONES`.
 
 ---
 
-## 10. Cómo funciona la actividad en clase
+## 10. Cómo funciona el quiz: roles, calificación y salida
 
-1. La profesora abre `index.html` (o entra directo a **Quiz**).
-2. Elige modalidad (individual o grupos), número de preguntas,
-   dificultad y tiempo por pregunta.
-3. Pulsa **🚀 Iniciar Quiz**.
-4. Cada pregunta se proyecta en pantalla grande con sus 4 opciones
-   (A–D) y un temporizador circular. Los estudiantes escriben el
-   número de pregunta y la letra elegida en el cuaderno o en una hoja
-   — la página no recoge respuestas.
-5. Al terminar el tiempo (o si la profesora pulsa "Siguiente pregunta"),
-   pasa automáticamente a la siguiente. No hay pantalla de revisión
-   intermedia.
-6. Al finalizar todas las preguntas, la profesora **registra
-   manualmente** cuántas respuestas fueron correctas usando el
-   contador +/-. La página calcula el porcentaje y el XP.
-7. Botón **🔄 Nuevo Quiz** para repetir con preguntas distintas.
+Al abrir **Quiz** se elige un rol. **El rol organiza la actividad en la página;
+no es un inicio de sesión ni una medida de seguridad** (el sitio es estático y no
+tiene servidor: cualquier persona con conocimientos técnicos podría alterar el
+comportamiento desde las herramientas del navegador).
+
+### Modo alumno
+1. Elige tipo de pregunta (opción múltiple o abiertas), cantidad (5/10/15/20) y dificultad.
+   La modalidad **por grupos aparece bloqueada** («solo maestro»); el tiempo por pregunta
+   es fijo y el alumno no puede pausarlo.
+2. Una pregunta a la vez: selecciona una opción y pulsa **Confirmar respuesta**. La página
+   indica con texto y color si fue correcta o incorrecta (y cuál era la correcta). Cada pregunta
+   se cuenta una sola vez aunque se pulse varias veces.
+3. Si el tiempo se agota, se registra la opción marcada (o «sin responder») y el cuestionario
+   continúa solo tras unos segundos.
+4. **Preguntas abiertas:** el alumno redacta su respuesta en un campo de texto y pulsa
+   **Guardar y continuar** (no se admiten respuestas vacías; existe el botón explícito
+   **Dejar sin responder**). Estas respuestas **no se califican automáticamente**: quedan
+   «pendientes de revisión del maestro» y aparecen en el resumen final. No se usa inteligencia artificial.
+5. Resultado: total, correctas, incorrectas, sin responder, porcentaje, nota de 1,0 a 5,0,
+   resumen por pregunta y botón **Copiar resumen** (para entregarlo al maestro).
+
+### Modo maestro
+- Configura modalidad (individual o por grupos), tipo, cantidad (incluida personalizada), dificultad,
+  tiempo por pregunta, orden aleatorio y sonido.
+- Proyecta cada pregunta con temporizador circular y controles: **Pausar / Reanudar**
+  (conserva el tiempo restante exacto), **Mostrar respuesta** (opción múltiple) y **Siguiente**.
+  Al llegar a cero el aviso «¡TIEMPO!» queda en pantalla y el maestro decide cuándo continuar.
+- **Por grupos:** se elige el número de grupos (2 a 8) y se les pone nombre. En cada pregunta el maestro
+  otorga (o quita) el punto a los grupos que respondieron bien. Al final se muestra un ranking
+  con puntos y nota por grupo.
+- **Individual (respuestas en papel):** al terminar, el maestro registra cuántas fueron correctas con el
+  contador +/- y la página calcula porcentaje y nota con la misma fórmula.
+
+### Calificación (1,0 a 5,0)
+```
+Nota = 1,0 + (aciertos / preguntas calificables) × 4,0      (redondeada a 1 decimal)
+```
+Ejemplos: 75 % → 4,0 · 60 % → 3,4 · 0 % → 1,0 · 100 % → 5,0.
+Solo las preguntas de opción múltiple son «calificables»; las no contestadas cuentan como no acertadas.
+Si hubiera preguntas abiertas pendientes junto a preguntas objetivas, la nota se muestra como
+**provisional**. Si no hay preguntas calificables, no se calcula nota. El antiguo sistema de XP
+fue eliminado. Código: `js/quiz/quiz-score.js`.
+
+### Salir del cuestionario
+El botón **✕ Salir** abre una confirmación. **Continuar** conserva respuestas, pregunta y temporizador;
+**Salir** descarta la partida, detiene el temporizador y vuelve a la pantalla de rol con una
+configuración nueva. La siguiente partida genera otra selección y otro orden aleatorios.
+Recargar la página, cerrar la pestaña o usar el botón «Atrás» durante la partida también piden confirmación.
+
+### Aleatoriedad
+Cada partida elige preguntas al azar del banco (sin repetir), mezcla su orden y mezcla las opciones
+A–D conservando la relación con la respuesta correcta (se trabaja sobre copias: los bancos no se modifican).
+Si con los filtros elegidos hay menos preguntas que las pedidas, la página avisa antes de iniciar y
+el cuestionario se ajusta a la cantidad disponible.
+
+### Limitaciones
+- Nada se guarda: ni notas, ni respuestas, ni el rol (solo viven en memoria durante la partida).
+  No hay registro académico centralizado ni sincronización entre dispositivos.
+- El rol y los bloqueos del alumno son de interfaz (ver arriba): no impiden manipulación técnica.
+- Los bancos no incluyen explicaciones por pregunta; si algún día se agrega un campo `explicacion`
+  a una pregunta, se muestra automáticamente tras responder.
+- Una partida contiene un solo tipo de pregunta (opción múltiple o abierta), según la configuración.
+- Tras una partida, el botón «Atrás» del navegador puede requerir una pulsación extra
+  (se añade una entrada de historial para poder pedir confirmación).
 
 También se puede practicar un solo mecanismo: desde su tarjeta en
 "Aprender", botón **Practicar este mecanismo** dentro del modal.

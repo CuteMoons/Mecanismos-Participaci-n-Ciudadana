@@ -1,10 +1,17 @@
 /**
  * js/quiz/quiz-engine.js
  * Motor de selección de preguntas para una partida de quiz.
- * Responsable únicamente de ELEGIR las preguntas; no toca el DOM.
+ * Solo ELIGE preguntas; no toca el DOM. Cada partida genera una selección
+ * y un orden nuevos (Fisher-Yates con Math.random).
+ *
+ * Las preguntas devueltas son COPIAS: las opciones se reordenan en la copia
+ * y se guarda la clave correcta (respuestaCorrecta) de la copia, de modo que
+ * los bancos originales nunca se modifican.
  */
 
 const QuizEngine = (() => {
+  const LETRAS = ["A", "B", "C", "D", "E", "F"];
+
   /** Mezcla un arreglo sin mutar el original (Fisher-Yates). */
   function shuffle(arr) {
     const copy = [...arr];
@@ -26,64 +33,127 @@ const QuizEngine = (() => {
     });
   }
 
-  /**
-   * Construye el conjunto de preguntas para una partida.
-   * @param {object} config - ver quiz-config.js
-   * @returns {Array} preguntas seleccionadas, sin duplicados
-   */
-  function construirPartida(config) {
-    if (config.tipoPregunta === "abierta") {
-      return construirPartidaAbierta(config);
-    }
-    return construirPartidaMultiple(config);
-  }
-
-  /** Selección para el banco de opción múltiple (con dificultad). */
-  function construirPartidaMultiple(config) {
-    let universo = config.mecanismoFiltro
-      ? obtenerPreguntasPorMecanismo(config.mecanismoFiltro)
-      : BANCO_PREGUNTAS;
-
-    let seleccionadas = [];
-
-    if (config.dificultad === "mixto") {
-      const niveles = ["facil", "media", "dificil"];
-      const disponibles = niveles.filter((n) => universo.some((p) => p.dificultad === n));
-      const cantidades = distribuirEquilibrado(config.numPreguntas, disponibles.length || 1);
-
-      disponibles.forEach((nivel, idx) => {
-        const pool = shuffle(universo.filter((p) => p.dificultad === nivel));
-        seleccionadas.push(...pool.slice(0, cantidades[idx]));
-      });
-    } else {
-      const pool = shuffle(universo.filter((p) => p.dificultad === config.dificultad));
-      seleccionadas = pool.slice(0, config.numPreguntas);
-    }
-
-    return finalizarSeleccion(seleccionadas, config);
-  }
-
-  /** Selección para el banco de preguntas abiertas (sin dificultad ni opciones). */
-  function construirPartidaAbierta(config) {
-    let universo = config.mecanismoFiltro
-      ? obtenerPreguntasAbiertasPorMecanismo(config.mecanismoFiltro)
-      : BANCO_PREGUNTAS_ABIERTAS;
-
-    const seleccionadas = shuffle(universo).slice(0, config.numPreguntas);
-    return finalizarSeleccion(seleccionadas, config);
-  }
-
-  /** Quita duplicados por id y aplica el orden aleatorio final si aplica. */
-  function finalizarSeleccion(seleccionadas, config) {
+  /** Quita duplicados por id (conserva la primera aparición). */
+  function sinDuplicados(lista) {
     const vistos = new Set();
-    let resultado = seleccionadas.filter((p) => {
+    return lista.filter((p) => {
       if (vistos.has(p.id)) return false;
       vistos.add(p.id);
       return true;
     });
-    if (config.aleatorio) resultado = shuffle(resultado);
-    return resultado;
   }
 
-  return { construirPartida, shuffle };
+  /**
+   * Devuelve una copia de la pregunta con las opciones reordenadas.
+   * La letra correcta se recalcula a partir del TEXTO de la opción correcta
+   * original, por lo que la relación con la respuesta correcta se conserva.
+   */
+  function barajarOpciones(pregunta, mezclar) {
+    const copia = { ...pregunta };
+    if (!pregunta.opciones) return copia;
+
+    const entradas = Object.entries(pregunta.opciones); // [[letra, texto], ...]
+    const orden = mezclar ? shuffle(entradas) : entradas;
+    const nuevas = {};
+    let nuevaCorrecta = null;
+
+    orden.forEach(([letraOriginal, texto], i) => {
+      const letra = LETRAS[i];
+      nuevas[letra] = texto;
+      if (letraOriginal === pregunta.respuestaCorrecta) nuevaCorrecta = letra;
+    });
+
+    copia.opciones = nuevas;
+    copia.respuestaCorrecta = nuevaCorrecta;
+    return copia;
+  }
+
+  /**
+   * Construye la partida.
+   * @returns {{preguntas:Array, solicitadas:number, disponibles:number, ajustada:boolean}}
+   */
+  function construirPartida(config) {
+    const resultado =
+      config.tipoPregunta === "abierta"
+        ? construirAbiertas(config)
+        : construirMultiples(config);
+
+    let preguntas = sinDuplicados(resultado.preguntas);
+    if (config.aleatorio) preguntas = shuffle(preguntas);
+
+    if (config.tipoPregunta !== "abierta") {
+      preguntas = preguntas.map((p) => barajarOpciones(p, config.aleatorio));
+    }
+
+    return {
+      preguntas,
+      solicitadas: config.numPreguntas,
+      disponibles: resultado.disponibles,
+      ajustada: preguntas.length < config.numPreguntas
+    };
+  }
+
+  function construirMultiples(config) {
+    const universo = config.mecanismoFiltro
+      ? obtenerPreguntasPorMecanismo(config.mecanismoFiltro)
+      : BANCO_PREGUNTAS;
+
+    const objetivo = config.numPreguntas;
+    let seleccionadas = [];
+    let disponibles;
+
+    if (config.dificultad === "mixto") {
+      disponibles = universo.length;
+      const niveles = ["facil", "media", "dificil"].filter((n) => universo.some((p) => p.dificultad === n));
+      const cantidades = distribuirEquilibrado(objetivo, niveles.length || 1);
+      const usados = new Set();
+
+      niveles.forEach((nivel, idx) => {
+        const pool = shuffle(universo.filter((p) => p.dificultad === nivel));
+        pool.slice(0, cantidades[idx]).forEach((p) => {
+          seleccionadas.push(p);
+          usados.add(p.id);
+        });
+      });
+
+      // Si algún nivel tenía menos preguntas, completa con otras no usadas.
+      if (seleccionadas.length < objetivo) {
+        const resto = shuffle(universo.filter((p) => !usados.has(p.id)));
+        seleccionadas.push(...resto.slice(0, objetivo - seleccionadas.length));
+      }
+    } else {
+      const pool = universo.filter((p) => p.dificultad === config.dificultad);
+      disponibles = pool.length;
+      seleccionadas = shuffle(pool).slice(0, objetivo);
+    }
+
+    return { preguntas: seleccionadas, disponibles };
+  }
+
+  function construirAbiertas(config) {
+    const universo = config.mecanismoFiltro
+      ? obtenerPreguntasAbiertasPorMecanismo(config.mecanismoFiltro)
+      : BANCO_PREGUNTAS_ABIERTAS;
+    return {
+      preguntas: shuffle(universo).slice(0, config.numPreguntas),
+      disponibles: universo.length
+    };
+  }
+
+  /** Cantidad de preguntas disponibles para la configuración dada (para avisos en la UI). */
+  function contarDisponibles(config) {
+    if (config.tipoPregunta === "abierta") {
+      return (config.mecanismoFiltro
+        ? obtenerPreguntasAbiertasPorMecanismo(config.mecanismoFiltro)
+        : BANCO_PREGUNTAS_ABIERTAS
+      ).length;
+    }
+    const universo = config.mecanismoFiltro
+      ? obtenerPreguntasPorMecanismo(config.mecanismoFiltro)
+      : BANCO_PREGUNTAS;
+    if (config.dificultad === "mixto") return universo.length;
+    return universo.filter((p) => p.dificultad === config.dificultad).length;
+  }
+
+  return { construirPartida, contarDisponibles, shuffle, barajarOpciones };
 })();

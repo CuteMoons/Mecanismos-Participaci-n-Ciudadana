@@ -1,14 +1,17 @@
 /**
  * js/quiz/quiz-timer.js
- * Temporizador de cuenta regresiva reutilizado en cada pregunta.
- * No conoce nada del quiz en sí: solo cuenta segundos y dispara callbacks.
+ * Temporizador de cuenta regresiva basado en el reloj real (Date.now), no
+ * en contar ticks: si el navegador retrasa un intervalo, el tiempo restante
+ * sigue siendo correcto. Soporta pausa/reanudación conservando lo restante.
  */
 
 function crearTemporizador({ elLabel, elTimer, elRing, elFlash, radio = 82 }) {
   const circunferencia = 2 * Math.PI * radio;
-  let total = 0;
-  let restante = 0;
+  let totalMs = 0;
+  let restanteMs = 0;
+  let finEsperado = 0;      // marca de tiempo (ms) en que llegará a 0 mientras corre
   let intervalId = null;
+  let corriendo = false;
   let sonidoActivo = true;
   let onTick = () => {};
   let onEnd = () => {};
@@ -19,50 +22,91 @@ function crearTemporizador({ elLabel, elTimer, elRing, elFlash, radio = 82 }) {
     return `${m}:${s}`;
   }
 
+  function segundosRestantes() {
+    return Math.max(0, Math.ceil(restanteMs / 1000));
+  }
+
   function pintar() {
-    if (elLabel) elLabel.textContent = formatear(restante);
+    const seg = segundosRestantes();
+    const totalSeg = totalMs / 1000;
+    if (elLabel) elLabel.textContent = formatear(seg);
     if (elRing) {
-      const progreso = total > 0 ? restante / total : 0;
+      const progreso = totalMs > 0 ? restanteMs / totalMs : 0;
       elRing.style.strokeDasharray = `${circunferencia}`;
       elRing.style.strokeDashoffset = `${circunferencia * (1 - progreso)}`;
     }
     if (elTimer) {
-      elTimer.classList.toggle("is-warning", restante <= Math.max(30, total * 0.3) && restante > 10);
-      elTimer.classList.toggle("is-critical", restante <= 10 && restante > 0);
+      elTimer.classList.toggle("is-warning", seg <= Math.max(30, totalSeg * 0.3) && seg > 10);
+      elTimer.classList.toggle("is-critical", seg <= 10 && seg > 0);
     }
   }
 
-  function start(segundos, callbacks = {}) {
-    stop();
-    total = segundos;
-    restante = segundos;
-    onTick = callbacks.onTick || (() => {});
-    onEnd = callbacks.onEnd || (() => {});
+  function tick() {
+    restanteMs = Math.max(0, finEsperado - Date.now());
     pintar();
-    intervalId = setInterval(() => {
-      restante -= 1;
-      pintar();
-      onTick(restante);
-      if (restante <= 0) {
-        stop();
-        if (elFlash) elFlash.classList.remove("visually-hidden");
-        onEnd();
-      }
-    }, 1000);
+    onTick(segundosRestantes());
+    if (restanteMs <= 0) {
+      detener();
+      if (elFlash) elFlash.classList.remove("visually-hidden");
+      onEnd();
+    }
   }
 
-  function stop() {
+  function detener() {
     if (intervalId) clearInterval(intervalId);
     intervalId = null;
+    corriendo = false;
   }
 
-  function setSonido(activo) {
-    sonidoActivo = activo;
+  /** Inicia desde cero con `segundos`. */
+  function start(segundos, callbacks = {}) {
+    detener();
+    totalMs = segundos * 1000;
+    restanteMs = totalMs;
+    onTick = callbacks.onTick || (() => {});
+    onEnd = callbacks.onEnd || (() => {});
+    if (elFlash) elFlash.classList.add("visually-hidden");
+    pintar();
+    reanudar();
   }
 
-  function isSonidoActivo() {
-    return sonidoActivo;
+  /** Pausa conservando el tiempo restante exacto. */
+  function pausar() {
+    if (!corriendo) return;
+    restanteMs = Math.max(0, finEsperado - Date.now());
+    detener();
+    pintar();
   }
 
-  return { start, stop, setSonido, isSonidoActivo, circunferencia };
+  /** Continúa desde el tiempo restante (no reinicia). */
+  function reanudar() {
+    if (corriendo || restanteMs <= 0) return;
+    finEsperado = Date.now() + restanteMs;
+    corriendo = true;
+    intervalId = setInterval(tick, 250);
+  }
+
+  /** Detiene y deja el reloj en cero visual, sin disparar onEnd. */
+  function stop() {
+    detener();
+    onTick = () => {};
+    onEnd = () => {};
+  }
+
+  function reiniciarVisual(segundos) {
+    stop();
+    totalMs = segundos * 1000;
+    restanteMs = totalMs;
+    if (elFlash) elFlash.classList.add("visually-hidden");
+    pintar();
+  }
+
+  return {
+    start, pausar, reanudar, stop, reiniciarVisual,
+    setSonido: (v) => { sonidoActivo = v; },
+    isSonidoActivo: () => sonidoActivo,
+    estaCorriendo: () => corriendo,
+    restanteSegundos: segundosRestantes,
+    circunferencia
+  };
 }

@@ -35,3 +35,7 @@
 body, .navbar, .modal, .mech-card, .surface, .option-card, .pill, .filter-chip {
   transition: background var(--t-slow) var(--ease), border-color var(--t-slow) var(--ease), color var(--t-slow) var(--ease), box-shadow var(--t-slow) var(--ease);
 }
+
+/* Quiz: sombras en tema oscuro para las nuevas tarjetas */
+[data-theme="dark"] .role-card,
+[data-theme="dark"] .grade-card { box-shadow: var(--shadow-md); }
