@@ -1,0 +1,151 @@
+/* ==========================================================================
+   GAME-SHELL.CSS
+   Piezas comunes de los juegos: barra con el botón Salir, panel de
+   controles del maestro, velo de pausa y panel de la pista activa del
+   crucigrama. Reutiliza las variables y los temas del proyecto, por lo
+   que funciona igual en modo claro y oscuro.
+   ========================================================================== */
+
+/* ---- Barra superior del juego: Salir + título ---- */
+.game-toolbar {
+  display: grid;
+  grid-template-columns: minmax(96px, 1fr) auto minmax(96px, 1fr);
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+.game-toolbar .crossword-game-head,
+.game-toolbar .matching-game-head { margin-bottom: 0; }
+.game-toolbar__spacer { display: block; }
+
+.game-exit-btn {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+.game-exit-btn svg { width: 18px; height: 18px; stroke: currentColor; }
+.game-exit-btn:hover { border-color: var(--color-danger); color: var(--color-danger); }
+.game-exit-btn:focus-visible { outline: 3px solid var(--color-secondary); outline-offset: 2px; }
+
+/* ---- Notas y pasos de la configuración ---- */
+.config-launch { display: flex; flex-wrap: wrap; gap: var(--space-3); justify-content: center; }
+
+/* ---- Panel del maestro (solo existe en el DOM en modo maestro) ---- */
+.teacher-panel {
+  max-width: 1180px;
+  margin: 0 auto var(--space-5);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px dashed var(--color-secondary);
+  background: color-mix(in srgb, var(--color-secondary) 8%, var(--surface));
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+.teacher-panel[hidden] { display: none; }
+.teacher-panel__label {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--fs-sm);
+  color: var(--color-secondary);
+}
+.teacher-panel__actions { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.teacher-panel__actions .btn { padding: 0.45rem 0.9rem; font-size: var(--fs-sm); border: 1px solid var(--border); background: var(--surface); }
+.teacher-solution {
+  flex-basis: 100%;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  font-size: var(--fs-sm);
+}
+.teacher-solution[hidden] { display: none; }
+.teacher-solution ul { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: var(--space-1) var(--space-4); margin-top: var(--space-2); }
+.teacher-solution li { overflow-wrap: anywhere; }
+
+/* ---- Velo de pausa ---- */
+.cw-board-stage { position: relative; width: 100%; max-width: 560px; }
+.cw-board-stage .cw-board { max-width: 100%; }
+.pause-veil {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--surface) 96%, transparent);
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  text-align: center;
+  font-family: var(--font-display);
+}
+.pause-veil[hidden] { display: none; }
+.pause-veil p { font-size: var(--fs-lg); font-weight: 700; margin: 0; }
+.pause-veil span { color: var(--text-muted); font-size: var(--fs-sm); }
+
+/* ---- Crucigrama: pista de la palabra activa ---- */
+.active-clue {
+  width: 100%;
+  max-width: 560px;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 5px solid var(--color-secondary);
+  box-shadow: var(--shadow-sm);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-1) var(--space-3);
+  align-items: center;
+  min-height: 84px;
+}
+.active-clue[data-dir="down"] { border-left-color: var(--color-primary); }
+.active-clue__dir {
+  grid-column: 1 / 2;
+  font-family: var(--font-display);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-secondary);
+}
+.active-clue[data-dir="down"] .active-clue__dir { color: var(--color-primary); }
+.active-clue__text { grid-column: 1 / 2; margin: 0; font-size: var(--fs-base); line-height: 1.4; color: var(--text); }
+.active-clue:not(.has-clue) .active-clue__text { color: var(--text-muted); }
+.active-clue__switch {
+  grid-column: 2 / 3;
+  grid-row: 1 / 3;
+  align-self: center;
+  border: 1px solid var(--border);
+  font-size: var(--fs-xs);
+  padding: 0.45rem 0.8rem;
+  white-space: nowrap;
+}
+.active-clue__switch[hidden] { display: none; }
+
+.cw-keys-hint { font-size: var(--fs-xs); text-align: center; margin: 0; }
+
+/* Casillas: el tablero conserva el aspecto del proyecto; solo se asegura un tamaño táctil usable */
+.cw-cell__input { touch-action: manipulation; }
+
+/* ---- Teléfonos ---- */
+@media (max-width: 700px) {
+  .game-toolbar { grid-template-columns: auto 1fr; }
+  .game-toolbar__spacer { display: none; }
+  .game-toolbar .crossword-game-head h2,
+  .game-toolbar .matching-game-head h2 { font-size: var(--fs-md); }
+  .active-clue { grid-template-columns: 1fr; }
+  .active-clue__switch { grid-column: 1; grid-row: auto; justify-self: start; }
+  .cw-keys-hint { display: none; }
+  .teacher-panel { padding: var(--space-3); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .game-exit-btn { transition: none; }
+}

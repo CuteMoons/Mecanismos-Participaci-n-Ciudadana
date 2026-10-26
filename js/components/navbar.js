@@ -37,10 +37,14 @@ function renderNavbar() {
           <li><a class="navbar__link" data-page="index.html" href="${base}index.html">Inicio</a></li>
           <li><a class="navbar__link" data-page="aprender.html" href="${base}pages/aprender.html">Aprender</a></li>
           <li><a class="navbar__link" data-page="quiz.html" href="${base}pages/quiz.html">Quiz</a></li>
-          <li><a class="navbar__link" data-page="juegos.html|crucigrama.html|crucigrama-nombres.html|relacionar.html" href="${base}pages/juegos.html">Juegos</a></li>
+          <li><a class="navbar__link" data-page="juegos.html|crucigrama.html|relacionar.html" href="${base}pages/juegos.html">Juegos</a></li>
         </ul>
 
         <div class="navbar__actions">
+          <button class="sound-toggle" type="button" aria-pressed="true" aria-label="Efectos de sonido activados. Pulsa para desactivarlos" title="Sonido activado">
+            <svg class="icon-sound-on" viewBox="0 0 24 24" fill="none" aria-hidden="true">${svgIcon("volume-on")}</svg>
+            <svg class="icon-sound-off" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="display:none">${svgIcon("volume-x")}</svg>
+          </button>
           <button class="theme-toggle" aria-label="Cambiar modo claro/oscuro" aria-pressed="false">
             <svg class="icon-moon" viewBox="0 0 24 24" fill="none">${svgIcon("moon")}</svg>
             <svg class="icon-sun" viewBox="0 0 24 24" fill="none">${svgIcon("sun")}</svg>

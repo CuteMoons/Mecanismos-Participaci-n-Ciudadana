@@ -15,16 +15,6 @@
   aspect-ratio: var(--cw-cols, 10) / var(--cw-rows, 10);
 }
 
-.cw-board--wide {
-  max-width: 760px;
-}
-.cw-board--wide .cw-cell__input {
-  font-size: clamp(0.5rem, 1.6vw, 0.85rem);
-}
-.cw-board--wide .cw-cell__number {
-  font-size: clamp(0.42rem, 1vw, 0.55rem);
-}
-
 .cw-cell {
   position: relative;
   background: var(--surface);
@@ -67,11 +57,26 @@
 }
 .cw-cell__input:focus { outline: none; }
 
-.cw-cell.is-active-word { background: color-mix(in srgb, var(--color-secondary) 14%, var(--surface)); }
+/* Palabra activa: el color indica la dirección (azul = horizontal, rojo = vertical) */
+.cw-board { --cw-dir-color: var(--color-secondary); }
+.cw-board[data-dir="down"] { --cw-dir-color: var(--color-primary); }
+.cw-cell.is-active-word { background: color-mix(in srgb, var(--cw-dir-color) 16%, var(--surface)); }
 .cw-cell.is-selected {
-  background: color-mix(in srgb, var(--color-primary) 20%, var(--surface));
-  box-shadow: inset 0 0 0 2px var(--color-primary);
+  background: color-mix(in srgb, var(--cw-dir-color) 30%, var(--surface));
+  box-shadow: inset 0 0 0 2px var(--cw-dir-color);
 }
+.cw-cell.is-selected::before {
+  content: "→";
+  position: absolute;
+  bottom: 0;
+  left: 2px;
+  font-size: 0.55rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--cw-dir-color);
+  pointer-events: none;
+}
+.cw-board[data-dir="down"] .cw-cell.is-selected::before { content: "↓"; }
 
 .cw-cell.is-correct { background: color-mix(in srgb, var(--color-success) 22%, var(--surface)); }
 .cw-cell.is-correct::after {
@@ -103,10 +108,6 @@
 }
 .cw-cell--locked {
   background: color-mix(in srgb, var(--color-success) 10%, var(--surface));
-}
-
-.cw-cell.is-mech-highlight:not(.is-active-word):not(.is-selected) {
-  background: color-mix(in srgb, var(--color-accent) 20%, var(--surface));
 }
 
 /* ---- Panel de pistas ---- */
@@ -160,7 +161,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: color-mix(in srgb, var(--mech-color, var(--color-secondary)) 16%, transparent);
+  background: color-mix(in srgb, var(--color-secondary) 16%, transparent);
 }
 .clue-item__badge svg { width: 17px; height: 17px; stroke: var(--mech-color, var(--color-secondary)); }
 .clue-item__num {
@@ -194,10 +195,6 @@
 .clue-item.is-solved .clue-item__badge { background: color-mix(in srgb, var(--color-success) 20%, transparent); }
 .clue-item.is-solved .clue-item__badge svg,
 .clue-item.is-solved .clue-item__num { color: var(--color-success); stroke: var(--color-success); }
-.clue-item.is-mech-highlight:not(.is-active) {
-  border-color: color-mix(in srgb, var(--color-accent) 55%, var(--border));
-  background: color-mix(in srgb, var(--color-accent) 10%, var(--surface-2));
-}
 
 @media (max-width: 980px) {
   .crossword-clues { max-height: none; }

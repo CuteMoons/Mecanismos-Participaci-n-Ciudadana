@@ -17,8 +17,8 @@
   <link rel="stylesheet" href="../css/quiz.css" />
   <link rel="stylesheet" href="../css/modal.css" />
   <link rel="stylesheet" href="../css/crossword.css" />
-  <link rel="stylesheet" href="../css/crossword-cards.css" />
   <link rel="stylesheet" href="../css/crossword-board.css" />
+  <link rel="stylesheet" href="../css/game-shell.css" />
   <link rel="stylesheet" href="../css/responsive.css" />
   <link rel="stylesheet" href="../css/themes.css" />
 </head>
@@ -39,58 +39,125 @@
             Resuelve las pistas, completa las palabras y demuestra cuánto sabes
             sobre la participación ciudadana.
           </p>
-          <button class="btn btn-primary btn-lg" id="btn-comenzar-crucigrama">Comenzar crucigrama</button>
+          <button class="btn btn-primary btn-lg" id="btn-comenzar-crucigrama" data-sound="confirm">Comenzar crucigrama</button>
         </div>
       </section>
 
-      <!-- ============ ETAPA 2: CONFIGURACIÓN ============ -->
-      <section class="crossword-stage" data-stage="config">
+      <!-- ============ ETAPA 2: ROL (alumno / maestro) ============ -->
+      <section class="crossword-stage" data-stage="role" aria-labelledby="cw-role-title">
         <div class="section-head" style="margin-bottom: var(--space-6);">
           <span class="eyebrow">🧩 Crucigrama</span>
-          <h1>Configura la actividad</h1>
+          <h1 id="cw-role-title">¿Cómo quieres participar?</h1>
+          <p class="text-muted">Elige el modo antes de iniciar el juego.</p>
+        </div>
+
+        <div class="role-grid" id="cw-role-grid">
+          <button type="button" class="role-card" data-role="alumno" data-sound="confirm">
+            <span class="role-card__icon" aria-hidden="true">🎓</span>
+            <span class="role-card__title">Soy alumno</span>
+            <span class="role-card__text">Juega directamente: resuelve el crucigrama con las pistas.</span>
+            <ul class="role-card__list">
+              <li>Eliges la dificultad y empiezas</li>
+              <li>Tiempo fijo de 10 minutos</li>
+              <li>Ayudas con descuento de puntos</li>
+            </ul>
+            <span class="role-card__cta">Continuar como alumno →</span>
+          </button>
+
+          <button type="button" class="role-card" data-role="maestro" data-sound="confirm">
+            <span class="role-card__icon" aria-hidden="true">🧑‍🏫</span>
+            <span class="role-card__title">Soy maestro</span>
+            <span class="role-card__text">Prepara y dirige la actividad frente a la clase.</span>
+            <ul class="role-card__list">
+              <li>Modalidad, tiempo y dificultad</li>
+              <li>Pausar y reanudar el juego</li>
+              <li>Consultar la solución (oculta por defecto)</li>
+              <li>Terminar la actividad cuando decida</li>
+            </ul>
+            <span class="role-card__cta">Continuar como maestro →</span>
+          </button>
+        </div>
+
+        <p class="role-note text-muted">
+          El modo organiza la actividad en esta página; no es un inicio de sesión ni una medida de seguridad.
+        </p>
+      </section>
+
+      <!-- ============ ETAPA 3: CONFIGURACIÓN ============ -->
+      <section class="crossword-stage" data-stage="config">
+        <div class="section-head" style="margin-bottom: var(--space-6);">
+          <span class="eyebrow" id="cw-config-badge">🧩 Crucigrama</span>
+          <h1 id="cw-config-title">Configura la actividad</h1>
         </div>
 
         <div class="config-card">
-          <div class="config-group">
+          <div class="config-group" id="cw-group-modalidad">
             <p class="config-group__title"><span class="step-badge">1</span> Modo de juego</p>
             <div class="option-grid" id="cw-config-modalidad"></div>
           </div>
 
-          <div class="config-group">
+          <div class="config-group" id="cw-group-tiempo">
             <p class="config-group__title"><span class="step-badge">2</span> Tiempo</p>
             <div class="pill-group" id="cw-config-tiempo"></div>
           </div>
 
           <div class="config-group">
-            <p class="config-group__title"><span class="step-badge">3</span> Dificultad</p>
+            <p class="config-group__title"><span class="step-badge" id="cw-step-dificultad">3</span> Dificultad</p>
             <div class="pill-group" id="cw-config-dificultad"></div>
+            <p class="config-note" id="cw-config-note"></p>
           </div>
 
           <div class="config-launch">
-            <button class="btn btn-primary btn-lg" id="btn-iniciar-crucigrama">🚀 Iniciar crucigrama</button>
+            <button class="btn btn-ghost" id="btn-cw-cambiar-rol" type="button">← Cambiar de modo</button>
+            <button class="btn btn-primary btn-lg" id="btn-iniciar-crucigrama" data-sound="start">🚀 Iniciar crucigrama</button>
           </div>
         </div>
       </section>
 
-      <!-- ============ ETAPA 3: JUEGO ============ -->
+      <!-- ============ ETAPA 4: JUEGO ============ -->
       <section class="crossword-stage" data-stage="game">
-        <div class="crossword-game-head">
-          <span class="eyebrow" style="justify-content:center;">🧩 Crucigrama</span>
-          <h2>Pon a prueba lo aprendido</h2>
+        <div class="game-toolbar">
+          <button type="button" class="btn btn-ghost game-exit-btn" id="btn-cw-salir" data-sound="none">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 4h4a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-4M10 8l-4 4 4 4M6 12h11" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Salir
+          </button>
+          <div class="crossword-game-head">
+            <span class="eyebrow" style="justify-content:center;">🧩 Crucigrama</span>
+            <h2>Pon a prueba lo aprendido</h2>
+          </div>
+          <span class="game-toolbar__spacer" aria-hidden="true"></span>
         </div>
-
-        <div class="mech-selector" id="cw-mech-cards"></div>
-        <div class="mech-context" id="cw-mech-context" hidden></div>
 
         <div class="crossword-stats">
           <span class="crossword-stat crossword-stat--timer" id="cw-timer">⏱️ --:--</span>
           <span class="crossword-stat crossword-stat--score" id="cw-score">⭐ 0 puntos</span>
           <span class="crossword-stat" id="cw-mode-badge">👥 Grupos</span>
+          <span class="crossword-stat" id="cw-role-badge">🎓 Alumno</span>
         </div>
+
+        <!-- Controles administrativos: solo se crean cuando el modo es maestro -->
+        <div class="teacher-panel" id="cw-teacher-panel" hidden></div>
 
         <div class="crossword-layout">
           <div class="crossword-board-wrap">
-            <div class="cw-board" id="cw-board"></div>
+            <!-- Pista de la palabra activa (nunca muestra la respuesta) -->
+            <div class="active-clue" id="cw-active-clue" aria-live="polite">
+              <span class="active-clue__dir">Elige una casilla</span>
+              <p class="active-clue__text">Selecciona una casilla o una pista para ver aquí su descripción.</p>
+              <button type="button" class="btn btn-ghost active-clue__switch" id="btn-cw-direction" hidden data-sound="select"></button>
+            </div>
+
+            <div class="cw-board-stage">
+              <div class="cw-board" id="cw-board" role="group" aria-label="Tablero del crucigrama"></div>
+              <div class="pause-veil" id="cw-pause-veil" hidden>
+                <p>⏸️ Actividad en pausa</p>
+                <span>El maestro la reanudará.</span>
+              </div>
+            </div>
+
+            <p class="cw-keys-hint text-muted">
+              Flechas: moverse · Espacio o Enter: cambiar dirección · Retroceso: borrar
+            </p>
 
             <div class="crossword-actions">
               <button class="btn btn-ghost" id="btn-ayuda" aria-haspopup="true" aria-expanded="false">💡 Ayuda</button>
@@ -104,8 +171,7 @@
                   <small>−50 puntos</small>
                 </button>
               </div>
-              <button class="btn btn-secondary" id="btn-comprobar">✓ Comprobar</button>
-              <button class="timer-mute" id="btn-cw-mute" aria-pressed="false"></button>
+              <button class="btn btn-secondary" id="btn-comprobar" data-sound="none">✓ Comprobar</button>
             </div>
 
             <p class="crossword-feedback" id="cw-feedback" aria-live="polite"></p>
@@ -113,21 +179,22 @@
 
           <div class="crossword-clues">
             <div class="clue-group">
-              <h3>Horizontales</h3>
+              <h3>Horizontales →</h3>
               <ul id="cw-clues-across"></ul>
             </div>
             <div class="clue-group">
-              <h3>Verticales</h3>
+              <h3>Verticales ↓</h3>
               <ul id="cw-clues-down"></ul>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- ============ ETAPA 4: RESULTADO ============ -->
+      <!-- ============ ETAPA 5: RESULTADO ============ -->
       <section class="crossword-stage result-stage" data-stage="result">
         <div class="result-badge">🎉</div>
-        <h2>¡Crucigrama completado!</h2>
+        <h2 id="cw-result-title">¡Crucigrama completado!</h2>
+        <p class="text-muted" id="cw-result-note"></p>
 
         <div class="result-stats">
           <div class="result-stat"><b id="cw-result-score">0</b><span>Puntuación</span></div>
@@ -136,8 +203,8 @@
         </div>
 
         <div class="question-actions">
-          <a class="btn btn-secondary" href="../index.html">🏠 Volver</a>
-          <button class="btn btn-primary" id="btn-cw-nuevo">🔄 Jugar de nuevo</button>
+          <a class="btn btn-secondary" href="juegos.html">🏠 Volver a Juegos</a>
+          <button class="btn btn-primary" id="btn-cw-nuevo" data-sound="confirm">🔄 Jugar de nuevo</button>
         </div>
       </section>
 
@@ -176,15 +243,18 @@
   <script src="../js/components/animations.js"></script>
 
   <!-- Núcleo -->
+  <script src="../js/sound.js"></script>
   <script src="../js/theme.js"></script>
   <script src="../js/navigation.js"></script>
   <script src="../js/modal.js"></script>
+  <script src="../js/game-shell.js"></script>
 
   <!-- Reutilizado del quiz: shuffle de arreglos -->
   <script src="../js/quiz/quiz-engine.js"></script>
 
   <!-- Crucigrama -->
   <script src="../js/crossword/crossword-generator.js"></script>
+  <script src="../js/crossword/crossword-nav.js"></script>
   <script src="../js/crossword/crossword-game.js"></script>
   <script src="../js/crossword/crossword-ui.js"></script>
   <script src="../js/crossword/crossword.js"></script>

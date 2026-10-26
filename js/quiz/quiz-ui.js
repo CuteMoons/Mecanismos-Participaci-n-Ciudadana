@@ -304,9 +304,12 @@ const QuizUI = (() => {
     // 6. Opciones (solo maestro)
     $("config-opciones-group").hidden = !esMaestro;
     $("toggle-aleatorio").checked = config.aleatorio;
-    $("toggle-sonido").checked = config.sonido;
+    $("toggle-sonido").checked = window.RCSound ? RCSound.isEnabled() : config.sonido;
     $("toggle-aleatorio").onchange = (e) => QuizConfig.set({ aleatorio: e.target.checked });
-    $("toggle-sonido").onchange = (e) => QuizConfig.set({ sonido: e.target.checked });
+    $("toggle-sonido").onchange = (e) => {
+      QuizConfig.set({ sonido: e.target.checked });
+      if (window.RCSound) RCSound.setEnabled(e.target.checked);   // preferencia global
+    };
 
     // Filtro por mecanismo ("Practicar este mecanismo")
     if (config.mecanismoFiltro) {

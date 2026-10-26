@@ -109,3 +109,7 @@
 }
 
 body.modal-open { overflow: hidden; }
+
+/* Mientras un aviso se está cerrando no debe interceptar clics (evita que el
+   primer clic tras pulsar «Continuar» caiga sobre el velo y se pierda). */
+.modal-overlay:not(.is-open) { pointer-events: none; }

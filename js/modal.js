@@ -93,6 +93,7 @@ const RCModal = (() => {
     overlay.querySelector(".modal").innerHTML = buildContent(mecanismo);
     overlay.classList.add("is-open");
     document.body.classList.add("modal-open");
+    if (window.RCSound) RCSound.play("open");
 
     overlay.querySelector(".modal__close").addEventListener("click", close);
     overlay.querySelector('[data-action="cerrar"]').addEventListener("click", close);
@@ -109,7 +110,8 @@ const RCModal = (() => {
   }
 
   function close() {
-    if (!overlay) return;
+    if (!overlay || !overlay.classList.contains("is-open")) return;
+    if (window.RCSound) RCSound.play("close");
     overlay.classList.remove("is-open");
     document.body.classList.remove("modal-open");
     if (lastFocused) lastFocused.focus();

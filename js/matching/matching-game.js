@@ -1,27 +1,27 @@
 /**
  * js/matching/matching-game.js
- * Estado y reglas del juego "Relaciona los mecanismos". No toca el
- * DOM ni implementa el arrastre en sí (eso es matching-ui.js):
- * solo decide qué pasa cuando se coloca, se quita o se comprueba
- * una relación.
+ * Estado y reglas del juego "Relaciona los mecanismos". No toca el DOM.
+ *
+ * Reglas:
+ *  - Cada mecanismo (ficha) puede estar en UN solo significado a la vez.
+ *  - Colocar una ficha en un significado ocupado intercambia/devuelve la anterior.
+ *  - Las relaciones se pueden corregir libremente hasta comprobar:
+ *    no hay aciertos ni errores a la vista durante la partida.
+ *  - Solo al comprobar (evaluar) se calcula el resultado.
  */
 
 function crearPartidaMatching(mecanismos) {
-  // Cada fila muestra el significado de un mecanismo (orden barajado);
-  // el usuario debe arrastrar la ficha del mecanismo correcto sobre ella.
   const filas = shuffleArray(mecanismos).map((m) => ({
     mechanismId: m.id,
     significado: m.significado,
-    filledWith: null,   // id del mecanismo colocado actualmente (correcto o no)
-    correct: false,
-    locked: false,
-    incorrectFlash: false
+    filledWith: null     // id de la ficha colocada (acierte o no; no se revela)
   }));
 
-  // Fichas arrastrables: una por mecanismo, en orden barajado.
   const opciones = shuffleArray(
-    mecanismos.map((m) => ({ id: m.id, nombre: m.nombre, icono: m.icono, color: m.color, used: false }))
+    mecanismos.map((m) => ({ id: m.id, nombre: m.nombre, icono: m.icono, color: m.color }))
   );
+
+  let evaluada = false;
 
   function shuffleArray(arr) {
     const copy = [...arr];
@@ -32,62 +32,54 @@ function crearPartidaMatching(mecanismos) {
     return copy;
   }
 
-  function obtenerFicha(chipId) {
-    return opciones.find((o) => o.id === chipId) || null;
-  }
+  const obtenerFicha = (chipId) => opciones.find((o) => o.id === chipId) || null;
+  const filaDeFicha = (chipId) => filas.findIndex((f) => f.filledWith === chipId);
 
   /**
-   * Coloca la ficha `chipId` sobre la fila `rowIndex`.
-   * Devuelve { ignorado, correcta } para que la interfaz reaccione
-   * (sonido, mensaje, etc.) sin tener que releer todo el estado.
+   * Coloca la ficha en la fila. Si la ficha venía de otra fila y la de
+   * destino estaba ocupada, ambas se intercambian; si venía del grupo
+   * de disponibles, la ocupante regresa al grupo.
+   * Devuelve { ignorado, movida, desde } para que la interfaz reaccione.
    */
   function colocar(rowIndex, chipId) {
+    if (evaluada) return { ignorado: true };
     const fila = filas[rowIndex];
-    if (!fila || fila.locked) return { ignorado: true };
-    const ficha = obtenerFicha(chipId);
-    if (!ficha || (ficha.used && fila.filledWith !== chipId)) return { ignorado: true };
+    if (!fila || !obtenerFicha(chipId)) return { ignorado: true };
+    const origen = filaDeFicha(chipId);
+    if (origen === rowIndex) return { ignorado: true };
 
-    // Si la fila ya tenía otra ficha (incorrecta) puesta, la liberamos.
-    if (fila.filledWith && fila.filledWith !== chipId) {
-      const anterior = obtenerFicha(fila.filledWith);
-      if (anterior) anterior.used = false;
-    }
-
-    ficha.used = true;
+    const ocupante = fila.filledWith;
+    if (origen !== -1) filas[origen].filledWith = ocupante || null; // intercambio (o queda vacía)
     fila.filledWith = chipId;
-    const esCorrecta = chipId === fila.mechanismId;
-    fila.correct = esCorrecta;
-    fila.locked = esCorrecta;
-    fila.incorrectFlash = !esCorrecta;
-
-    return { ignorado: false, correcta: esCorrecta };
+    return { ignorado: false, desde: origen, intercambio: Boolean(ocupante && origen !== -1) };
   }
 
-  /** Quita la ficha de una fila (solo si no está bloqueada/correcta). */
+  /** Devuelve la ficha al grupo de disponibles. */
   function quitarDeFila(rowIndex) {
+    if (evaluada) return false;
     const fila = filas[rowIndex];
-    if (!fila || fila.locked) return;
-    if (fila.filledWith) {
-      const ficha = obtenerFicha(fila.filledWith);
-      if (ficha) ficha.used = false;
-    }
+    if (!fila || !fila.filledWith) return false;
     fila.filledWith = null;
-    fila.correct = false;
-    fila.incorrectFlash = false;
+    return true;
   }
 
-  function contarCorrectas() {
-    return filas.filter((f) => f.locked).length;
+  const disponibles = () => opciones.filter((o) => filaDeFicha(o.id) === -1);
+  const contarColocadas = () => filas.filter((f) => f.filledWith).length;
+  const estaCompleto = () => filas.every((f) => f.filledWith);
+
+  /** Comprueba todas las relaciones. A partir de aquí la partida queda cerrada. */
+  function evaluar() {
+    evaluada = true;
+    return filas.map((f) => ({ correcta: f.filledWith === f.mechanismId }));
   }
 
-  function estaCompleto() {
-    return filas.every((f) => f.locked);
-  }
+  const contarCorrectas = () => filas.filter((f) => f.filledWith === f.mechanismId).length;
 
   return {
     filas, opciones,
-    colocar, quitarDeFila,
-    contarCorrectas, estaCompleto,
+    colocar, quitarDeFila, filaDeFicha, obtenerFicha, disponibles,
+    contarColocadas, estaCompleto, evaluar, contarCorrectas,
+    estaEvaluada: () => evaluada,
     total: filas.length
   };
 }
@@ -103,3 +95,5 @@ function calcularCalificacion(correctas, total) {
   const limitada = Math.max(1, Math.min(5, nota));
   return Math.round(limitada * 10) / 10;
 }
+
+if (typeof module !== "undefined") module.exports = { crearPartidaMatching, calcularCalificacion };

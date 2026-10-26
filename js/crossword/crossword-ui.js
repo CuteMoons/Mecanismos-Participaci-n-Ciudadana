@@ -1,6 +1,8 @@
 /**
  * js/crossword/crossword-ui.js
- * Renderiza y actualiza el DOM del crucigrama. No decide reglas del
+ * Renderiza y actualiza el DOM del crucigrama. Las casillas solo muestran
+ * lo que escribió el jugador y los números de referencia; las pistas
+ * nunca incluyen el nombre de la respuesta. No decide reglas del
  * juego (eso es crossword-game.js) ni arma el tablero (eso es
  * crossword-generator.js); solo pinta el estado actual.
  */
@@ -10,57 +12,6 @@ const CrosswordUI = (() => {
     document.querySelectorAll(".crossword-stage").forEach((el) => {
       el.classList.toggle("is-active", el.dataset.stage === name);
     });
-  }
-
-  // ---------------------------------------------------------------
-  // Tarjetas de mecanismos
-  // ---------------------------------------------------------------
-  function renderMechCards(containerEl, onSelect) {
-    containerEl.innerHTML = "";
-    MECANISMOS.forEach((mecanismo) => {
-      const card = document.createElement("button");
-      card.type = "button";
-      card.className = "mech-select-card";
-      card.dataset.mechId = mecanismo.id;
-      card.style.setProperty("--mech-color", mecanismo.color);
-      card.setAttribute("aria-pressed", "false");
-      card.innerHTML = `
-        <span class="mech-select-card__icon">
-          <svg viewBox="0 0 24 24" fill="none">${svgIcon(mecanismo.icono)}</svg>
-        </span>
-        <span class="mech-select-card__name">${mecanismo.nombre}</span>
-      `;
-      card.addEventListener("click", () => onSelect(mecanismo.id));
-      containerEl.appendChild(card);
-    });
-  }
-
-  function setActiveMechCard(containerEl, mechId) {
-    containerEl.classList.toggle("has-active", Boolean(mechId));
-    containerEl.querySelectorAll(".mech-select-card").forEach((card) => {
-      const isActive = card.dataset.mechId === mechId;
-      card.classList.toggle("is-active", isActive);
-      card.setAttribute("aria-pressed", String(isActive));
-    });
-  }
-
-  function renderMechContext(containerEl, mecanismo) {
-    if (!mecanismo) {
-      containerEl.hidden = true;
-      containerEl.innerHTML = "";
-      return;
-    }
-    containerEl.hidden = false;
-    containerEl.style.setProperty("--mech-color", mecanismo.color);
-    containerEl.innerHTML = `
-      <span class="mech-context__icon">
-        <svg viewBox="0 0 24 24" fill="none">${svgIcon(mecanismo.icono)}</svg>
-      </span>
-      <span>
-        <span class="mech-context__title">${mecanismo.nombre}</span>
-        <p class="mech-context__text">${mecanismo.descripcionCorta}</p>
-      </span>
-    `;
   }
 
   // ---------------------------------------------------------------
@@ -102,19 +53,20 @@ const CrosswordUI = (() => {
         input.className = "cw-cell__input";
         input.type = "text";
         input.inputMode = "text";
-        input.maxLength = 1;
         input.autocomplete = "off";
+        input.autocapitalize = "characters";
         input.spellcheck = false;
-        input.setAttribute("aria-label", `Casilla fila ${r + 1}, columna ${c + 1}`);
+        input.tabIndex = -1; // el tabulador entra al tablero por UNA sola casilla (tabindex móvil)
+        input.setAttribute("aria-label", etiquetaCasilla(partida, r, c));
         input.value = partida.answers[r][c] || "";
         cellEl.appendChild(input);
 
         cellEl.addEventListener("click", () => callbacks.onCellClick(r, c));
+        input.addEventListener("focus", () => { callbacks.onCellFocus(r, c); input.select(); });
         input.addEventListener("keydown", (e) => callbacks.onKeyDown(e, r, c));
         input.addEventListener("input", (e) => {
-          const val = (e.target.value || "").replace(/[^a-zA-ZÁÉÍÓÚÑáéíóúñ]/g, "").slice(-1);
-          e.target.value = val.toUpperCase();
-          callbacks.onLetterInput(r, c, val);
+          const val = (e.target.value || "").replace(/[^a-zA-ZÁÉÍÓÚÜÑáéíóúüñ]/g, "").slice(-1);
+          callbacks.onLetterInput(r, c, val, e.target);
         });
 
         containerEl.appendChild(cellEl);
@@ -122,15 +74,28 @@ const CrosswordUI = (() => {
     }
   }
 
+  /** Etiqueta para lectores de pantalla: ubicación y palabras que pasan por la casilla. */
+  function etiquetaCasilla(partida, r, c) {
+    const partes = partida.grid[r][c].words
+      .map((i) => partida.placements[i])
+      .sort((a, b) => (a.dir === "across" ? -1 : 1) - (b.dir === "across" ? -1 : 1))
+      .map((p) => `${p.number} ${p.dir === "across" ? "horizontal" : "vertical"}`);
+    return `Fila ${r + 1}, columna ${c + 1}. Palabra ${partes.join(" y ")}`;
+  }
+
   /** Refresca solo los estados visuales (no reconstruye el tablero). */
   function updateBoardStates(containerEl, partida, seleccion) {
     const activeWordCells = new Set();
-    if (seleccion && seleccion.placementIndex != null) {
-      const p = partida.placements[seleccion.placementIndex];
-      for (let i = 0; i < p.length; i++) {
-        const r = p.dir === "down" ? p.row + i : p.row;
-        const c = p.dir === "across" ? p.col + i : p.col;
-        activeWordCells.add(`${r},${c}`);
+    const activa = seleccion ? CrosswordNav.palabraEn(partida, seleccion.row, seleccion.col, seleccion.dir) : -1;
+    if (activa !== -1) {
+      CrosswordNav.casillasDePalabra(partida, activa).forEach((k) => activeWordCells.add(`${k.row},${k.col}`));
+    }
+
+    // Sin selección, el tabulador entra por la primera casilla del tablero.
+    let primeraFila = -1, primeraCol = -1;
+    outer: for (let r = 0; r < partida.rows; r++) {
+      for (let c = 0; c < partida.cols; c++) {
+        if (partida.grid[r][c]) { primeraFila = r; primeraCol = c; break outer; }
       }
     }
 
@@ -151,6 +116,8 @@ const CrosswordUI = (() => {
 
       const input = cellEl.querySelector(".cw-cell__input");
       if (input) {
+        const esCursor = Boolean(seleccion && seleccion.row === r && seleccion.col === c);
+        input.tabIndex = (seleccion ? esCursor : (r === primeraFila && c === primeraCol)) ? 0 : -1;
         // La celda bloqueada es de solo lectura de verdad (no solo
         // visualmente): el navegador impide escribir, borrar o pegar
         // texto sobre ella. La lógica del juego (crossword-game.js)
@@ -158,7 +125,8 @@ const CrosswordUI = (() => {
         // adicional a nivel de interfaz.
         input.readOnly = resuelta;
         input.setAttribute("aria-readonly", String(resuelta));
-        if (resuelta || document.activeElement !== input) input.value = partida.answers[r][c] || "";
+        // El estado del juego manda: la casilla siempre muestra lo que hay en `answers`.
+        input.value = partida.answers[r][c] || "";
       }
     });
   }
@@ -176,44 +144,85 @@ const CrosswordUI = (() => {
     const ordenadas = [...partida.placements].sort((a, b) => a.number - b.number);
     ordenadas.forEach((p) => {
       const idx = partida.placements.indexOf(p);
-      const mecanismo = p.entry.mechanism ? obtenerMecanismoPorId(p.entry.mechanism) : null;
-      // El nombre completo y correctamente escrito (con tildes/espacios)
-      // se muestra una sola vez: se prefiere "display" (usado por el
-      // segundo crucigrama, de nombres completos) y si no existe se
-      // usa el nombre del mecanismo asociado.
-      const nombreMostrar = p.entry.display || (mecanismo ? mecanismo.nombre : null);
       const li = document.createElement("li");
       const btn = document.createElement("button");
       btn.type = "button";
       btn.className = "clue-item";
       btn.dataset.placementIndex = String(idx);
-      if (mecanismo) btn.style.setProperty("--mech-color", mecanismo.color);
-      btn.innerHTML = `
-        <span class="clue-item__badge">
-          ${
-            mecanismo
-              ? `<svg viewBox="0 0 24 24" fill="none">${svgIcon(mecanismo.icono)}</svg>`
-              : `<span class="clue-item__num">${p.number}</span>`
-          }
-        </span>
-        <span class="clue-item__body">
-          <span class="clue-item__meta">
-            Nº ${p.number} · ${p.dir === "across" ? "Horizontal" : "Vertical"}${nombreMostrar ? " · " + nombreMostrar : ""}
-          </span>
-          <span class="clue-item__text">${p.entry.clue}</span>
-        </span>
-      `;
+      btn.dataset.sound = "select";
+
+      const badge = document.createElement("span");
+      badge.className = "clue-item__badge";
+      const num = document.createElement("span");
+      num.className = "clue-item__num";
+      num.textContent = String(p.number);
+      badge.appendChild(num);
+
+      const body = document.createElement("span");
+      body.className = "clue-item__body";
+      const meta = document.createElement("span");
+      meta.className = "clue-item__meta";
+      meta.textContent = `${p.dir === "across" ? "Horizontal" : "Vertical"} · ${p.length} letras`;
+      const text = document.createElement("span");
+      text.className = "clue-item__text";
+      text.textContent = p.entry.clue;
+      body.append(meta, text);
+
+      btn.append(badge, body);
       btn.addEventListener("click", () => callbacks.onClueClick(idx));
       li.appendChild(btn);
       (p.dir === "across" ? acrossEl : downEl).appendChild(li);
     });
   }
 
+  /**
+   * Panel de la pista activa: número, dirección, longitud y texto de la
+   * pista. NUNCA muestra la respuesta. El botón permite alternar la
+   * dirección cuando la casilla seleccionada es compartida.
+   */
+  function renderActiveClue(containerEl, partida, seleccion, puedeAlternar) {
+    const dirEl = containerEl.querySelector(".active-clue__dir");
+    const textEl = containerEl.querySelector(".active-clue__text");
+    const btn = containerEl.querySelector(".active-clue__switch");
+    if (!seleccion) {
+      containerEl.classList.remove("has-clue");
+      dirEl.textContent = "Elige una casilla";
+      textEl.textContent = "Selecciona una casilla o una pista para ver aquí su descripción.";
+      btn.hidden = true;
+      return;
+    }
+    const idx = CrosswordNav.palabraEn(partida, seleccion.row, seleccion.col, seleccion.dir);
+    const p = partida.placements[idx];
+    containerEl.classList.add("has-clue");
+    containerEl.dataset.dir = p.dir;
+    dirEl.textContent = `${p.number} ${p.dir === "across" ? "→ Horizontal" : "↓ Vertical"} · ${p.length} letras`;
+    textEl.textContent = p.entry.clue;
+    btn.hidden = !puedeAlternar;
+    if (puedeAlternar) {
+      const otra = p.dir === "across" ? "vertical" : "horizontal";
+      btn.textContent = p.dir === "across" ? "↓ Cambiar a vertical" : "→ Cambiar a horizontal";
+      btn.setAttribute("aria-label", `Cambiar a la palabra ${otra} de esta casilla`);
+    }
+  }
+
+  /** Lleva la pista activa a la vista DENTRO de su panel (sin mover la página). */
+  function mostrarPistaActiva(panelEl) {
+    const activa = panelEl.querySelector(".clue-item.is-active");
+    if (!activa || panelEl.scrollHeight <= panelEl.clientHeight) return;
+    const top = activa.offsetTop - panelEl.offsetTop;
+    if (top < panelEl.scrollTop) panelEl.scrollTop = top - 8;
+    else if (top + activa.offsetHeight > panelEl.scrollTop + panelEl.clientHeight) {
+      panelEl.scrollTop = top + activa.offsetHeight - panelEl.clientHeight + 8;
+    }
+  }
+
   function updateClueStates(acrossEl, downEl, partida, seleccion) {
+    const activa = seleccion ? CrosswordNav.palabraEn(partida, seleccion.row, seleccion.col, seleccion.dir) : -1;
     [acrossEl, downEl].forEach((listEl) => {
       listEl.querySelectorAll(".clue-item").forEach((btn) => {
         const idx = Number(btn.dataset.placementIndex);
-        btn.classList.toggle("is-active", Boolean(seleccion && seleccion.placementIndex === idx));
+        btn.classList.toggle("is-active", idx === activa);
+        btn.setAttribute("aria-current", idx === activa ? "true" : "false");
         btn.classList.toggle("is-solved", partida.wordState[idx].solved);
       });
     });
@@ -238,9 +247,8 @@ const CrosswordUI = (() => {
 
   return {
     showStage,
-    renderMechCards, setActiveMechCard, renderMechContext,
     renderBoard, updateBoardStates,
-    renderClues, updateClueStates,
+    renderClues, updateClueStates, renderActiveClue, mostrarPistaActiva,
     updateScore, updateTimer
   };
 })();

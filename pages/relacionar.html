@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Relaciona los Mecanismos · Participación Ciudadana · I.E. José Antonio Aguilera</title>
-  <meta name="description" content="Juego de relación (arrastrar y soltar) entre los mecanismos de participación ciudadana y su significado." />
+  <meta name="description" content="Juego de relación (arrastrar y soltar, o con clics) entre los mecanismos de participación ciudadana y su significado." />
   <link rel="icon" type="image/png" href="../assets/logo/favicon.png" />
   <link rel="icon" href="../assets/logo/favicon.ico" sizes="any" />
   <link rel="apple-touch-icon" href="../assets/logo/favicon.png" />
@@ -14,7 +14,9 @@
   <link rel="stylesheet" href="../css/navbar.css" />
   <link rel="stylesheet" href="../css/sections.css" />
   <link rel="stylesheet" href="../css/quiz.css" />
+  <link rel="stylesheet" href="../css/modal.css" />
   <link rel="stylesheet" href="../css/matching.css" />
+  <link rel="stylesheet" href="../css/game-shell.css" />
   <link rel="stylesheet" href="../css/responsive.css" />
   <link rel="stylesheet" href="../css/themes.css" />
 </head>
@@ -30,21 +32,61 @@
         <div class="matching-intro reveal">
           <span class="matching-intro__icon">🔗</span>
           <h1>Relaciona los Mecanismos</h1>
-          <p class="matching-intro__lead">Une cada mecanismo con su significado correcto.</p>
+          <p class="matching-intro__lead">Une cada significado con el mecanismo que le corresponde.</p>
           <p class="text-muted">
-            Arrastra cada mecanismo hasta el significado que le corresponde.
-            En pantallas táctiles también puedes tocar un mecanismo y luego
-            tocar la casilla donde quieras colocarlo.
+            Arrastra cada mecanismo hasta su significado, o toca primero uno
+            y luego el otro. Puedes corregir tus relaciones antes de
+            comprobar el resultado.
           </p>
-          <button class="btn btn-primary btn-lg" id="btn-comenzar-match">Comenzar</button>
+          <button class="btn btn-primary btn-lg" id="btn-comenzar-match" data-sound="confirm">Comenzar</button>
         </div>
       </section>
 
-      <!-- ============ ETAPA 2: CONFIGURACIÓN ============ -->
-      <section class="matching-stage" data-stage="config">
+      <!-- ============ ETAPA 2: ROL (alumno / maestro) ============ -->
+      <section class="matching-stage" data-stage="role" aria-labelledby="mg-role-title">
         <div class="section-head" style="margin-bottom: var(--space-6);">
           <span class="eyebrow">🔗 Relaciona los Mecanismos</span>
-          <h1>Configura la actividad</h1>
+          <h1 id="mg-role-title">¿Cómo quieres participar?</h1>
+          <p class="text-muted">Elige el modo antes de iniciar el juego.</p>
+        </div>
+
+        <div class="role-grid" id="mg-role-grid">
+          <button type="button" class="role-card" data-role="alumno" data-sound="confirm">
+            <span class="role-card__icon" aria-hidden="true">🎓</span>
+            <span class="role-card__title">Soy alumno</span>
+            <span class="role-card__text">Juega directamente y recibe tu calificación al comprobar.</span>
+            <ul class="role-card__list">
+              <li>Eliges la dificultad y empiezas</li>
+              <li>Sin límite de tiempo</li>
+              <li>Las respuestas correctas no se muestran</li>
+            </ul>
+            <span class="role-card__cta">Continuar como alumno →</span>
+          </button>
+
+          <button type="button" class="role-card" data-role="maestro" data-sound="confirm">
+            <span class="role-card__icon" aria-hidden="true">🧑‍🏫</span>
+            <span class="role-card__title">Soy maestro</span>
+            <span class="role-card__text">Prepara y dirige la actividad frente a la clase.</span>
+            <ul class="role-card__list">
+              <li>Dificultad y tiempo de la actividad</li>
+              <li>Pausar y reanudar el juego</li>
+              <li>Consultar las respuestas correctas</li>
+              <li>Terminar y calificar cuando decida</li>
+            </ul>
+            <span class="role-card__cta">Continuar como maestro →</span>
+          </button>
+        </div>
+
+        <p class="role-note text-muted">
+          El modo organiza la actividad en esta página; no es un inicio de sesión ni una medida de seguridad.
+        </p>
+      </section>
+
+      <!-- ============ ETAPA 3: CONFIGURACIÓN ============ -->
+      <section class="matching-stage" data-stage="config">
+        <div class="section-head" style="margin-bottom: var(--space-6);">
+          <span class="eyebrow" id="mg-config-badge">🔗 Relaciona los Mecanismos</span>
+          <h1 id="mg-config-title">Configura la actividad</h1>
         </div>
 
         <div class="config-card">
@@ -56,38 +98,70 @@
             </p>
           </div>
 
-          <div class="config-group">
+          <div class="config-group" id="mg-group-tiempo">
             <p class="config-group__title"><span class="step-badge">2</span> Tiempo</p>
             <div class="pill-group" id="mg-config-tiempo"></div>
           </div>
 
           <div class="config-launch">
-            <button class="btn btn-primary btn-lg" id="btn-iniciar-match">🚀 Iniciar</button>
+            <button class="btn btn-ghost" id="btn-mg-cambiar-rol" type="button">← Cambiar de modo</button>
+            <button class="btn btn-primary btn-lg" id="btn-iniciar-match" data-sound="start">🚀 Iniciar</button>
           </div>
         </div>
       </section>
 
-      <!-- ============ ETAPA 3: JUEGO ============ -->
+      <!-- ============ ETAPA 4: JUEGO ============ -->
       <section class="matching-stage" data-stage="game">
-        <div class="matching-game-head">
-          <span class="eyebrow" style="justify-content:center;">🔗 Relaciona los Mecanismos</span>
-          <h2>Arrastra cada mecanismo hasta su significado</h2>
+        <div class="game-toolbar">
+          <button type="button" class="btn btn-ghost game-exit-btn" id="btn-mg-salir" data-sound="none">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 4h4a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-4M10 8l-4 4 4 4M6 12h11" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Salir
+          </button>
+          <div class="matching-game-head">
+            <span class="eyebrow" style="justify-content:center;">🔗 Relaciona los Mecanismos</span>
+            <h2>Une cada significado con su mecanismo</h2>
+          </div>
+          <span class="game-toolbar__spacer" aria-hidden="true"></span>
         </div>
 
         <div class="match-stats">
           <span class="match-stat" id="mg-timer">⏱️ --:--</span>
           <span class="match-stat" id="mg-progreso">0 / 8 relacionadas</span>
+          <span class="match-stat" id="mg-role-badge">🎓 Alumno</span>
         </div>
 
-        <div class="match-board" id="mg-filas"></div>
+        <!-- Controles administrativos: solo se crean cuando el modo es maestro -->
+        <div class="teacher-panel" id="mg-teacher-panel" hidden></div>
 
-        <div class="match-pool-wrap">
-          <h3>Opciones de respuesta</h3>
-          <div class="match-pool" id="mg-pool"></div>
+        <div class="match-stage-wrap">
+          <div class="match-layout" id="mg-layout">
+            <section class="match-col match-col--defs" aria-labelledby="mg-defs-title">
+              <h3 id="mg-defs-title">Significados</h3>
+              <ol class="match-list" id="mg-filas"></ol>
+            </section>
+
+            <section class="match-col match-col--pool" aria-labelledby="mg-pool-title">
+              <h3 id="mg-pool-title">Mecanismos <small id="mg-pool-count"></small></h3>
+              <div class="match-pool" id="mg-pool"></div>
+            </section>
+          </div>
+          <div class="pause-veil" id="mg-pause-veil" hidden>
+            <p>⏸️ Actividad en pausa</p>
+            <span>El maestro la reanudará.</span>
+          </div>
+        </div>
+
+        <p class="match-status" id="mg-status" aria-live="polite">
+          Arrastra un mecanismo hasta su significado, o toca uno y luego el otro.
+        </p>
+
+        <div class="match-actions">
+          <button type="button" class="btn btn-primary btn-lg" id="btn-mg-comprobar" data-sound="none" disabled>✓ Comprobar y finalizar</button>
+          <span class="match-actions__hint text-muted" id="mg-comprobar-hint"></span>
         </div>
       </section>
 
-      <!-- ============ ETAPA 4: RESULTADO ============ -->
+      <!-- ============ ETAPA 5: RESULTADO ============ -->
       <section class="matching-stage result-stage" data-stage="result">
         <div class="result-badge">🎉</div>
         <h2>Actividad completada</h2>
@@ -100,9 +174,15 @@
           <div class="result-stat"><b id="mg-result-time">00:00</b><span>Tiempo</span></div>
         </div>
 
+        <div class="match-review-wrap">
+          <h3>Revisión de tus relaciones</h3>
+          <ul class="match-review" id="mg-review"></ul>
+          <div class="match-review-actions" id="mg-review-actions"></div>
+        </div>
+
         <div class="question-actions">
           <a class="btn btn-secondary" href="juegos.html">🏠 Volver a Juegos</a>
-          <button class="btn btn-primary" id="btn-mg-nuevo">🔄 Jugar de nuevo</button>
+          <button class="btn btn-primary" id="btn-mg-nuevo" data-sound="confirm">🔄 Jugar de nuevo</button>
         </div>
       </section>
 
@@ -140,8 +220,11 @@
   <script src="../js/components/animations.js"></script>
 
   <!-- Núcleo -->
+  <script src="../js/sound.js"></script>
   <script src="../js/theme.js"></script>
   <script src="../js/navigation.js"></script>
+  <script src="../js/modal.js"></script>
+  <script src="../js/game-shell.js"></script>
 
   <!-- Juego de relación -->
   <script src="../js/matching/matching-game.js"></script>

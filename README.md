@@ -32,9 +32,8 @@ participacion-ciudadana/
 ├── pages/
 │   ├── aprender.html          → Los 8 mecanismos con filtros
 │   ├── quiz.html               → Rol, configuración, cuestionario y resultados
-│   ├── juegos.html              → Hub: enlaza los 3 juegos siguientes
-│   ├── crucigrama.html          → Crucigrama original
-│   ├── crucigrama-nombres.html  → Crucigrama de nombres completos (independiente)
+│   ├── juegos.html              → Hub: enlaza los juegos siguientes
+│   ├── crucigrama.html          → Crucigrama (único)
 │   └── relacionar.html          → Relaciona los mecanismos (drag & drop)
 ├── css/                      → Un archivo por responsabilidad (ver abajo)
 ├── js/
@@ -43,15 +42,14 @@ participacion-ciudadana/
 │   ├── navigation.js          → Navbar activo + menú hamburguesa
 │   ├── modal.js                → Modal de información de un mecanismo
 │   ├── quiz/                   → Motor del quiz (config, engine, timer, score, ui, orquestador)
-│   ├── crossword/               → Motor de AMBOS crucigramas (generator/game/ui genéricos
-│   │                               + un controlador propio por crucigrama)
+│   ├── crossword/               → Motor del crucigrama (generator/game/nav/ui + controlador)
 │   ├── matching/                 → Motor de "Relaciona los mecanismos"
 │   └── components/             → navbar, cards, buttons, animations, icons, info-general
 ├── data/
 │   ├── mecanismos/             → Un archivo por mecanismo + index.js agregador
 │   ├── preguntas/               → Banco de opción múltiple (por dificultad) + agregador
 │   ├── preguntas-abiertas/      → Banco de preguntas abiertas (respuesta libre) + agregador
-│   ├── crossword/                → Bancos de palabras/pistas de ambos crucigramas
+│   ├── crossword/                → Banco de palabras/pistas del crucigrama
 │   ├── matching/                  → Significados (medio/difícil) del juego de relación
 │   └── general/                   → Información general (marco legal, glosario, etc.)
 ├── assets/
@@ -357,11 +355,11 @@ También se puede practicar un solo mecanismo: desde su tarjeta en
 
 ---
 
-## 11. Juegos: crucigramas y relación
+## 11. Juegos: crucigrama y relación
 
-Hay tres actividades tipo juego, reunidas en `pages/juegos.html` y
+Hay dos actividades tipo juego (además del quiz), reunidas en `pages/juegos.html` y
 enlazadas desde el ítem "Juegos" del navbar (que queda activo en las
-cuatro páginas de juegos, no solo en el hub).
+tres páginas de juegos, no solo en el hub).
 
 ### 11.1. Crucigrama (original)
 
@@ -380,7 +378,8 @@ js/crossword/crossword-game.js       -> puntuacion, respuestas, ayudas, comproba
 js/crossword/crossword-ui.js         -> pinta tablero, tarjetas, pistas y estados
 js/crossword/crossword.js            -> controlador: conecta todo lo anterior
 css/crossword.css                    -> layout general (intro, stats, tablero+pistas)
-css/crossword-cards.css              -> tarjetas de mecanismos y tarjeta contextual
+js/crossword/crossword-nav.js        -> selección de palabra y teclado (lógica pura, sin DOM)
+css/game-shell.css                   -> barra Salir, panel del maestro, pista activa
 css/crossword-board.css              -> cuadricula, casillas y panel de pistas
 ```
 
@@ -420,42 +419,27 @@ palabras/derechos relacionados con la participación, pero no se
 presentan como dos de los seis mecanismos que regula directamente la
 Ley 1757 de 2015.
 
-### 11.2. Crucigrama de Nombres Completos (segundo crucigrama)
+### 11.2. Selección, teclado y pistas del crucigrama
 
-`pages/crucigrama-nombres.html`. Es un crucigrama **independiente**
-del original: mismo motor genérico (generador/estado/interfaz de
-arriba), pero con su propio banco de datos y su propio controlador,
-pensado para los nombres completos de los mecanismos ("Revocatoria
-del Mandato", "Derecho de Petición", etc.) en una cuadrícula más
-grande.
+- Casilla de **una** palabra → se selecciona esa palabra. Casilla
+  **compartida** → un segundo clic (o Espacio/Enter, o el botón
+  «Cambiar a horizontal/vertical» del panel de la pista) alterna la
+  dirección. El color indica la dirección activa (azul horizontal,
+  rojo vertical) y la casilla muestra una flecha.
+- Escribir rellena solo la palabra activa y avanza dentro de ella.
+  Las flechas mueven el cursor (saltan huecos, no fallan en los bordes)
+  y conservan la dirección cuando es posible. Retroceso borra la letra
+  de la casilla; si está vacía, borra la anterior de la misma palabra.
+- Las casillas muestran solo lo escrito y el número de referencia. Las
+  pistas son descripciones/situaciones: **no pueden nombrar la
+  respuesta ni otra respuesta del banco** (ver encabezado de
+  `crossword-data.js`). Los nombres de los mecanismos no aparecen en el
+  juego.
+- Corrección importante en `crossword-generator.js`: antes, si una
+  palabra candidata se descartaba, las casillas podían apuntar a otra
+  palabra; ahora el índice es la posición real en `placements`.
 
-```
-data/crossword/crossword-full-data.js -> banco de nombres completos
-js/crossword/crossword-full.js         -> controlador independiente (su propia dificultad/config)
-```
-
-Cada palabra guarda dos formas:
-
-```javascript
-{
-  word: "REVOCATORIADELMANDATO", // para la cuadrícula: sin espacios ni tildes
-  display: "Revocatoria del Mandato", // nombre completo y correcto
-  clue: "...",
-  mechanism: "revocatoria-mandato",
-  difficulty: "dificil"
-}
-```
-
-El nombre completo y correctamente escrito (`display`, con espacios y
-tildes) es lo que se muestra en las pistas — nunca la versión interna
-sin espacios, que solo se usa para construir la cuadrícula. Para
-agregar una palabra nueva a este segundo crucigrama, edita
-`data/crossword/crossword-full-data.js` con esa misma estructura; no
-hace falta tocar el generador (ya soporta nombres largos: el lienzo
-interno de trabajo es de 41×41, ver `GRID_SIZE` en
-`crossword-generator.js`).
-
-### 11.3. Relaciona los Mecanismos (arrastrar y soltar)
+### 11.3. Relaciona los Mecanismos (arrastrar y soltar, o clic)
 
 `pages/relacionar.html`. Juego de relación: cada fila muestra el
 significado de un mecanismo; el estudiante arrastra la ficha del
@@ -496,13 +480,50 @@ un decimal — 0% da exactamente 1.0 y 100% da exactamente 5.0.
 (cuenta regresiva; al llegar a 00:00 finaliza automáticamente con lo
 que se alcanzó a responder).
 
-### 11.4. Página de Juegos (navegación)
+### 11.3.1. Rediseño del juego de relacionar
 
-`pages/juegos.html` reúne los tres juegos en tarjetas simples. El
+Dos columnas compactas (significados con su casilla · mecanismos
+disponibles; en teléfono, lista vertical con bandeja fija abajo).
+Arrastre con Pointer Events (ratón, lápiz y táctil) o selección por
+clic/toque en cualquier orden. Un mecanismo solo puede estar en un
+significado; se puede mover, intercambiar o quitar. **No hay
+aciertos/errores a la vista durante la partida**: se califican al pulsar
+«Comprobar y finalizar». El alumno no ve las respuestas correctas; el
+maestro puede mostrarlas al final.
+
+### 11.4. Modo alumno / maestro, salida y página de Juegos
+
+**Modo.** Antes de cada juego se elige alumno o maestro. Es solo
+organización de la actividad en una página estática: **no es
+autenticación** y no protege nada. El alumno recibe valores fijos y no
+tiene controles administrativos en el DOM. El maestro configura
+(modalidad/tiempo/dificultad), puede **pausar/reanudar**, consultar la
+solución (se construye solo al pedirla) y **terminar** la actividad.
+
+**Salir.** Todos los juegos tienen botón «Salir» con aviso «¿Salir del
+juego?» (Continuar / Salir). `js/game-shell.js` (`RCGame.session`)
+registra intervalos, temporizadores y oyentes de la partida y los libera
+al terminar o salir; también pide confirmación al pulsar enlaces
+internos y al usar «Atrás», y activa el aviso nativo del navegador al
+recargar/cerrar.
+
+**Página de Juegos.** `pages/juegos.html` reúne los juegos en tarjetas simples. El
 navbar solo muestra un ítem "Juegos" (para no saturarlo); ese enlace
 queda marcado como activo en las cuatro páginas de esta sección,
 gracias a que `data-page` en `js/components/navbar.js` acepta varias
 páginas separadas por `|`, y `js/navigation.js` las reconoce todas.
+
+## 11.5. Sonido global
+
+`js/sound.js` (`window.RCSound`) sintetiza los efectos con Web Audio
+(sin archivos ni librerías). Un único botón en el navbar activa o
+desactiva el sonido de **toda** la página; la preferencia se guarda en
+`localStorage` (`rc-sound`). Activado por defecto; el navegador solo
+permite audio tras el primer clic/toque. Al desactivar se corta todo lo
+que suene. Uso: `RCSound.play("correct")` (nombres en `SOUNDS`). Los
+clics en botones suenan automáticamente; usa `data-sound="none"` para
+silenciar uno o `data-sound="confirm"` para otro efecto. El interruptor
+de sonido del quiz usa esta misma preferencia global.
 
 ## 12. Modo claro / oscuro
 

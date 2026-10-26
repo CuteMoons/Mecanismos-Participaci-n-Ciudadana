@@ -48,6 +48,7 @@ const CrosswordGenerator = (() => {
       const celda = grid[r][c];
       if (celda) {
         if (celda.letter !== word[i]) return false; // choque de letras distintas
+        if (celda.dirs[dir]) return false;          // no se solapa con otra palabra de la misma dirección
         tieneAlgunCruce = true;
       } else {
         // Si la celda está vacía, las celdas perpendiculares adyacentes
@@ -72,10 +73,14 @@ const CrosswordGenerator = (() => {
     for (let i = 0; i < entry.word.length; i++) {
       const r = row + dr * i;
       const c = col + dc * i;
-      if (!grid[r][c]) grid[r][c] = { letter: entry.word[i], words: [] };
+      if (!grid[r][c]) grid[r][c] = { letter: entry.word[i], words: [], dirs: {} };
       grid[r][c].words.push(index);
+      grid[r][c].dirs[dir] = true;
     }
-    return { index, row, col, dir, length: entry.word.length };
+    // `index` es la POSICIÓN de la palabra en `placements` (no en la lista de
+    // candidatas): las celdas guardan este mismo número, así que cada celda
+    // apunta siempre a la palabra correcta aunque alguna candidata se descarte.
+    return { index, row, col, dir, length: entry.word.length, entry };
   }
 
   /** Busca la mejor posición para cruzar `entry` con lo ya colocado. */
@@ -135,20 +140,20 @@ const CrosswordGenerator = (() => {
     // Primera palabra: centrada, horizontal.
     const primera = ordenadas[0];
     const colInicio = CENTER - Math.floor(primera.word.length / 2);
-    placements.push(colocar(grid, primera, CENTER, colInicio, "across", 0));
+    placements.push(colocar(grid, primera, CENTER, colInicio, "across", placements.length));
 
     for (let i = 1; i < ordenadas.length; i++) {
       const entry = ordenadas[i];
       const pos = buscarPosicion(grid, entry);
       if (!pos) continue; // no se logró cruzar: se descarta esta palabra
-      placements.push(colocar(grid, entry, pos.row, pos.col, pos.dir, i));
+      placements.push(colocar(grid, entry, pos.row, pos.col, pos.dir, placements.length));
     }
 
-    return recortar(grid, placements, ordenadas);
+    return recortar(grid, placements);
   }
 
   /** Recorta el grid al área realmente usada y numera las palabras. */
-  function recortar(grid, placements, entries) {
+  function recortar(grid, placements) {
     let minR = GRID_SIZE, maxR = -1, minC = GRID_SIZE, maxC = -1;
     for (let r = 0; r < GRID_SIZE; r++) {
       for (let c = 0; c < GRID_SIZE; c++) {
@@ -171,8 +176,7 @@ const CrosswordGenerator = (() => {
     const finalPlacements = placements.map((p) => ({
       ...p,
       row: p.row - minR,
-      col: p.col - minC,
-      entry: entries[p.index]
+      col: p.col - minC
     }));
 
     // Numeración: recorrido por filas/columnas; una celda recibe número

@@ -18,8 +18,7 @@
   let sesion = null;       // partida en curso (null si no hay)
   let timer = null;
   let avanceId = null;     // setTimeout del avance automático (solo alumno)
-  let sonidoActivo = true;
-  let audioCtx = null;
+  let sonidoActivo = window.RCSound ? RCSound.isEnabled() : true; // refleja la preferencia GLOBAL
   let ultimoResumen = "";
 
   /* ----------------------------- utilidades ----------------------------- */
@@ -47,21 +46,8 @@
   }
 
   function pitar() {
-    if (!sonidoActivo) return;
-    try {
-      const Ctx = window.AudioContext || window.webkitAudioContext;
-      if (!Ctx) return;
-      audioCtx = audioCtx || new Ctx();
-      if (audioCtx.state === "suspended") audioCtx.resume();
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.frequency.value = 880;
-      gain.gain.value = 0.08;
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start();
-      osc.stop(audioCtx.currentTime + 0.35);
-    } catch (_) { /* el sonido es opcional */ }
+    // Aviso de fin de tiempo: usa el sistema global (respeta el botón de sonido del navbar).
+    if (window.RCSound) RCSound.play("alarm");
   }
 
   const preguntaActual = () => sesion.preguntas[sesion.indice];
@@ -117,7 +103,6 @@
       return;
     }
 
-    sonidoActivo = config.sonido;
     sesion = {
       rol: config.rol,
       config: Object.freeze(config),
@@ -187,6 +172,7 @@
     QuizUI.resaltarOpciones({ seleccion: letra, correcta });
 
     const detalle = `La respuesta correcta es ${textoOpcion(p, correcta)}`;
+    if (window.RCSound && estado !== "sin-responder") RCSound.play(estado === "correcta" ? "correct" : "incorrect");
     if (estado === "correcta") {
       QuizUI.mostrarFeedback({ tipo: "ok", texto: "✔ ¡Correcto!", explicacion: p.explicacion });
     } else if (estado === "incorrecta") {
@@ -314,6 +300,7 @@
 
     if (sesion.rol === "alumno") finalizarAlumno();
     else finalizarMaestro();
+    if (window.RCSound) RCSound.play("complete");
     QuizUI.showStage("result");
   }
 
@@ -432,6 +419,7 @@
   }
 
   function confirmarSalida() {
+    if (window.RCSound) { RCSound.stopAll(); RCSound.play("exit"); }
     QuizUI.cerrarModalSalida();
     descartarPartida();
     QuizConfig.reset();            // configuración desde cero (conserva solo el filtro por mecanismo)
@@ -487,9 +475,7 @@
 
     // Sonido (preferencia propia de cada persona, no es un control administrativo)
     const alternarSonido = () => {
-      sonidoActivo = !sonidoActivo;
-      timer.setSonido(sonidoActivo);
-      pintarMute();
+      if (window.RCSound) RCSound.toggle();   // un solo interruptor para toda la página
     };
     $("btn-mute").addEventListener("click", alternarSonido);
     $("btn-mute-alumno").addEventListener("click", alternarSonido);
@@ -532,6 +518,10 @@
     // Resultado
     $("btn-copiar").addEventListener("click", copiarResumen);
     $("btn-nuevo-quiz").addEventListener("click", nuevoCuestionario);
+  }
+
+  if (window.RCSound) {
+    RCSound.onChange((on) => { sonidoActivo = on; timer.setSonido(on); pintarMute(); });
   }
 
   leerFiltroDeURL();

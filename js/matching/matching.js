@@ -1,8 +1,9 @@
 /**
  * js/matching/matching.js
- * Controlador principal de "Relaciona los mecanismos". Conecta la
- * configuración, el estado del juego (matching-game.js) y la
- * interfaz (matching-ui.js) con la interacción del usuario.
+ * Controlador de "Relaciona los mecanismos".
+ * Flujo: introducción → modo (alumno/maestro) → configuración → juego → resultado.
+ * Todo lo creado durante la partida (reloj, oyentes, arrastre) se registra en
+ * `sess` y se libera al terminar o al confirmar la salida.
  */
 
 (function initMatching() {
@@ -15,190 +16,250 @@
     { label: "20 min", value: 1200 }
   ];
 
+  let rol = null;
   let config = { dificultad: "media", tiempoSegundos: 0 };
   let partida = null;
-  let selectedChipId = null;
-  let timerInterval = null;
-  let tiempoRestanteOInicial = 0;
-  let modoSinLimite = false;
+  let seleccion = null;      // { tipo:"chip", id } | { tipo:"slot", row } | null
+  let reloj = null;
+  let pausado = false;
 
+  const sess = RCGame.session({ name: "relacionar", onDiscard: descartarPartida });
+  const $ = (id) => document.getElementById(id);
   const els = {
-    filas: document.getElementById("mg-filas"),
-    pool: document.getElementById("mg-pool"),
-    timer: document.getElementById("mg-timer"),
-    progreso: document.getElementById("mg-progreso"),
-    resultGrade: document.getElementById("mg-result-grade"),
-    resultCorrect: document.getElementById("mg-result-correct"),
-    resultIncorrect: document.getElementById("mg-result-incorrect"),
-    resultTime: document.getElementById("mg-result-time")
+    filas: $("mg-filas"), pool: $("mg-pool"), poolCount: $("mg-pool-count"),
+    timer: $("mg-timer"), progreso: $("mg-progreso"), status: $("mg-status"),
+    btnComprobar: $("btn-mg-comprobar"), hint: $("mg-comprobar-hint"),
+    layout: $("mg-layout"), veil: $("mg-pause-veil"), teacher: $("mg-teacher-panel"),
+    roleBadge: $("mg-role-badge")
   };
 
-  // =================================================================
-  // CONFIGURACIÓN
-  // =================================================================
+  // ---------------- configuración ----------------
   function pillGroup(container, opciones, valorActual, onSelect) {
     container.innerHTML = "";
     opciones.forEach((op) => {
-      const label = typeof op === "object" ? op.label : op;
-      const value = typeof op === "object" ? op.value : op;
       const btn = document.createElement("button");
       btn.type = "button";
-      btn.className = "pill" + (value === valorActual ? " is-selected" : "");
-      btn.textContent = label;
+      btn.className = "pill" + (op.value === valorActual ? " is-selected" : "");
+      btn.textContent = op.label;
       btn.addEventListener("click", () => {
         container.querySelectorAll(".pill").forEach((p) => p.classList.remove("is-selected"));
         btn.classList.add("is-selected");
-        onSelect(value);
+        onSelect(op.value);
       });
       container.appendChild(btn);
     });
   }
 
   function renderConfigStage() {
-    const dificultades = [
-      { label: "Medio", value: "media" },
-      { label: "Difícil", value: "dificil" }
-    ];
-    pillGroup(document.getElementById("mg-config-dificultad"), dificultades, config.dificultad, (v) => { config.dificultad = v; });
-    pillGroup(document.getElementById("mg-config-tiempo"), TIEMPO_OPCIONES, config.tiempoSegundos, (v) => { config.tiempoSegundos = v; });
+    const esMaestro = rol === "maestro";
+    $("mg-config-badge").textContent = esMaestro ? "🧑‍🏫 Modo maestro" : "🎓 Modo alumno";
+    $("mg-config-title").textContent = esMaestro ? "Configura la actividad" : "¿Con qué dificultad quieres jugar?";
+    $("mg-group-tiempo").hidden = !esMaestro;
+    if (!esMaestro) config.tiempoSegundos = 0;
+    pillGroup($("mg-config-dificultad"),
+      [{ label: "Medio", value: "media" }, { label: "Difícil", value: "dificil" }],
+      config.dificultad, (v) => { config.dificultad = v; });
+    pillGroup($("mg-config-tiempo"), TIEMPO_OPCIONES, config.tiempoSegundos, (v) => { config.tiempoSegundos = v; });
   }
 
-  // =================================================================
-  // TEMPORIZADOR (mismo patrón visual que el crucigrama)
-  // =================================================================
-  function formatearTiempo(seg) {
-    const m = Math.floor(seg / 60).toString().padStart(2, "0");
-    const s = (seg % 60).toString().padStart(2, "0");
-    return `${m}:${s}`;
-  }
-
-  function pintarTimer() {
+  // ---------------- reloj ----------------
+  function pintarReloj(info) {
     let tono = null;
-    if (!modoSinLimite) {
-      if (tiempoRestanteOInicial <= 30) tono = "critical";
-      else if (tiempoRestanteOInicial <= 120) tono = "warning";
-    }
-    els.timer.textContent = `⏱️ ${formatearTiempo(tiempoRestanteOInicial)}`;
+    if (!info.unlimited) tono = info.remaining <= 30 ? "critical" : info.remaining <= 120 ? "warning" : null;
+    els.timer.textContent = `⏱️ ${RCGame.formatTime(info.shown)}`;
     els.timer.classList.toggle("is-warning", tono === "warning");
     els.timer.classList.toggle("is-critical", tono === "critical");
   }
 
-  function iniciarTimer() {
-    detenerTimer();
-    modoSinLimite = config.tiempoSegundos === 0;
-    tiempoRestanteOInicial = modoSinLimite ? 0 : config.tiempoSegundos;
-    pintarTimer();
-    timerInterval = setInterval(() => {
-      if (modoSinLimite) {
-        tiempoRestanteOInicial += 1;
-      } else {
-        tiempoRestanteOInicial -= 1;
-        if (tiempoRestanteOInicial <= 0) {
-          tiempoRestanteOInicial = 0;
-          pintarTimer();
-          detenerTimer();
-          finalizarPartida(true);
-          return;
-        }
-      }
-      pintarTimer();
-    }, 1000);
+  // ---------------- interacción ----------------
+  const decir = (t) => { els.status.textContent = t; };
+
+  function refrescar() {
+    MatchingUI.render(els, partida, { seleccion, bloqueado: pausado }, callbacks);
+    MatchingUI.actualizarProgreso(els.progreso, partida.contarColocadas(), partida.total);
+    const completo = partida.estaCompleto();
+    els.btnComprobar.disabled = !completo || pausado;
+    els.hint.textContent = completo ? "" : `Faltan ${partida.total - partida.contarColocadas()} por relacionar.`;
   }
 
-  function detenerTimer() {
-    if (timerInterval) clearInterval(timerInterval);
-    timerInterval = null;
+  function colocar(row, chipId, sonido) {
+    const r = partida.colocar(row, chipId);
+    seleccion = null;
+    if (r.ignorado) { refrescar(); return; }
+    RCSound.play(sonido);
+    refrescar();
+    const ficha = partida.obtenerFicha(chipId);
+    decir(`${ficha.nombre} relacionado con el significado ${MatchingUI.letra(row)}.`);
   }
 
-  function tiempoTranscurridoTexto() {
-    if (modoSinLimite) return formatearTiempo(tiempoRestanteOInicial);
-    return formatearTiempo(config.tiempoSegundos - tiempoRestanteOInicial);
-  }
-
-  // =================================================================
-  // INTERACCIÓN (arrastrar/soltar + selección por clic, accesible)
-  // =================================================================
   const callbacks = {
-    onDrop: (rowIndex, chipId) => colocarFicha(rowIndex, chipId),
-    onRowClick: (rowIndex) => {
-      if (selectedChipId) {
-        colocarFicha(rowIndex, selectedChipId);
-        selectedChipId = null;
-      } else {
-        // Si la fila ya tiene una ficha incorrecta puesta, un clic la libera.
-        const fila = partida.filas[rowIndex];
-        if (fila.filledWith && !fila.locked) {
-          partida.quitarDeFila(rowIndex);
-          refrescar();
-        }
-      }
+    onPick: () => RCSound.play("pick"),
+    onDrop: (row, chipId) => colocar(row, chipId, "drop"),
+    onReturn: (chipId) => {
+      const row = partida.filaDeFicha(chipId);
+      if (row !== -1) { partida.quitarDeFila(row); seleccion = null; RCSound.play("unmatch"); refrescar(); decir("Mecanismo devuelto a la lista."); }
     },
-    onChipClick: (chipId) => {
-      selectedChipId = selectedChipId === chipId ? null : chipId;
+    onChipClick: (id) => {
+      if (pausado) return;
+      if (seleccion && seleccion.tipo === "slot") { colocar(seleccion.row, id, "match"); return; }
+      if (seleccion && seleccion.tipo === "chip" && seleccion.id === id) { seleccion = null; decir("Selección cancelada."); }
+      else { seleccion = { tipo: "chip", id }; RCSound.play("select"); decir(`Seleccionado: ${partida.obtenerFicha(id).nombre}. Ahora elige su significado.`); }
       refrescar();
+    },
+    onSlotClick: (row) => {
+      if (pausado) return;
+      if (seleccion && seleccion.tipo === "chip") { colocar(row, seleccion.id, "match"); return; }
+      const fila = partida.filas[row];
+      if (seleccion && seleccion.tipo === "slot" && seleccion.row === row) { seleccion = null; decir("Selección cancelada."); }
+      else if (fila.filledWith) { seleccion = { tipo: "chip", id: fila.filledWith }; RCSound.play("select"); decir(`Seleccionado: ${partida.obtenerFicha(fila.filledWith).nombre}. Elige otro significado para moverlo.`); }
+      else { seleccion = { tipo: "slot", row }; RCSound.play("select"); decir(`Significado ${MatchingUI.letra(row)} seleccionado. Ahora elige un mecanismo.`); }
+      refrescar();
+    },
+    onRemove: (row) => {
+      if (pausado) return;
+      if (partida.quitarDeFila(row)) { seleccion = null; RCSound.play("unmatch"); refrescar(); decir("Relación quitada."); }
     }
   };
 
-  function colocarFicha(rowIndex, chipId) {
-    const resultado = partida.colocar(rowIndex, chipId);
-    if (!resultado.ignorado) {
-      selectedChipId = null;
-      refrescar();
-      revisarFinalAutomatico();
-    }
+  // ---------------- maestro ----------------
+  function construirPanelMaestro() {
+    const p = els.teacher;
+    p.innerHTML = "";
+    p.hidden = rol !== "maestro";
+    if (rol !== "maestro") return;
+    p.innerHTML = `
+      <span class="teacher-panel__label">🧑‍🏫 Controles del maestro</span>
+      <div class="teacher-panel__actions">
+        <button type="button" class="btn btn-ghost" id="btn-mg-pausa" data-sound="none">⏸️ Pausar</button>
+        <button type="button" class="btn btn-ghost" id="btn-mg-solucion" aria-expanded="false" aria-controls="mg-solucion" data-sound="none">👁️ Ver respuestas</button>
+        <button type="button" class="btn btn-ghost" id="btn-mg-terminar" data-sound="none">🏁 Terminar y calificar</button>
+      </div>
+      <div class="teacher-solution" id="mg-solucion" hidden></div>`;
+    const btnPausa = p.querySelector("#btn-mg-pausa");
+    const btnSol = p.querySelector("#btn-mg-solucion");
+    const btnFin = p.querySelector("#btn-mg-terminar");
+    const sol = p.querySelector("#mg-solucion");
+
+    sess.listen(btnPausa, "click", () => alternarPausa(btnPausa));
+    sess.listen(btnSol, "click", () => {
+      const abrir = sol.hidden;
+      if (abrir && !sol.dataset.built) {
+        const items = partida.filas.map((f, i) => `<li><b>${MatchingUI.letra(i)}</b> ${partida.obtenerFicha(f.mechanismId).nombre}</li>`).join("");
+        sol.innerHTML = `<p class="text-muted">Solo para el maestro. Evita proyectar esta lista a la clase.</p><ul>${items}</ul>`;
+        sol.dataset.built = "1";
+      }
+      sol.hidden = !abrir;
+      btnSol.setAttribute("aria-expanded", String(abrir));
+      btnSol.textContent = abrir ? "🙈 Ocultar respuestas" : "👁️ Ver respuestas";
+      RCSound.play(abrir ? "open" : "close");
+    });
+    let armado = null;
+    sess.listen(btnFin, "click", () => {
+      if (armado) { armado.clear(); armado = null; finalizar("maestro"); return; }
+      btnFin.textContent = "¿Seguro? Pulsa de nuevo";
+      RCSound.play("open");
+      armado = sess.timeout(() => { armado = null; btnFin.textContent = "🏁 Terminar y calificar"; }, 3500);
+    });
   }
 
-  function refrescar() {
-    MatchingUI.renderFilas(els.filas, partida, callbacks);
-    MatchingUI.renderPool(els.pool, partida, callbacks, selectedChipId);
-    MatchingUI.actualizarProgreso(els.progreso, partida.contarCorrectas(), partida.total);
-  }
-
-  // =================================================================
-  // FLUJO DE PANTALLAS
-  // =================================================================
-  function revisarFinalAutomatico() {
-    if (partida.estaCompleto()) finalizarPartida(false);
-  }
-
-  function iniciarPartida() {
-    const mecanismos = construirMecanismosParaJuego(config.dificultad);
-    partida = crearPartidaMatching(mecanismos);
-    selectedChipId = null;
+  function alternarPausa(btn) {
+    if (!reloj || !partida) return;
+    pausado = !pausado;
+    if (pausado) { reloj.pause(); MatchingUI.cancelarArrastre(); seleccion = null; } else reloj.resume();
+    els.layout.inert = pausado;
+    els.veil.hidden = !pausado;
+    btn.textContent = pausado ? "▶️ Reanudar" : "⏸️ Pausar";
     refrescar();
-    iniciarTimer();
+    RCSound.play(pausado ? "pause" : "resume");
+  }
+
+  // ---------------- flujo ----------------
+  function iniciarPartida() {
+    sess.start();
+    partida = crearPartidaMatching(construirMecanismosParaJuego(config.dificultad));
+    seleccion = null;
+    pausado = false;
+    els.layout.inert = false;
+    els.veil.hidden = true;
+    els.roleBadge.textContent = rol === "maestro" ? "🧑‍🏫 Maestro" : "🎓 Alumno";
+    decir("Arrastra un mecanismo hasta su significado, o toca uno y luego el otro.");
+    sess.listen($("btn-mg-salir"), "click", () => sess.requestExit());
+    sess.listen(els.btnComprobar, "click", () => { if (partida.estaCompleto()) finalizar("completo"); });
+    sess.listen(document, "keydown", (e) => {
+      if (e.key === "Escape" && seleccion && !RCGame.isExitModalOpen()) { seleccion = null; refrescar(); decir("Selección cancelada."); }
+    });
+    sess.onCleanup(() => MatchingUI.cancelarArrastre());   // sin arrastres ni fantasmas tras salir
+    construirPanelMaestro();
+    refrescar();
+    reloj = RCGame.clock({ session: sess, limitSeconds: config.tiempoSegundos, onTick: pintarReloj, onEnd: () => finalizar("tiempo") });
+    reloj.start();
     MatchingUI.showStage("game");
   }
 
-  function finalizarPartida(porTiempo) {
-    detenerTimer();
+  function finalizar(motivo) {
+    if (!partida || partida.estaEvaluada()) return;
+    if (reloj) reloj.stop();
+    const tiempo = RCGame.formatTime(reloj ? reloj.info().elapsed : 0);
+    MatchingUI.cancelarArrastre();
+    partida.evaluar();
+    sess.end();
+    RCSound.stopAll();
+    RCSound.play("complete");
+
     const correctas = partida.contarCorrectas();
     const total = partida.total;
-    const calificacion = calcularCalificacion(correctas, total);
+    $("mg-result-grade").textContent = calcularCalificacion(correctas, total).toFixed(1);
+    $("mg-result-correct").textContent = `${correctas} / ${total}`;
+    $("mg-result-incorrect").textContent = String(total - correctas);
+    $("mg-result-time").textContent = tiempo;
+    $("mg-result-note").textContent =
+      motivo === "tiempo" ? "⏰ El tiempo terminó."
+      : motivo === "maestro" ? "El maestro dio por terminada la actividad."
+      : correctas === total ? "🎉 ¡Todas las relaciones son correctas!" : "Actividad completada.";
 
-    els.resultGrade.textContent = calificacion.toFixed(1);
-    els.resultCorrect.textContent = `${correctas} / ${total}`;
-    els.resultIncorrect.textContent = String(total - correctas);
-    els.resultTime.textContent = tiempoTranscurridoTexto();
-
-    const nota = document.getElementById("mg-result-note");
-    if (nota) nota.textContent = porTiempo ? "⏰ El tiempo terminó." : "🎉 ¡Completaste todas las relaciones!";
-
+    const lista = $("mg-review");
+    const acciones = $("mg-review-actions");
+    MatchingUI.renderRevision(lista, partida, false);
+    acciones.innerHTML = "";
+    if (rol === "maestro" && correctas < total) {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "btn btn-ghost";
+      b.textContent = "👁️ Mostrar respuestas correctas";
+      b.addEventListener("click", () => { MatchingUI.renderRevision(lista, partida, true); b.remove(); });
+      acciones.appendChild(b);
+    } else if (correctas < total) {
+      const p = document.createElement("p");
+      p.className = "text-muted";
+      p.innerHTML = 'Las respuestas correctas no se muestran: repasa en <a href="aprender.html">Aprender</a> y vuelve a intentarlo.';
+      acciones.appendChild(p);
+    }
     MatchingUI.showStage("result");
   }
 
-  // =================================================================
-  // INICIALIZACIÓN
-  // =================================================================
-  document.getElementById("btn-comenzar-match").addEventListener("click", () => {
-    renderConfigStage();
-    MatchingUI.showStage("config");
-  });
-  document.getElementById("btn-iniciar-match").addEventListener("click", iniciarPartida);
-  document.getElementById("btn-mg-nuevo").addEventListener("click", () => {
-    renderConfigStage();
-    MatchingUI.showStage("config");
-  });
+  function descartarPartida() {
+    if (reloj) reloj.stop();
+    MatchingUI.cancelarArrastre();
+    reloj = null; partida = null; seleccion = null; pausado = false; rol = null;
+    config = { dificultad: "media", tiempoSegundos: 0 };
+    els.layout.inert = false;
+    els.filas.innerHTML = ""; els.pool.innerHTML = "";
+    els.teacher.innerHTML = ""; els.teacher.hidden = true;
+    els.veil.hidden = true;
+    MatchingUI.showStage("role");
+  }
 
+  // ---------------- inicialización ----------------
+  $("btn-comenzar-match").addEventListener("click", () => MatchingUI.showStage("role"));
+  $("mg-role-grid").addEventListener("click", (e) => {
+    const card = e.target.closest(".role-card");
+    if (!card) return;
+    rol = card.dataset.role === "maestro" ? "maestro" : "alumno";
+    renderConfigStage();
+    MatchingUI.showStage("config");
+  });
+  $("btn-mg-cambiar-rol").addEventListener("click", () => { rol = null; MatchingUI.showStage("role"); });
+  $("btn-iniciar-match").addEventListener("click", iniciarPartida);
+  $("btn-mg-nuevo").addEventListener("click", () => { renderConfigStage(); MatchingUI.showStage("config"); });
   MatchingUI.showStage("intro");
 })();
