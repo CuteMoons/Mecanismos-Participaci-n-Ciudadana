@@ -10,16 +10,25 @@
  *  - Solo al comprobar (evaluar) se calcula el resultado.
  */
 
-function crearPartidaMatching(mecanismos) {
-  const filas = shuffleArray(mecanismos).map((m) => ({
+function crearPartidaMatching(mecanismos, meta = {}) {
+  // La correspondencia se guarda por `id` (fila.mechanismId ↔ ficha.id): mezclar el
+  // orden visual de filas y fichas nunca cambia cuál es la respuesta correcta.
+  let ordenFilas, ordenFichas;
+  let intentos = 0;
+  do {
+    ordenFilas = shuffleArray(mecanismos);
+    ordenFichas = shuffleArray(mecanismos);
+    intentos++;
+    // Evita que fichas y filas queden en el mismo orden (respuestas "alineadas").
+  } while (mecanismos.length > 2 && intentos < 8 && ordenFilas.every((m, i) => m.id === ordenFichas[i].id));
+
+  const filas = ordenFilas.map((m) => ({
     mechanismId: m.id,
     significado: m.significado,
     filledWith: null     // id de la ficha colocada (acierte o no; no se revela)
   }));
 
-  const opciones = shuffleArray(
-    mecanismos.map((m) => ({ id: m.id, nombre: m.nombre, icono: m.icono, color: m.color }))
-  );
+  const opciones = ordenFichas.map((m) => ({ id: m.id, nombre: m.nombre, icono: m.icono, emoji: m.emoji, color: m.color }));
 
   let evaluada = false;
 
@@ -80,20 +89,11 @@ function crearPartidaMatching(mecanismos) {
     colocar, quitarDeFila, filaDeFicha, obtenerFicha, disponibles,
     contarColocadas, estaCompleto, evaluar, contarCorrectas,
     estaEvaluada: () => evaluada,
+    meta,
     total: filas.length
   };
 }
 
-/**
- * Calificación de 1.0 a 5.0, proporcional a los aciertos.
- * 0% -> 1.0 · 100% -> 5.0 (exacto). Máximo un decimal.
- */
-function calcularCalificacion(correctas, total) {
-  if (total <= 0) return 1.0;
-  const proporcion = Math.max(0, Math.min(1, correctas / total));
-  const nota = 1 + proporcion * 4;
-  const limitada = Math.max(1, Math.min(5, nota));
-  return Math.round(limitada * 10) / 10;
-}
+// calcularCalificacion() vive en js/grading.js (compartida con la sopa de letras).
 
-if (typeof module !== "undefined") module.exports = { crearPartidaMatching, calcularCalificacion };
+if (typeof module !== "undefined") module.exports = { crearPartidaMatching };

@@ -525,6 +525,76 @@ clics en botones suenan automáticamente; usa `data-sound="none"` para
 silenciar uno o `data-sound="confirm"` para otro efecto. El interruptor
 de sonido del quiz usa esta misma preferencia global.
 
+
+## 11.6. Versiones de los juegos y sopa de letras
+
+**Crucigramas (7 versiones).** El clásico (se arma al azar con
+`data/crossword/crossword-data.js` y se valida antes de jugarse) y **6
+versiones nuevas** en `data/crossword/crossword-versions.js`, cada una con
+su tema, palabras, pistas y **4 distribuciones verificadas** con cruces
+distintos (no son giros ni reflejos: la «firma» de cruces cambia).
+Cada partida elige una versión al azar y una de sus distribuciones; nunca
+se repite la misma dos veces seguidas. Si cambias el contenido, edita
+`tools/crossword-source.js` y ejecuta `node tools/generar-crucigramas.js`
+(solo guarda distribuciones que pasan `js/crossword/crossword-validator.js`;
+el mismo validador se ejecuta al iniciar cada partida). La dificultad
+(Cualquiera / Fácil / Medio / Difícil) filtra qué versiones pueden salir.
+
+**Relacionar (6 versiones).** La clásica (mecanismo ↔ significado) y 5 más
+en `data/matching/matching-versions.js` (instituciones, términos
+electorales, herramientas en casos reales, datos clave —con distribución
+invertida: concepto fijo y texto arrastrable— y conceptos de la
+democracia). Filas y fichas se mezclan en cada partida; la corrección se
+hace por `id` de pareja, no por posición.
+
+**Sopa de letras (6 versiones, `pages/sopa.html`).** Datos en
+`data/wordsearch/wordsearch-data.js` (12 palabras por versión). El tablero
+(10×10 a 13×13 según las palabras) se genera en cada partida: las palabras
+se colocan al azar en las **8 direcciones**, se rellena con letras
+aleatorias y se comprueba que cada palabra aparezca una sola vez. Se
+selecciona arrastrando (ratón/dedo), con dos clics o con teclado
+(flechas + Enter). Acierto = color distinto de rojo; error = rojo temporal
+que se limpia solo; las ya encontradas no suman. La calificación (1.0–5.0)
+sale de `js/grading.js`, compartida con relacionar.
+
+## 11.6. Versiones de crucigrama, relacionar y sopa de letras
+
+**Crucigrama (7 versiones).** El «clásico» se arma al azar con el banco
+general y se valida antes de jugarse. Además hay **6 versiones con
+tema, palabras y pistas propias** (`data/crossword/crossword-versions.js`,
+generado) con **4 distribuciones verificadas cada una**. Dos
+distribuciones solo cuentan como distintas si cambian los cruces
+(qué palabras se cortan y en qué letras), no si se gira o refleja el
+tablero. Cada partida elige una versión y una distribución al azar (no se
+repite la misma exacta dos veces seguidas). Al iniciar se vuelve a
+validar con `js/crossword/crossword-validator.js` (letras en cruces,
+sin solapes, sin palabras accidentales, todo conectado).
+- Editar contenido: `tools/crossword-source.js` y luego
+  `node tools/generar-crucigramas.js` (verifica y regenera el archivo).
+- La dificultad filtra versiones; «Cualquiera» las usa todas.
+
+**Relacionar (6 versiones).** La clásica (mecanismo ↔ significado) más 5
+versiones en `data/matching/matching-versions.js`: instituciones,
+términos electorales, herramientas ciudadanas en casos, datos clave
+(distribución *inversa*: la fila es el concepto y se arrastra el texto)
+y conceptos de la democracia. Se elige una al azar y se **mezclan filas y
+fichas** en cada partida; la corrección usa el `id` de cada pareja, no la
+posición.
+
+**Sopa de letras (6 versiones, 12 palabras cada una).**
+`pages/sopa.html`, datos en `data/wordsearch/wordsearch-data.js`. En cada
+partida se genera un tablero nuevo (10×10 a 13×13 según las palabras):
+las palabras se colocan al azar en las **8 direcciones** (también
+invertidas) y el resto se rellena con letras aleatorias; se verifica que
+cada palabra aparezca una sola vez. Selección: arrastre (ratón/dedo),
+dos clics/toques (inicio y fin) o teclado (flechas + Enter). Acierto:
+queda marcada con un color no rojo y tachada en la lista; error: rojo
+temporal que se limpia solo; repetida: no suma. Calificación 1.0–5.0 con
+`js/grading.js` (la misma del relacionar).
+
+**Pruebas.** La carpeta `tests/` contiene las pruebas automáticas
+(Node + Chromium headless con puppeteer-core); ver `tests/README.md`.
+
 ## 12. Modo claro / oscuro
 
 El botón del navbar cambia el tema y lo guarda en `localStorage`, así

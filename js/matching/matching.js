@@ -17,7 +17,7 @@
   ];
 
   let rol = null;
-  let config = { dificultad: "media", tiempoSegundos: 0 };
+  let config = { dificultad: "cualquiera", tiempoSegundos: 0 };
   let partida = null;
   let seleccion = null;      // { tipo:"chip", id } | { tipo:"slot", row } | null
   let reloj = null;
@@ -29,7 +29,7 @@
     filas: $("mg-filas"), pool: $("mg-pool"), poolCount: $("mg-pool-count"),
     timer: $("mg-timer"), progreso: $("mg-progreso"), status: $("mg-status"),
     btnComprobar: $("btn-mg-comprobar"), hint: $("mg-comprobar-hint"),
-    layout: $("mg-layout"), veil: $("mg-pause-veil"), teacher: $("mg-teacher-panel"),
+    layout: $("mg-layout"), defsTitle: $("mg-defs-title"), poolName: $("mg-pool-name"), versionBadge: $("mg-version-badge"), veil: $("mg-pause-veil"), teacher: $("mg-teacher-panel"),
     roleBadge: $("mg-role-badge")
   };
 
@@ -57,7 +57,7 @@
     $("mg-group-tiempo").hidden = !esMaestro;
     if (!esMaestro) config.tiempoSegundos = 0;
     pillGroup($("mg-config-dificultad"),
-      [{ label: "Medio", value: "media" }, { label: "Difícil", value: "dificil" }],
+      [{ label: "Cualquiera", value: "cualquiera" }, { label: "Medio", value: "media" }, { label: "Difícil", value: "dificil" }],
       config.dificultad, (v) => { config.dificultad = v; });
     pillGroup($("mg-config-tiempo"), TIEMPO_OPCIONES, config.tiempoSegundos, (v) => { config.tiempoSegundos = v; });
   }
@@ -69,6 +69,52 @@
     els.timer.textContent = `⏱️ ${RCGame.formatTime(info.shown)}`;
     els.timer.classList.toggle("is-warning", tono === "warning");
     els.timer.classList.toggle("is-critical", tono === "critical");
+  }
+
+  // ---------------- versiones ----------------
+  const PALETA = ["#2563eb", "#16a34a", "#dc2626", "#d97706", "#7c3aed", "#0891b2", "#db2777", "#65a30d"];
+  let ultimaVersion = null;     // para no repetir la misma versión dos veces seguidas
+
+  function itemsDeVersion(v) {
+    const inverso = v.modo === "inverso";
+    return v.pares.map((p, i) => ({
+      id: p.id,
+      nombre: inverso ? p.texto : p.concepto,         // lo que se arrastra
+      significado: inverso ? p.concepto : p.texto,    // lo que queda fijo en la fila
+      icono: null, emoji: v.emoji, color: PALETA[i % PALETA.length]
+    }));
+  }
+
+  /** Una versión es válida si todas sus parejas son únicas y completas. */
+  function versionValida(items) {
+    const ids = new Set(items.map((i) => i.id));
+    const nombres = new Set(items.map((i) => i.nombre));
+    const filas = new Set(items.map((i) => i.significado));
+    return items.length >= 5 && ids.size === items.length && nombres.size === items.length && filas.size === items.length
+      && items.every((i) => i.nombre && i.significado);
+  }
+
+  /** Elige al azar una versión (la clásica o una de MATCHING_VERSIONS) según el nivel. */
+  function crearPartidaAleatoria(nivel) {
+    const versiones = MATCHING_VERSIONS.filter((v) => nivel === "cualquiera" || v.nivel === nivel);
+    const opciones = ["clasico", ...versiones.map((v) => v.id)];
+    for (let intento = 0; intento < 8; intento++) {
+      const elegida = opciones[Math.floor(Math.random() * opciones.length)];
+      if (elegida === ultimaVersion && intento < 7 && opciones.length > 1) continue;
+      let items, meta;
+      if (elegida === "clasico") {
+        items = construirMecanismosParaJuego(nivel === "dificil" ? "dificil" : "media");
+        meta = { id: "clasico", titulo: "Mecanismos y significados", modo: "normal", encabezadoFilas: "Significados", encabezadoFichas: "Mecanismos" };
+      } else {
+        const v = versiones.find((x) => x.id === elegida);
+        items = itemsDeVersion(v);
+        meta = { id: v.id, titulo: v.titulo, modo: v.modo, encabezadoFilas: v.encabezadoFilas, encabezadoFichas: v.encabezadoFichas };
+      }
+      if (!versionValida(items)) continue;
+      ultimaVersion = elegida;
+      return crearPartidaMatching(items, meta);
+    }
+    return crearPartidaMatching(construirMecanismosParaJuego("media"), { id: "clasico", titulo: "Mecanismos y significados", modo: "normal" });
   }
 
   // ---------------- interacción ----------------
@@ -89,7 +135,7 @@
     RCSound.play(sonido);
     refrescar();
     const ficha = partida.obtenerFicha(chipId);
-    decir(`${ficha.nombre} relacionado con el significado ${MatchingUI.letra(row)}.`);
+    decir(`Relación establecida en la fila ${MatchingUI.letra(row)}.`);
   }
 
   const callbacks = {
@@ -176,7 +222,8 @@
   // ---------------- flujo ----------------
   function iniciarPartida() {
     sess.start();
-    partida = crearPartidaMatching(construirMecanismosParaJuego(config.dificultad));
+    partida = crearPartidaAleatoria(config.dificultad);
+    els.versionBadge.textContent = `📚 ${partida.meta.titulo}`;
     seleccion = null;
     pausado = false;
     els.layout.inert = false;
@@ -241,7 +288,7 @@
     if (reloj) reloj.stop();
     MatchingUI.cancelarArrastre();
     reloj = null; partida = null; seleccion = null; pausado = false; rol = null;
-    config = { dificultad: "media", tiempoSegundos: 0 };
+    config = { dificultad: "cualquiera", tiempoSegundos: 0 };
     els.layout.inert = false;
     els.filas.innerHTML = ""; els.pool.innerHTML = "";
     els.teacher.innerHTML = ""; els.teacher.hidden = true;

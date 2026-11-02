@@ -201,5 +201,40 @@ const CrosswordGenerator = (() => {
     return { grid: finalGrid, numbers: numeros, placements: finalPlacements, rows, cols };
   }
 
-  return { generar };
+  /**
+   * Construye el resultado del juego (mismo formato que `generar`) a partir
+   * de una distribución ya fijada: layout = { rows, cols, placements:[{word,row,col,dir}] }
+   * y words = [{ word, clue }]. No inventa posiciones: usa las verificadas.
+   */
+  function desdeLayout(layout, words) {
+    const porPalabra = new Map(words.map((w) => [w.word, w]));
+    const { rows, cols } = layout;
+    const grid = Array.from({ length: rows }, () => Array(cols).fill(null));
+    const placements = layout.placements.map((p, index) => ({
+      index, row: p.row, col: p.col, dir: p.dir, length: p.word.length, entry: porPalabra.get(p.word)
+    }));
+    placements.forEach((p) => {
+      for (let i = 0; i < p.length; i++) {
+        const r = p.dir === "down" ? p.row + i : p.row;
+        const c = p.dir === "across" ? p.col + i : p.col;
+        if (!grid[r][c]) grid[r][c] = { letter: p.entry.word[i], words: [], dirs: {} };
+        grid[r][c].words.push(p.index);
+        grid[r][c].dirs[p.dir] = true;
+      }
+    });
+    let numero = 1;
+    const numbers = Array.from({ length: rows }, () => Array(cols).fill(null));
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        if (!grid[r][c]) continue;
+        const iniciaAcross = (c === 0 || !grid[r][c - 1]) && Boolean(grid[r][c + 1]);
+        const iniciaDown = (r === 0 || !grid[r - 1][c]) && Boolean(grid[r + 1] && grid[r + 1][c]);
+        if (iniciaAcross || iniciaDown) numbers[r][c] = numero++;
+      }
+    }
+    placements.forEach((p) => { p.number = numbers[p.row][p.col]; });
+    return { grid, numbers, placements, rows, cols };
+  }
+
+  return { generar, desdeLayout };
 })();

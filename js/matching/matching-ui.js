@@ -22,7 +22,8 @@ const MatchingUI = (() => {
     const icon = document.createElement("span");
     icon.className = "match-chip__icon";
     icon.style.setProperty("--mech-color", ficha.color || "var(--color-primary)");
-    icon.innerHTML = `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">${svgIcon(ficha.icono)}</svg>`;
+    if (ficha.icono) icon.innerHTML = `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">${svgIcon(ficha.icono)}</svg>`;
+    else { icon.textContent = ficha.emoji || "•"; icon.classList.add("match-chip__icon--emoji"); icon.setAttribute("aria-hidden", "true"); }
     const label = document.createElement("span");
     label.className = "match-chip__label";
     label.textContent = ficha.nombre;
@@ -36,6 +37,10 @@ const MatchingUI = (() => {
    * ctx = { seleccion: {tipo:"chip",id}|{tipo:"slot",row}|null, bloqueado: bool }
    */
   function render(els, partida, ctx, cb) {
+    const m = partida.meta || {};
+    els.layout.classList.toggle("match-layout--inverso", m.modo === "inverso");
+    els.defsTitle.textContent = m.encabezadoFilas || "Significados";
+    els.poolName.textContent = m.encabezadoFichas || "Mecanismos";
     els.filas.innerHTML = "";
     partida.filas.forEach((fila, i) => {
       const li = document.createElement("li");
@@ -53,7 +58,7 @@ const MatchingUI = (() => {
       badge.setAttribute("aria-hidden", "true");
 
       const meaning = document.createElement("p");
-      meaning.className = "match-meaning";
+      meaning.className = "match-meaning" + (m.modo === "inverso" ? " match-meaning--concepto" : "");
       meaning.id = `mg-meaning-${i}`;
       meaning.textContent = fila.significado;
 

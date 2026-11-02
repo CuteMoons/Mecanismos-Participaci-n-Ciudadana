@@ -31,7 +31,7 @@
   const LETRA = /^[a-zA-ZÁÉÍÓÚÜÑáéíóúüñ]$/;
 
   let rol = null;                 // null | "alumno" | "maestro"
-  let config = { modalidad: "individual", tiempoSegundos: TIEMPO_ALUMNO, dificultad: "media" };
+  let config = { modalidad: "individual", tiempoSegundos: TIEMPO_ALUMNO, dificultad: "cualquiera" };
   let partida = null;
   let sel = null;                 // { row, col, dir }
   let reloj = null;
@@ -91,8 +91,8 @@
     $("cw-group-tiempo").hidden = !esMaestro;
     $("cw-step-dificultad").textContent = esMaestro ? "3" : "1";
     $("cw-config-note").textContent = esMaestro
-      ? "El tablero se genera al azar con palabras del banco según la dificultad."
-      : "Tendrás 10 minutos. Las pistas son descripciones: tendrás que razonar para deducir cada respuesta.";
+      ? "Cada partida elige al azar un crucigrama distinto (con su propio tema, pistas y distribución). «Cualquiera» los incluye todos."
+      : "Tendrás 10 minutos. Cada partida trae un crucigrama distinto y las pistas son descripciones: razona para deducir cada respuesta.";
 
     if (!esMaestro) {
       config.modalidad = "individual";
@@ -120,6 +120,7 @@
     pillGroup($("cw-config-tiempo"), TIEMPO_OPCIONES, config.tiempoSegundos, (v) => { config.tiempoSegundos = v; });
 
     const dificultades = [
+      { label: "Cualquiera", value: "cualquiera" },
       { label: "Fácil", value: "facil" },
       { label: "Medio", value: "media" },
       { label: "Difícil", value: "dificil" }
@@ -128,24 +129,58 @@
   }
 
   // =================================================================
-  // GENERACIÓN DE PARTIDA
+  // GENERACIÓN DE PARTIDA: versión (aleatoria) + distribución verificada
   // =================================================================
-  function elegirPalabras(dificultad) {
-    const cfg = DIFFICULTY_SETTINGS[dificultad] || DIFFICULTY_SETTINGS.media;
+  let ultimaEleccion = null;     // solo para no repetir EXACTAMENTE la misma distribución dos veces seguidas
+
+  function azar(n) { return Math.floor(Math.random() * n); }
+
+  /** Crucigrama "clásico": se arma al azar con el banco general y se VALIDA antes de jugarse. */
+  function generarClasico(dificultad) {
+    const nivel = DIFFICULTY_SETTINGS[dificultad] ? dificultad : "media";
+    const cfg = DIFFICULTY_SETTINGS[nivel];
     const pool = CROSSWORD_WORDS.filter((w) => cfg.pools.includes(w.difficulty));
-    const barajadas = QuizEngine.shuffle(pool);
-    return barajadas.slice(0, Math.min(cfg.count + 4, barajadas.length));
+    for (let intento = 0; intento < 12; intento++) {
+      const barajadas = QuizEngine.shuffle(pool).slice(0, Math.min(cfg.count + 4, pool.length));
+      const res = CrosswordGenerator.generar(barajadas);
+      if (res.placements.length < Math.min(5, cfg.count)) continue;
+      const layout = { rows: res.rows, cols: res.cols, placements: res.placements.map((p) => ({ word: p.entry.word, row: p.row, col: p.col, dir: p.dir })) };
+      if (CrosswordValidator.validarLayout(layout, res.placements.map((p) => p.entry)).ok) {
+        return { resultado: res, titulo: "Clásico (temas variados)", clave: "clasico" };
+      }
+    }
+    return null;
   }
 
-  function generarResultado(dificultad) {
-    const cfg = DIFFICULTY_SETTINGS[dificultad] || DIFFICULTY_SETTINGS.media;
-    let resultado;
-    let intentos = 0;
-    do {
-      resultado = CrosswordGenerator.generar(elegirPalabras(dificultad));
-      intentos++;
-    } while (resultado.placements.length < Math.min(5, cfg.count) && intentos < 6);
-    return resultado;
+  /** Versiones con distribuciones verificadas (data/crossword/crossword-versions.js). */
+  function generarDeVersion(version) {
+    const idx = azar(version.layouts.length);
+    const layout = version.layouts[idx];
+    // Se vuelve a validar al iniciar: si algo estuviera mal, esa distribución no se usa.
+    if (!CrosswordValidator.validarLayout(layout, version.words).ok) return null;
+    return { resultado: CrosswordGenerator.desdeLayout(layout, version.words), titulo: version.titulo, clave: `${version.id}#${idx}` };
+  }
+
+  /**
+   * Elige una versión al azar entre las disponibles para el nivel pedido
+   * ("cualquiera" = todas) y una de sus distribuciones. La elección no depende
+   * de partidas anteriores, salvo que no se repite la misma distribución
+   * exacta dos veces seguidas.
+   */
+  function crearCrucigrama(nivel) {
+    const versiones = CROSSWORD_VERSIONS.filter((v) => nivel === "cualquiera" || v.nivel === nivel);
+    const opciones = ["clasico", ...versiones.map((v) => v.id)];
+    for (let intento = 0; intento < 6; intento++) {
+      const elegida = opciones[azar(opciones.length)];
+      const creado = elegida === "clasico" ? generarClasico(nivel === "cualquiera" ? "media" : nivel) : generarDeVersion(versiones.find((v) => v.id === elegida));
+      if (!creado) continue;
+      if (creado.clave === ultimaEleccion && intento < 5) continue;   // evita repetir idéntica
+      ultimaEleccion = creado.clave;
+      return creado;
+    }
+    const respaldo = generarClasico("media");     // último recurso: siempre válido
+    ultimaEleccion = respaldo.clave;
+    return respaldo;
   }
 
   // =================================================================
@@ -247,9 +282,12 @@
     const limpia = letra.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
     const info = CrosswordNav.alEscribir(partida, sel);
     if (!info.escribe) {
-      // Casilla bloqueada (ya pertenece a una palabra resuelta): se pasa a la siguiente editable.
+      // Casilla bloqueada (ya pertenece a una palabra resuelta): la letra se escribe
+      // en la siguiente casilla editable de la MISMA palabra activa, sin perderse.
       const sig = CrosswordNav.siguienteEnPalabra(partida, sel);
-      if (sig) aplicarSeleccion({ row: sig.row, col: sig.col, dir: sel.dir });
+      if (!sig) return;
+      sel = { row: sig.row, col: sig.col, dir: sel.dir };
+      escribir(letra);
       return;
     }
     const eventos = partida.escribirLetra(sel.row, sel.col, limpia);
@@ -441,7 +479,9 @@
 
   function iniciarPartida() {
     sess.start();                            // limpia lo anterior y activa las protecciones
-    partida = crearPartidaCrucigrama(generarResultado(config.dificultad));
+    const creado = crearCrucigrama(config.dificultad);
+    partida = crearPartidaCrucigrama(creado.resultado);
+    $("cw-version-badge").textContent = `📚 ${creado.titulo}`;
     sel = null;
     pausado = false;
     els.board.inert = false;
@@ -501,7 +541,7 @@
     sel = null;
     pausado = false;
     rol = null;
-    config = { modalidad: "individual", tiempoSegundos: TIEMPO_ALUMNO, dificultad: "media" };
+    config = { modalidad: "individual", tiempoSegundos: TIEMPO_ALUMNO, dificultad: "cualquiera" };
     els.board.inert = false;
     els.board.innerHTML = "";
     els.cluesAcross.innerHTML = "";

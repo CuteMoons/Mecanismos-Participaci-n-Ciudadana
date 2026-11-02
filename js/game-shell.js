@@ -105,6 +105,14 @@ const RCGame = (() => {
     }
   }
 
+  // history.back() es asíncrono: su popstate puede llegar cuando ya empezó otra
+  // partida. Se cuentan los retrocesos propios para no confundirlos con el botón Atrás.
+  let retrocesosPropios = 0;
+  function retrocederPropio() {
+    retrocesosPropios++;
+    try { history.back(); } catch (_) { retrocesosPropios--; }
+  }
+
   // ------------------------------------------------------------------
   // Sesión de juego
   // ------------------------------------------------------------------
@@ -151,6 +159,7 @@ const RCGame = (() => {
           e.returnValue = "";
         });
         api.listen(window, "popstate", () => {
+          if (retrocesosPropios > 0) { retrocesosPropios--; return; }
           if (!active) return;
           history.pushState({ rcGuard: name }, "");
           pushedState = true;
@@ -188,9 +197,7 @@ const RCGame = (() => {
         if (pushedState) {
           pushedState = false;
           // Quita la entrada de historial que se añadió para capturar «Atrás».
-          if (history.state && history.state.rcGuard === name) {
-            try { history.back(); } catch (_) { /* nada */ }
-          }
+          if (history.state && history.state.rcGuard === name) retrocederPropio();
         }
       },
 
@@ -215,7 +222,7 @@ const RCGame = (() => {
             api.dispose();
             if (quitarGuarda && !destino) {
               // se retira la entrada de guarda para que «Atrás» funcione normal
-              try { history.back(); } catch (_) { /* nada */ }
+              retrocederPropio();
             }
             // 3) se descarta el estado y se vuelve a la pantalla de inicio/selección
             onDiscard();

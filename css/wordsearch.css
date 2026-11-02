@@ -1,0 +1,83 @@
+/* ==========================================================================
+   WORDSEARCH.CSS — Sopa de letras. Usa las variables y temas del proyecto.
+   ========================================================================== */
+.ws-shell { padding-block: var(--space-8); min-height: 70vh; }
+.ws-stage { display: none; }
+.ws-stage.is-active { display: block; animation: wsFade var(--t-base) var(--ease); }
+@keyframes wsFade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+.ws-intro { max-width: 640px; margin: 0 auto; text-align: center; display: flex; flex-direction: column; align-items: center; gap: var(--space-4); }
+.ws-intro__icon { font-size: 3.5rem; }
+.ws-intro__lead { font-size: var(--fs-lg); font-weight: 600; }
+.ws-game-head { text-align: center; }
+.ws-game-head h2 { font-size: var(--fs-lg); }
+
+.ws-stats { display: flex; flex-wrap: wrap; gap: var(--space-3); justify-content: center; margin-bottom: var(--space-4); }
+.ws-stat { padding: var(--space-2) var(--space-4); border-radius: var(--radius-full); background: var(--surface); border: 1px solid var(--border); font-family: var(--font-display); font-weight: 700; box-shadow: var(--shadow-sm); }
+.ws-stat.is-warning { color: var(--color-accent); border-color: var(--color-accent); }
+.ws-stat.is-critical { color: var(--color-danger); border-color: var(--color-danger); }
+
+/* Paleta de palabras encontradas (ninguna es roja) */
+:root {
+  --ws-c0: #0f766e; --ws-c1: #2563eb; --ws-c2: #7c3aed; --ws-c3: #b45309;
+  --ws-c4: #15803d; --ws-c5: #0e7490; --ws-c6: #a21caf; --ws-c7: #4d7c0f;
+}
+
+.ws-layout { display: grid; grid-template-columns: minmax(0, 1fr) 250px; gap: var(--space-5); max-width: 980px; margin: 0 auto; align-items: start; }
+.ws-board-stage { position: relative; width: 100%; max-width: 620px; margin-inline: auto; }
+
+.ws-board {
+  --ws-n: 12;
+  display: grid;
+  grid-template-columns: repeat(var(--ws-n), 1fr);
+  width: 100%;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  touch-action: none;          /* el arrastre con el dedo no desplaza la página */
+  user-select: none;
+  -webkit-user-select: none;
+}
+.ws-cell {
+  aspect-ratio: 1;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0; border: 0;
+  background: transparent; color: var(--text);
+  font-family: var(--font-display); font-weight: 700;
+  font-size: clamp(0.85rem, calc(min(100vw, 620px) / var(--ws-n) * 0.5), 1.35rem);
+  line-height: 1; cursor: pointer;
+  box-shadow: inset 0 0 0 0.5px color-mix(in srgb, var(--border) 60%, transparent);
+  transition: background var(--t-fast) var(--ease);
+}
+.ws-cell:focus-visible { outline: 3px solid var(--color-secondary); outline-offset: -3px; z-index: 1; }
+.ws-cell.is-start { background: color-mix(in srgb, var(--color-secondary) 35%, var(--surface)); box-shadow: inset 0 0 0 3px var(--color-secondary); }
+.ws-cell.is-selecting { background: color-mix(in srgb, var(--color-secondary) 32%, var(--surface)); }
+.ws-cell.is-found { background: color-mix(in srgb, var(--found) 30%, var(--surface)); box-shadow: inset 0 -3px 0 var(--found); }
+.ws-cell.is-repeated { background: color-mix(in srgb, var(--color-accent) 40%, var(--surface)); }
+/* Selección incorrecta: rojo temporal (queda por encima de cualquier otro estado) */
+.ws-cell.is-wrong, .ws-cell.is-found.is-wrong { background: color-mix(in srgb, var(--color-danger) 38%, var(--surface)); box-shadow: inset 0 0 0 2px var(--color-danger); }
+
+.ws-status { text-align: center; font-size: var(--fs-sm); color: var(--text-muted); margin: var(--space-3) auto 0; min-height: 2.6em; max-width: 620px; }
+
+.ws-words-wrap { position: sticky; top: calc(var(--navbar-height) + var(--space-3)); padding: var(--space-4); border-radius: var(--radius-md); background: var(--surface); border: 1px solid var(--border); }
+.ws-words-wrap h3 { font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: var(--space-2); }
+.ws-words { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-1); }
+.ws-word { display: flex; align-items: center; gap: var(--space-2); font-family: var(--font-display); font-weight: 700; font-size: var(--fs-sm); padding: 0.2rem 0.45rem; border-radius: var(--radius-sm); }
+.ws-word__mark { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--border); display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem; flex-shrink: 0; }
+.ws-word.is-found { color: var(--text-muted); background: color-mix(in srgb, var(--found) 14%, transparent); }
+.ws-word.is-found .ws-word__text { text-decoration: line-through; text-decoration-thickness: 2px; }
+.ws-word.is-found .ws-word__mark { background: var(--found); border-color: var(--found); color: #fff; }
+
+@media (max-width: 800px) {
+  .ws-layout { grid-template-columns: minmax(0, 1fr); }
+  /* En teléfono el tablero va primero (es lo que se juega) y la lista de palabras debajo, compacta */
+  .ws-words-wrap { position: static; padding: var(--space-3); }
+  .ws-words { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2px var(--space-3); }
+  .ws-stats { margin-bottom: var(--space-3); }
+  .ws-game-head .eyebrow { display: none; }
+  .ws-word { font-size: var(--fs-xs); }
+  .ws-shell { padding-block: var(--space-5); }
+}
+@media (prefers-reduced-motion: reduce) { .ws-stage.is-active { animation: none; } .ws-cell { transition: none; } }
