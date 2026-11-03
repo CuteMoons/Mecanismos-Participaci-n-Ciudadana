@@ -478,6 +478,7 @@
   }
 
   function iniciarPartida() {
+    if (rol === "alumno" && !RCStudent.get()) { rol = null; CrosswordUI.showStage("role"); return; }   // sin identificar no se juega
     sess.start();                            // limpia lo anterior y activa las protecciones
     const creado = crearCrucigrama(config.dificultad);
     partida = crearPartidaCrucigrama(creado.resultado);
@@ -530,6 +531,7 @@
       motivo === "tiempo" ? "⏰ El tiempo terminó."
       : motivo === "maestro" ? "El maestro dio por terminada la actividad."
       : "¡Resolviste todas las palabras!";
+    RCStudent.pintarResultado($("cw-student-result"), rol);
     CrosswordUI.showStage("result");
   }
 
@@ -561,8 +563,17 @@
   function elegirRol(nuevoRol) {
     if (nuevoRol !== "alumno" && nuevoRol !== "maestro") return;
     rol = nuevoRol;
-    renderConfigStage();
-    CrosswordUI.showStage("config");
+    const continuar = () => { renderConfigStage(); CrosswordUI.showStage("config"); };
+    if (rol === "alumno") {
+      RCStudent.requerir({
+        mount: $("student-mount"),
+        mostrar: () => CrosswordUI.showStage("ident"),
+        volver: () => { rol = null; CrosswordUI.showStage("role"); },
+        continuar
+      });
+      return;
+    }
+    continuar();
   }
 
   $("btn-comenzar-crucigrama").addEventListener("click", () => CrosswordUI.showStage("role"));

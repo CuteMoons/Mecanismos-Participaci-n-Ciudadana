@@ -1,4 +1,4 @@
-const {launch,BASE,ok,newPage,sleep,results}=require('./common');
+const {launch,BASE,ok,newPage,sleep,results,alumno}=require('./common');
 const real=p=>p.__errors.filter(e=>!/ERR_NAME_NOT_RESOLVED/.test(e));
 (async()=>{
 const b=await launch();
@@ -30,7 +30,7 @@ await p.click('.sound-toggle');
 ok('Desactivar: estado y etiqueta cambian',await p.evaluate(()=>{const b=document.querySelector('.sound-toggle');return b.getAttribute('aria-pressed')==='false'&&/desactivados/.test(b.getAttribute('aria-label'))&&localStorage.getItem('rc-sound')==='off'}));
 ok('Desactivar corta lo que sonaba',await p.evaluate(()=>window.__aud.active===0));
 const c0=await p.evaluate(()=>window.__aud.started);
-await p.click('.role-card[data-role="alumno"]');await p.click('#btn-iniciar-crucigrama');await p.click('.cw-cell:not(.cw-cell--block)');await p.keyboard.press('a');
+await alumno(p);await p.click('#btn-iniciar-crucigrama');await p.click('.cw-cell:not(.cw-cell--block)');await p.keyboard.press('a');
 ok('Con audio desactivado ningún juego reproduce efectos',await p.evaluate(()=>window.__aud.started)===c0);
 // persistencia entre páginas y recarga (la recarga/cierre con partida activa pide confirmación nativa)
 await p.goto(BASE+'pages/relacionar.html');
@@ -39,7 +39,7 @@ ok('Preferencia persiste al navegar a otra página',await p.evaluate(()=>documen
 await p.reload();
 ok('Preferencia persiste tras recargar',await p.evaluate(()=>document.querySelector('.sound-toggle').getAttribute('aria-pressed')==='false'));
 const d0=await p.evaluate(()=>window.__aud.started);
-await p.click('#btn-comenzar-match');await p.click('.role-card[data-role="alumno"]');await p.click('#btn-iniciar-match');await p.click('#mg-pool .match-chip');
+await p.click('#btn-comenzar-match');await alumno(p);await p.click('#btn-iniciar-match');await p.click('#mg-pool .match-chip');
 ok('Relacionar respeta el silencio global (sin activar aparte)',await p.evaluate(()=>window.__aud.started)===d0);
 // reactivar
 await p.click('.sound-toggle');

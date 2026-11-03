@@ -1,4 +1,4 @@
-const {launch,BASE,ok,newPage,sleep,results}=require('./common');
+const {launch,BASE,ok,newPage,sleep,results,alumno}=require('./common');
 const real=p=>p.__errors.filter(e=>!/ERR_NAME_NOT_RESOLVED/.test(e));
 const root=require('path').resolve(__dirname,'..')+'/';
 const WV=require(root+'data/wordsearch/wordsearch-data.js');
@@ -18,7 +18,7 @@ ok('Juegos: hay tarjeta de Sopa de Letras con enlace correcto',await p.evaluate(
 await p.click('a.game-card[href="sopa.html"]');await p.waitForSelector('#btn-comenzar-ws');
 await p.click('#btn-comenzar-ws');
 ok('Sopa: selector de modo antes de jugar',await stage()==='role');
-await p.click('.role-card[data-role="alumno"]');
+await alumno(p);
 ok('Alumno juega directamente; sin controles de maestro en el DOM',await stage()==='game'&&await p.evaluate(()=>document.getElementById('ws-teacher-panel').children.length===0));
 let info=await p.evaluate(BUSCAR);
 ok('Cada palabra de la lista existe una sola vez en el tablero ('+info.words.length+' palabras, '+info.n+'×'+info.n+')',info.words.length>=10&&info.words.every(w=>info.out[w].length===1),JSON.stringify(Object.fromEntries(Object.entries(info.out).map(([k,v])=>[k,v.length]))));

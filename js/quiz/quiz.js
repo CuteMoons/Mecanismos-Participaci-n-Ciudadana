@@ -66,9 +66,22 @@
 
   function seleccionarRol(rol) {
     if (rol !== "alumno" && rol !== "maestro") return;
-    QuizConfig.reset();
-    QuizConfig.set({ rol, modalidad: "individual", aleatorio: true });
-    mostrarConfig();
+    const continuar = () => {
+      QuizConfig.reset();
+      QuizConfig.set({ rol, modalidad: "individual", aleatorio: true });
+      mostrarConfig();
+    };
+    if (rol === "alumno") {
+      // El alumno se identifica una sola vez por sesión (nombre obligatorio, curso opcional).
+      RCStudent.requerir({
+        mount: document.getElementById("student-mount"),
+        mostrar: () => QuizUI.showStage("ident", { focus: false }),
+        volver: mostrarRol,
+        continuar
+      });
+      return;
+    }
+    continuar();
   }
 
   function cambiarRol() {
@@ -87,6 +100,7 @@
     if (sesion && !sesion.terminada) return; // evita doble inicio
     const base = QuizConfig.get();
     if (base.rol !== "alumno" && base.rol !== "maestro") return mostrarRol();
+    if (base.rol === "alumno" && !RCStudent.get()) return mostrarRol();   // el alumno no juega sin identificarse
 
     // Reglas por rol, aplicadas también aquí (no solo en la interfaz)
     const config = { ...base };
@@ -324,12 +338,14 @@
     });
 
     QuizUI.renderResultAlumno({ stats, items });
+    RCStudent.pintarResultado(document.getElementById("result-student"), "alumno");
     ultimoResumen = construirResumenTexto(stats, items);
   }
 
   function construirResumenTexto(stats, items) {
     const lineas = [
       "Resultado del cuestionario · Mecanismos de Participación Ciudadana",
+      ...(RCStudent.get() ? [`Alumno: ${RCStudent.get().nombre}`, ...(RCStudent.get().curso ? [`Curso: ${RCStudent.get().curso}`] : [])] : []),
       `Preguntas: ${stats.total} | Correctas: ${stats.correctas} | Incorrectas: ${stats.incorrectas} | Sin responder: ${stats.sinResponder}`,
       stats.porcentaje === null ? "Aciertos: sin preguntas calificables" : `Aciertos (opción múltiple): ${stats.porcentaje}%`,
       `Nota${stats.notaProvisional ? " provisional" : ""}: ${QuizScore.formatearNota(stats.nota)} / 5,0`,

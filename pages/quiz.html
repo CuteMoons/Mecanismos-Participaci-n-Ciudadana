@@ -19,6 +19,7 @@
   <link rel="stylesheet" href="../css/timer.css" />
   <link rel="stylesheet" href="../css/progress.css" />
   <link rel="stylesheet" href="../css/responsive.css" />
+  <link rel="stylesheet" href="../css/student.css" />
   <link rel="stylesheet" href="../css/themes.css" />
 </head>
 <body>
@@ -65,6 +66,12 @@
         <p class="role-note text-muted">
           El rol organiza la actividad en esta página; no es un inicio de sesión ni una medida de seguridad.
         </p>
+        <p class="student-note text-muted" data-student-note hidden></p>
+      </section>
+
+      <!-- ============ IDENTIFICACIÓN DEL ALUMNO ============ -->
+      <section class="quiz-stage" id="stage-ident" data-stage="ident" aria-labelledby="student-title">
+        <div id="student-mount"></div>
       </section>
 
       <!-- ============ ETAPA 1: CONFIGURACIÓN ============ -->
@@ -227,6 +234,7 @@
 
         <!-- Resultado del ALUMNO -->
         <div class="result-block" id="result-alumno" hidden>
+          <div class="student-card" id="result-student" hidden></div>
           <div class="grade-card" id="grade-card">
             <span class="grade-card__label" id="grade-label">Calificación</span>
             <b class="grade-card__value" id="grade-value">—</b>
@@ -356,6 +364,7 @@
 
   <!-- Núcleo -->
   <script src="../js/sound.js"></script>
+  <script src="../js/student.js"></script>
   <script src="../js/theme.js"></script>
   <script src="../js/navigation.js"></script>
   <script src="../js/modal.js"></script>

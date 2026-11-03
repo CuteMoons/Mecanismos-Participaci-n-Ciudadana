@@ -1,8 +1,8 @@
-const {launch,BASE,ok,newPage,sleep,results}=require('./common');
+const {launch,BASE,ok,newPage,sleep,results,alumno}=require('./common');
 const real=p=>p.__errors.filter(e=>!/ERR_NAME_NOT_RESOLVED/.test(e));
 async function start(p,rol){
   await p.goto(BASE+'pages/relacionar.html');
-  await p.click('#btn-comenzar-match');await p.click(`.role-card[data-role="${rol}"]`);await p.click('#btn-iniciar-match');
+  await p.click('#btn-comenzar-match');if(rol==='alumno')await alumno(p);else await p.click('.role-card[data-role="maestro"]');await p.click('#btn-iniciar-match');
 }
 const stage=p=>p.evaluate(()=>document.querySelector('.matching-stage.is-active').dataset.stage);
 const centre=async(p,sel)=>{const h=await p.$(sel);const bb=await h.boundingBox();return {x:bb.x+bb.width/2,y:bb.y+bb.height/2}};
@@ -13,7 +13,7 @@ let p=await newPage(b);
 await p.goto(BASE+'pages/relacionar.html');
 await p.click('#btn-comenzar-match');
 ok('Selector de modo antes de jugar',await stage(p)==='role');
-await p.click('.role-card[data-role="alumno"]');
+await alumno(p);
 ok('Alumno: sin selector de tiempo',await p.evaluate(()=>document.getElementById('mg-group-tiempo').hidden));
 await p.click('#btn-iniciar-match');
 ok('Alumno: sin controles de maestro en el DOM',await p.evaluate(()=>document.getElementById('mg-teacher-panel').children.length===0));
@@ -73,7 +73,7 @@ await p.click('#btn-mg-salir');await sleep(450);await p.click('#game-exit-leave'
 ok('Salir descarta y vuelve a elegir modo',await stage(p)==='role');
 ok('Sin intervalos ni sonidos activos tras salir',await p.evaluate(()=>window.__iv.size===0&&window.__aud.active===0),'antes '+ivB);
 // nueva partida limpia y resultado
-await p.click('.role-card[data-role="alumno"]');await p.click('#btn-iniciar-match');
+await alumno(p);await p.click('#btn-iniciar-match');
 ok('Nueva partida reiniciada (0/8)',/0 \/ 8/.test(await p.$eval('#mg-progreso',e=>e.textContent)));
 // llenar en orden y comprobar (casi seguro con errores)
 for(let i=0;i<8;i++){await p.click('#mg-pool .match-chip');await p.click(`.match-row[data-row="${i}"] .match-slot__main`);}

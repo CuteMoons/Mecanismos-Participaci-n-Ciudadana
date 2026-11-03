@@ -26,4 +26,11 @@ async function newPage(b,{width=1280,height=900,mobile=false}={}){
   return p;
 }
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-module.exports={launch,BASE,ok,newPage,sleep,results:()=>results};
+/** Elige «Alumno» y, si aparece la identificación, la completa (la sesión la recuerda). */
+async function alumno(p,nombre='Ana María Pérez',curso='11-2'){
+  await p.click('.role-card[data-role="alumno"]');
+  await sleep(60);
+  const pide=await p.evaluate(()=>!!document.querySelector('[data-stage="ident"].is-active'));
+  if(pide){await p.type('#student-nombre',nombre);if(curso)await p.type('#student-curso',curso);await p.click('.student-form button[type="submit"]');await sleep(60);}
+}
+module.exports={launch,BASE,ok,newPage,sleep,alumno,results:()=>results};

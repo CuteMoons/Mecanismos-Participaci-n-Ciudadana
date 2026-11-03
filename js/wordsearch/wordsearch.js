@@ -152,6 +152,7 @@
 
   // ---------- flujo ----------
   function iniciarPartida() {
+    if (rol === "alumno" && !RCStudent.get()) { rol = null; WordSearchUI.showStage("role"); return; }   // sin identificar no se juega
     sess.start();
     const creada = crearPartida();
     version = creada.v; tablero = creada.t; partida = creada.p;
@@ -189,6 +190,7 @@
     $("ws-result-title").textContent = completa ? "¡Ganaste! Encontraste todas las palabras" : "Actividad finalizada";
     $("ws-result-note").textContent = completa ? `Sopa «${version.titulo}» completada.`
       : motivo === "tiempo" ? "⏰ El tiempo terminó." : "El maestro dio por terminada la actividad.";
+    RCStudent.pintarResultado($("ws-student-result"), rol);
     WordSearchUI.showStage("result");
   }
 
@@ -208,8 +210,15 @@
     const card = e.target.closest(".role-card");
     if (!card) return;
     rol = card.dataset.role === "maestro" ? "maestro" : "alumno";
-    if (rol === "alumno") { config.tiempoSegundos = 0; iniciarPartida(); }   // el alumno juega directamente
-    else { renderConfig(); WordSearchUI.showStage("config"); }
+    if (rol === "alumno") {
+      // identificación (una vez por sesión) y luego juega directamente
+      RCStudent.requerir({
+        mount: $("student-mount"),
+        mostrar: () => WordSearchUI.showStage("ident"),
+        volver: () => { rol = null; WordSearchUI.showStage("role"); },
+        continuar: () => { config.tiempoSegundos = 0; iniciarPartida(); }
+      });
+    } else { renderConfig(); WordSearchUI.showStage("config"); }
   });
   $("btn-ws-cambiar-rol").addEventListener("click", () => { rol = null; WordSearchUI.showStage("role"); });
   $("btn-iniciar-ws").addEventListener("click", iniciarPartida);

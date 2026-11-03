@@ -1,11 +1,11 @@
-const {launch,BASE,ok,newPage,sleep,results}=require('./common');
+const {launch,BASE,ok,newPage,sleep,results,alumno}=require('./common');
 const real=p=>p.__errors.filter(e=>!/ERR_NAME_NOT_RESOLVED/.test(e));
 (async()=>{
 const b=await launch();
 let p=await newPage(b);p.on('dialog',d=>d.accept());
 // ---- Quiz alumno: flujo completo básico ----
 await p.goto(BASE+'pages/quiz.html');
-await p.click('.role-card[data-role="alumno"]');
+await alumno(p);
 await p.click('#btn-iniciar-quiz');
 const q=await p.evaluate(()=>document.querySelector('.quiz-stage.is-active').dataset.stage);
 ok('Quiz alumno: llega a las preguntas',q==='question',q);
@@ -33,7 +33,7 @@ for(const theme of ['light','dark']){
   ok(`Crucigrama en modo ${theme}: tema aplicado y panel con contraste`,c.t===theme&&c.clue!==c.txt,JSON.stringify(c));
   await p.screenshot({path:`/tmp/cw_${theme}.png`});
   await p.goto(BASE+'pages/relacionar.html');
-  await p.click('#btn-comenzar-match');await p.click('.role-card[data-role="alumno"]');await p.click('#btn-iniciar-match');
+  await p.click('#btn-comenzar-match');await alumno(p);await p.click('#btn-iniciar-match');
   for(let i=0;i<3;i++){await p.click('#mg-pool .match-chip');await p.click(`.match-row[data-row="${i}"] .match-slot__main`);}
   await p.screenshot({path:`/tmp/mg_${theme}.png`});
 }

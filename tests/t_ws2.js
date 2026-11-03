@@ -1,4 +1,4 @@
-const {launch,BASE,ok,newPage,sleep,results}=require('./common');
+const {launch,BASE,ok,newPage,sleep,results,alumno}=require('./common');
 const real=p=>p.__errors.filter(e=>!/ERR_NAME_NOT_RESOLVED/.test(e));
 const BUSCAR=`(() => {const cells=[...document.querySelectorAll('.ws-cell')];const n=+document.getElementById('ws-board').dataset.n;
  const g=Array.from({length:n},(_,r)=>Array.from({length:n},(_,c)=>cells[r*n+c].textContent));
@@ -8,7 +8,7 @@ const BUSCAR=`(() => {const cells=[...document.querySelectorAll('.ws-cell')];con
 const b=await launch();let p=await newPage(b,{width:1280,height:1500});p.on('dialog',d=>d.accept());
 const stage=()=>p.evaluate(()=>document.querySelector('.ws-stage.is-active').dataset.stage);
 await p.goto(BASE+'pages/sopa.html');
-await p.click('#btn-comenzar-ws');await p.click('.role-card[data-role="alumno"]');
+await p.click('#btn-comenzar-ws');await alumno(p);
 const cen=(r,c)=>p.evaluate((r,c)=>{const e=document.querySelector(`.ws-cell[data-r="${r}"][data-c="${c}"]`).getBoundingClientRect();return {x:e.x+e.width/2,y:e.y+e.height/2}},r,c);
 async function arrastrar(r1,c1,r2,c2){const a=await cen(r1,c1),z=await cen(r2,c2);await p.mouse.move(a.x,a.y);await p.mouse.down();await p.mouse.move(z.x,z.y,{steps:6});await p.mouse.up();}
 let info=await p.evaluate(BUSCAR);
@@ -36,7 +36,7 @@ ok('Salir: vuelve a la selección de modo y descarta el progreso',await stage()=
 ok('Salida confirmada reproduce su efecto',await p.evaluate(()=>window.__aud.started)>aud0);
 ok('Sin intervalos, osciladores ni destellos activos tras salir',await p.evaluate(()=>window.__iv.size===0&&window.__aud.active===0&&document.querySelectorAll('.is-start,.is-selecting,.is-wrong').length===0));
 // Nueva partida arranca limpia
-await p.click('.role-card[data-role="alumno"]');
+await alumno(p);
 ok('Nueva partida reiniciada (0 encontradas, sin marcas)',await p.evaluate(()=>/^0 \//.test(document.getElementById('ws-progreso').textContent)&&document.querySelectorAll('.ws-cell.is-found').length===0));
 // Audio global: silenciar y jugar
 info=await p.evaluate(BUSCAR);
@@ -68,7 +68,7 @@ ok('Sopa (escritorio): sin errores JS ni rutas rotas',real(p).length===0,real(p)
 await p.close();
 // MÓVIL con toque real
 p=await newPage(b,{width:390,height:844,mobile:true});p.on('dialog',d=>d.accept());
-await p.goto(BASE+'pages/sopa.html');await p.click('#btn-comenzar-ws');await p.click('.role-card[data-role="alumno"]');
+await p.goto(BASE+'pages/sopa.html');await p.click('#btn-comenzar-ws');await alumno(p);
 const m=await p.evaluate(()=>{const bd=document.getElementById('ws-board').getBoundingClientRect();const c=document.querySelector('.ws-cell').getBoundingClientRect();return {ov:document.documentElement.scrollWidth>innerWidth,cell:c.width,fs:parseFloat(getComputedStyle(document.querySelector('.ws-cell')).fontSize),bw:bd.width,iw:innerWidth,n:+document.getElementById('ws-board').dataset.n,touch:getComputedStyle(document.getElementById('ws-board')).touchAction}});
 ok('Móvil: tablero cabe sin desborde, celdas ≥24px y letra ≥12px (celda '+m.cell.toFixed(1)+'px, letra '+m.fs.toFixed(1)+'px, '+m.n+'×'+m.n+')',!m.ov&&m.cell>=24&&m.fs>=12&&m.touch==='none',JSON.stringify(m));
 await p.screenshot({path:'/tmp/ws_mobile.png'});

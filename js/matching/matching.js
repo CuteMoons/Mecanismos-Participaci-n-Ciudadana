@@ -221,6 +221,7 @@
 
   // ---------------- flujo ----------------
   function iniciarPartida() {
+    if (rol === "alumno" && !RCStudent.get()) { rol = null; MatchingUI.showStage("role"); return; }   // sin identificar no se juega
     sess.start();
     partida = crearPartidaAleatoria(config.dificultad);
     els.versionBadge.textContent = `📚 ${partida.meta.titulo}`;
@@ -281,6 +282,7 @@
       p.innerHTML = 'Las respuestas correctas no se muestran: repasa en <a href="aprender.html">Aprender</a> y vuelve a intentarlo.';
       acciones.appendChild(p);
     }
+    RCStudent.pintarResultado($("mg-student-result"), rol);
     MatchingUI.showStage("result");
   }
 
@@ -302,8 +304,17 @@
     const card = e.target.closest(".role-card");
     if (!card) return;
     rol = card.dataset.role === "maestro" ? "maestro" : "alumno";
-    renderConfigStage();
-    MatchingUI.showStage("config");
+    const continuar = () => { renderConfigStage(); MatchingUI.showStage("config"); };
+    if (rol === "alumno") {
+      RCStudent.requerir({
+        mount: $("student-mount"),
+        mostrar: () => MatchingUI.showStage("ident"),
+        volver: () => { rol = null; MatchingUI.showStage("role"); },
+        continuar
+      });
+      return;
+    }
+    continuar();
   });
   $("btn-mg-cambiar-rol").addEventListener("click", () => { rol = null; MatchingUI.showStage("role"); });
   $("btn-iniciar-match").addEventListener("click", iniciarPartida);

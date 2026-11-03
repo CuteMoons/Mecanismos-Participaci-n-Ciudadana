@@ -1,4 +1,4 @@
-const {launch,BASE,ok,newPage,sleep,results}=require('./common');
+const {launch,BASE,ok,newPage,sleep,results,alumno}=require('./common');
 const root=require('path').resolve(__dirname,'..')+'/';
 const MV=require(root+'data/matching/matching-versions.js');
 const real=p=>p.__errors.filter(e=>!/ERR_NAME_NOT_RESOLVED/.test(e));
@@ -7,7 +7,7 @@ const b=await launch();let p=await newPage(b);p.on('dialog',d=>d.accept());
 await p.evaluateOnNewDocument(()=>{window.__q=[];const r=Math.random.bind(Math);Math.random=()=>window.__q.length?window.__q.shift():r();});
 // ================= RELACIONAR: cada versión =================
 await p.goto(BASE+'pages/relacionar.html');
-await p.click('#btn-comenzar-match');await p.click('.role-card[data-role="alumno"]');
+await p.click('#btn-comenzar-match');await alumno(p);
 const stage=()=>p.evaluate(()=>document.querySelector('.matching-stage.is-active').dataset.stage);
 const clasico=await p.evaluate(()=>{const it=construirMecanismosParaJuego('media');return it.map(i=>[i.significado,i.nombre])});
 const tabla={};clasico.forEach(([a,b])=>tabla[a]=b);
@@ -41,7 +41,7 @@ for(let i=0;i<8;i++){
   if(await stage()==='result')await p.click('#btn-mg-nuevo');
   await p.click('#btn-iniciar-match');
   ordenes.add(await p.evaluate(()=>[...document.querySelectorAll('.match-meaning')].map(e=>e.textContent.slice(0,10)).join('|')));
-  await p.click('#btn-mg-salir');await sleep(450);await p.click('#game-exit-leave');await sleep(120);await p.click('.role-card[data-role="alumno"]');
+  await p.click('#btn-mg-salir');await sleep(450);await p.click('#game-exit-leave');await sleep(120);await alumno(p);
 }
 ok('Relacionar: la misma versión cambia el orden entre partidas',ordenes.size>=6,String(ordenes.size));
 // variedad aleatoria
@@ -49,7 +49,7 @@ const vers=new Set();
 for(let i=0;i<24;i++){
   await p.evaluate(()=>{window.__q=[]});
   await p.click('#btn-iniciar-match');vers.add(await p.$eval('#mg-version-badge',e=>e.textContent));
-  await p.click('#btn-mg-salir');await sleep(450);await p.click('#game-exit-leave');await sleep(120);await p.click('.role-card[data-role="alumno"]');
+  await p.click('#btn-mg-salir');await sleep(450);await p.click('#game-exit-leave');await sleep(120);await alumno(p);
 }
 ok('Relacionar: aleatoriedad real (24 inicios → '+vers.size+' versiones)',vers.size>=5);
 ok('Relacionar: sin errores JS ni rutas rotas',real(p).length===0,real(p).join('|'));
@@ -69,7 +69,7 @@ await p.close();
 p=await newPage(b,{width:390,height:844,mobile:true});p.on('dialog',d=>d.accept());
 await p.evaluateOnNewDocument(()=>{window.__q=[];const r=Math.random.bind(Math);Math.random=()=>window.__q.length?window.__q.shift():r();});
 await p.goto(BASE+'pages/relacionar.html');
-await p.click('#btn-comenzar-match');await p.click('.role-card[data-role="alumno"]');
+await p.click('#btn-comenzar-match');await alumno(p);
 let movilOk=true;const det=[];
 for(let vi=0;vi<=MV.length;vi++){
   await p.evaluate(a=>{window.__q=[a]},(vi+0.5)/N);
@@ -77,7 +77,7 @@ for(let vi=0;vi<=MV.length;vi++){
   await p.click('#btn-iniciar-match');
   const m=await p.evaluate(()=>({ov:document.documentElement.scrollWidth>innerWidth,fs:parseFloat(getComputedStyle(document.querySelector('.match-meaning')).fontSize),chipH:document.querySelector('#mg-pool .match-chip').getBoundingClientRect().height,cols:getComputedStyle(document.getElementById('mg-layout')).gridTemplateColumns.split(' ').length}));
   if(m.ov||m.fs<13||m.chipH<40||m.cols!==1){movilOk=false;det.push(JSON.stringify(m))}
-  await p.click('#btn-mg-salir');await sleep(450);await p.click('#game-exit-leave');await sleep(120);await p.click('.role-card[data-role="alumno"]');
+  await p.click('#btn-mg-salir');await sleep(450);await p.click('#game-exit-leave');await sleep(120);await alumno(p);
 }
 ok('Relacionar en móvil: las 6 versiones sin desborde horizontal, texto ≥13px y objetivos táctiles ≥40px',movilOk,det.join(' '));
 await p.screenshot({path:'/tmp/mg_mobile_inv.png'});

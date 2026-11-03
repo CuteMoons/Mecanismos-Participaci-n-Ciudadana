@@ -1,4 +1,4 @@
-const {launch,BASE,ok,newPage,sleep,results}=require('./common');
+const {launch,BASE,ok,newPage,sleep,results,alumno}=require('./common');
 const fs=require('fs');
 const root=require('path').resolve(__dirname,'..')+'/';
 const CV=require(root+'data/crossword/crossword-versions.js');
@@ -6,7 +6,7 @@ const CV=require(root+'data/crossword/crossword-versions.js');
 const b=await launch();const p=await newPage(b);p.on('dialog',d=>d.accept());
 await p.evaluateOnNewDocument(()=>{window.__q=[];const r=Math.random.bind(Math);Math.random=()=>window.__q.length?window.__q.shift():r();});
 await p.goto(BASE+'pages/crucigrama.html');
-await p.click('#btn-comenzar-crucigrama');await p.click('.role-card[data-role="alumno"]');
+await p.click('#btn-comenzar-crucigrama');await alumno(p);
 const stage=()=>p.evaluate(()=>document.querySelector('.crossword-stage.is-active').dataset.stage);
 const clueMap={};CV.forEach(v=>v.words.forEach(w=>clueMap[w.clue]=w.word));
 // clásico: leer pool desde la página
@@ -61,7 +61,7 @@ for(let i=0;i<30;i++){
   const x=await p.evaluate(()=>({t:document.getElementById('cw-version-badge').textContent,l:[...document.querySelectorAll('.clue-item__text')].map(e=>e.textContent).sort().join('|').length,g:document.querySelectorAll('.cw-cell').length}));
   vistos.add(x.t);dist.add(x.t+x.g);
   await p.click('#btn-cw-salir');await sleep(450);await p.click('#game-exit-leave');await sleep(150);
-  await p.click('.role-card[data-role="alumno"]');
+  await alumno(p);
 }
 ok('Aleatoriedad: en 30 inicios aparecen varias versiones distintas ('+vistos.size+')',vistos.size>=4,[...vistos].join(' | '));
 // no repetir idéntica seguidas: 40 inicios forzando misma elección

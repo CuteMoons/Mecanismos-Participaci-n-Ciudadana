@@ -595,6 +595,30 @@ temporal que se limpia solo; repetida: no suma. Calificación 1.0–5.0 con
 **Pruebas.** La carpeta `tests/` contiene las pruebas automáticas
 (Node + Chromium headless con puppeteer-core); ver `tests/README.md`.
 
+## 11.7. Identificación del alumno
+
+Al elegir **Alumno** (cuestionario, crucigrama, relacionar o sopa de
+letras) aparece una pantalla para escribir el **nombre completo
+(obligatorio)** y el **curso (opcional)**. `js/student.js`
+(`window.RCStudent`) se encarga de todo:
+- Valida: el nombre no puede quedar vacío ni solo con espacios; se
+  recortan los espacios del inicio y del final y se juntan los repetidos
+  (máx. 80 caracteres el nombre y 20 el curso). Enter envía el formulario.
+- Se pide **una sola vez por sesión**: se guarda en `sessionStorage`
+  (clave `rc-student`), así que sirve para todos los juegos y para el
+  cuestionario, incluso al cambiar de página. Se borra al cerrar la
+  pestaña; no se envía a ningún sitio. En la pantalla de modos aparece
+  «Sesión de … · Cambiar alumno» para empezar con otro alumno.
+- Los resultados de todas las actividades muestran la tarjeta del
+  alumno (nombre y curso, si lo escribió) junto a la puntuación, la
+  calificación y las estadísticas de siempre; «Copiar resumen» del
+  cuestionario también incluye alumno y curso.
+- El **maestro** no se identifica y su flujo no cambia.
+- Cada juego vuelve a comprobar la identificación al iniciar la partida:
+  un alumno sin nombre no entra a la actividad.
+- No es autenticación: solo rotula los resultados en el navegador.
+  Estilos en `css/student.css` (claro/oscuro y móvil).
+
 ## 12. Modo claro / oscuro
 
 El botón del navbar cambia el tema y lo guarda en `localStorage`, así

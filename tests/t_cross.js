@@ -1,4 +1,4 @@
-const {launch,BASE,ok,newPage,sleep,results}=require('./common');
+const {launch,BASE,ok,newPage,sleep,results,alumno}=require('./common');
 (async()=>{
 const b=await launch();
 const p=await newPage(b);
@@ -8,7 +8,7 @@ ok('Inicia en introducción',await stage()==='intro');
 await p.click('#btn-comenzar-crucigrama');
 ok('Aparece selector de modo antes de jugar',await stage()==='role');
 // ---- ALUMNO ----
-await p.click('.role-card[data-role="alumno"]');
+await alumno(p);
 ok('Alumno: config sin modalidad ni tiempo',await p.evaluate(()=>document.getElementById('cw-group-modalidad').hidden&&document.getElementById('cw-group-tiempo').hidden));
 await p.click('#btn-iniciar-crucigrama');
 ok('Alumno: juego iniciado',await stage()==='game');
