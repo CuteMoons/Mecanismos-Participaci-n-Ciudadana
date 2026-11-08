@@ -619,6 +619,28 @@ letras) aparece una pantalla para escribir el **nombre completo
 - No es autenticación: solo rotula los resultados en el navegador.
   Estilos en `css/student.css` (claro/oscuro y móvil).
 
+## 11.8. Tres juegos nuevos: situaciones, memoria y ruleta
+
+Se **ampliaron** los juegos sin tocar los existentes. Cada uno sigue el mismo
+flujo que la sopa de letras: instrucciones → modo (alumno/maestro) →
+identificación (alumno) o configuración (maestro) → juego → resultados, con
+botón «Salir» + confirmación, audio global y la calificación 1,0–5,0.
+
+| Juego | Página | Datos | Controlador |
+|---|---|---|---|
+| ¿Qué harías en esta situación? | `pages/situaciones.html` | `data/situations/situaciones-data.js` (24 situaciones) | `js/situations/situaciones.js` |
+| Memoria de conceptos | `pages/memoria.html` | `data/memory/memoria-data.js` (14 parejas) | `js/memory/memoria.js` |
+| Ruleta de preguntas | `pages/ruleta.html` | `data/roulette/ruleta-data.js` (6 categorías × 8 preguntas) | `js/roulette/ruleta.js` |
+
+Piezas comunes: `js/minigames/mini-core.js` (etapas, flujo de modo, panel del
+maestro, pregunta de opción múltiple, resultados) y `css/minigames.css`.
+Reutilizan `RCGame`, `RCStudent`, `RCSound` y `calcularCalificacion`.
+
+- **Situaciones:** 10 al azar (maestro: 5/10/15), 4 opciones barajadas, retroalimentación y explicación. Nota = aciertos / total.
+- **Memoria:** 6 parejas al azar (maestro: 6/8/10), conjunto distinto al anterior. Nota: base de 3 puntos por pareja; cada intento fallido resta 1 y cada pareja sin encontrar resta 3 (sin fallos = 5,0).
+- **Ruleta:** 10 giros (maestro: 5/10/15). El ángulo final se sortea y la categoría sale de dónde se detiene; no se repiten preguntas mientras queden en esa categoría (si se agota una, se reinicia solo esa). Respeta `prefers-reduced-motion`.
+- Para agregar preguntas basta con añadir elementos a los arreglos de datos (3–4 opciones, `correcta` = índice, `explicacion`).
+
 ## 12. Modo claro / oscuro
 
 El botón del navbar cambia el tema y lo guarda en `localStorage`, así

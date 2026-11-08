@@ -1,0 +1,117 @@
+/* ==========================================================================
+   MINIGAMES.CSS — «¿Qué harías?», «Memoria de conceptos» y «Ruleta».
+   Reutiliza variables, temas, botones, role-card, pill, option-item,
+   result-stage y student-card ya existentes (quiz.css, game-shell.css,
+   student.css). Aquí solo están las piezas propias de estos tres juegos.
+   ========================================================================== */
+.mg-shell { padding-block: var(--space-8); min-height: 70vh; }
+.mg-shell [hidden] { display: none !important; }
+.mg-stage { display: none; }
+.mg-stage.is-active { display: block; animation: mgFade var(--t-base) var(--ease); }
+.mg-stage.result-stage.is-active { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: var(--space-5); }
+.mg-stage.result-stage .question-actions { flex-wrap: wrap; justify-content: center; }
+@keyframes mgFade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+/* ---- Introducción ---- */
+.mg-intro { max-width: 640px; margin: 0 auto; text-align: center; display: flex; flex-direction: column; align-items: center; gap: var(--space-4); }
+.mg-intro__icon { font-size: 3.5rem; }
+.mg-intro__lead { font-size: var(--fs-lg); font-weight: 600; }
+.mg-intro__actions { display: flex; flex-wrap: wrap; gap: var(--space-3); justify-content: center; }
+.mg-rules { width: 100%; text-align: left; padding: var(--space-4) var(--space-5); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); }
+.mg-rules h2 { font-size: var(--fs-sm); text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: var(--space-2); }
+.mg-rules ul { display: flex; flex-direction: column; gap: var(--space-2); font-size: var(--fs-sm); }
+.mg-rules li { padding-left: 1.4rem; position: relative; }
+.mg-rules li::before { content: "•"; position: absolute; left: 0.3rem; color: var(--color-primary); font-weight: 700; }
+.mg-back { text-align: center; margin-top: var(--space-3); }
+
+/* ---- Barra de estado ---- */
+.mg-game-head { text-align: center; }
+.mg-game-head h2 { font-size: var(--fs-lg); }
+.mg-stats { display: flex; flex-wrap: wrap; gap: var(--space-3); justify-content: center; margin-bottom: var(--space-4); }
+.mg-stat { padding: var(--space-2) var(--space-4); border-radius: var(--radius-full); background: var(--surface); border: 1px solid var(--border); font-family: var(--font-display); font-weight: 700; box-shadow: var(--shadow-sm); }
+.mg-stat.is-warning { color: var(--color-accent); border-color: var(--color-accent); }
+.mg-stat.is-critical { color: var(--color-danger); border-color: var(--color-danger); }
+.mg-playarea { position: relative; max-width: 1040px; margin: 0 auto; }
+.mg-status { text-align: center; font-size: var(--fs-sm); color: var(--text-muted); min-height: 1.6em; margin: var(--space-3) auto 0; }
+.mg-placeholder { text-align: center; color: var(--text-muted); padding: var(--space-6) var(--space-4); border: 2px dashed var(--border); border-radius: var(--radius-md); }
+
+/* ---- Pregunta de opción múltiple ---- */
+.mg-q { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--space-4); text-align: left; }
+.mg-q__tag { align-self: flex-start; font-family: var(--font-display); font-weight: 700; font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-secondary); background: color-mix(in srgb, var(--color-secondary) 10%, var(--surface)); border: 1px solid color-mix(in srgb, var(--color-secondary) 35%, var(--border)); border-radius: var(--radius-full); padding: 0.25rem 0.8rem; }
+.mg-q__situation { margin: 0; padding: var(--space-4) var(--space-5); background: var(--surface); border: 1px solid var(--border); border-left: 5px solid var(--color-accent); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); font-size: var(--fs-md); line-height: 1.5; }
+.mg-q__text { font-size: var(--fs-lg); line-height: 1.3; margin: 0; }
+.mg-options { display: grid; gap: var(--space-3); }
+.mg-options .option-item { font-size: var(--fs-base); }
+.mg-feedback { padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--border); font-size: var(--fs-sm); line-height: 1.5; }
+.mg-feedback b { display: block; font-family: var(--font-display); font-size: var(--fs-md); margin-bottom: var(--space-1); }
+.mg-feedback.is-correct { border-color: var(--color-success); background: color-mix(in srgb, var(--color-success) 12%, var(--surface)); }
+.mg-feedback.is-wrong { border-color: var(--color-danger); background: color-mix(in srgb, var(--color-danger) 10%, var(--surface)); }
+.mg-q__actions { display: flex; justify-content: flex-end; }
+
+/* ---- Resultados ---- */
+.mg-review { width: 100%; max-width: 720px; text-align: left; padding: var(--space-4) var(--space-5); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); }
+.mg-review h3 { font-size: var(--fs-md); margin-bottom: var(--space-2); }
+.mg-review ul { display: flex; flex-direction: column; gap: var(--space-2); font-size: var(--fs-sm); }
+.mg-review li { padding-left: 1.1rem; position: relative; line-height: 1.45; }
+.mg-review li::before { content: "•"; position: absolute; left: 0.2rem; color: var(--color-primary); font-weight: 700; }
+
+/* ---- Memoria ---- */
+.mem-board { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: var(--space-3); max-width: 920px; margin: 0 auto; }
+.mem-card { position: relative; height: 136px; padding: 0; border: 0; background: transparent; perspective: 800px; cursor: pointer; font: inherit; color: inherit; touch-action: manipulation; }
+.mem-card__inner { position: absolute; inset: 0; transform-style: preserve-3d; transition: transform 0.45s var(--ease); }
+.mem-card.is-up .mem-card__inner, .mem-card.is-matched .mem-card__inner { transform: rotateY(180deg); }
+.mem-face { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; padding: var(--space-2) var(--space-3); border-radius: var(--radius-md); border: 2px solid var(--border); overflow: hidden; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.mem-face--back { background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark)); border-color: var(--color-primary-dark); color: #fff; font-family: var(--font-display); font-weight: 700; font-size: 2.2rem; box-shadow: var(--shadow-sm); }
+.mem-face--front { transform: rotateY(180deg); background: var(--surface); color: var(--text); font-size: 0.8rem; line-height: 1.3; font-weight: 600; }
+.mem-card--concept .mem-face--front { border-color: var(--color-secondary); background: color-mix(in srgb, var(--color-secondary) 9%, var(--surface)); font-family: var(--font-display); font-weight: 700; font-size: var(--fs-md); }
+.mem-card--def .mem-face--front { border-color: var(--color-accent); }
+.mem-card.is-matched { cursor: default; }
+.mem-card.is-matched .mem-face--front { border-color: var(--color-success); background: color-mix(in srgb, var(--color-success) 15%, var(--surface)); }
+.mem-card.is-wrong .mem-face--front { border-color: var(--color-danger); background: color-mix(in srgb, var(--color-danger) 12%, var(--surface)); }
+.mem-card:hover:not(.is-up):not(.is-matched) .mem-face--back { filter: brightness(1.1); }
+.mem-card:focus-visible { outline: 3px solid var(--color-secondary); outline-offset: 3px; border-radius: var(--radius-md); }
+
+/* ---- Ruleta ---- */
+.roulette-layout { display: grid; grid-template-columns: minmax(0, 380px) minmax(0, 1fr); gap: var(--space-6); align-items: start; }
+.roulette-col { display: flex; flex-direction: column; align-items: center; gap: var(--space-4); }
+.roulette-wrap { position: relative; width: min(100%, 340px); aspect-ratio: 1; padding-top: 0; }
+.roulette-disc { width: 100%; height: 100%; border-radius: 50%; overflow: hidden; box-shadow: 0 6px 18px hsl(var(--shadow-color) / 0.3); }   /* recorta la ruleta al girar: sus esquinas no tapan el botón */
+.roulette-wheel { width: 100%; height: 100%; display: block; will-change: transform; }
+.roulette-pointer { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 14px solid transparent; border-right: 14px solid transparent; border-top: 28px solid var(--text); z-index: 2; filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.35)); }
+.rl-slice path { stroke: var(--surface); stroke-width: 1.5; }
+.rl-slice.is-winner path { stroke: var(--text); stroke-width: 3; }
+.rl-label { font-family: var(--font-display); font-weight: 700; font-size: 9.5px; fill: #fff; pointer-events: none; }
+.rl-hub { fill: var(--surface); stroke: var(--border); stroke-width: 3; }
+.rl-s0 path, .rl-dot.rl-s0 { fill: var(--color-primary); background: var(--color-primary); }
+.rl-s1 path, .rl-dot.rl-s1 { fill: var(--color-secondary); background: var(--color-secondary); }
+.rl-s2 path, .rl-dot.rl-s2 { fill: var(--color-accent); background: var(--color-accent); }
+.rl-s3 path, .rl-dot.rl-s3 { fill: var(--color-success); background: var(--color-success); }
+.rl-s4 path, .rl-dot.rl-s4 { fill: var(--color-primary-dark); background: var(--color-primary-dark); }
+.rl-s5 path, .rl-dot.rl-s5 { fill: var(--color-secondary-light); background: var(--color-secondary-light); }
+.rl-s2 .rl-label, .rl-s5 .rl-label { fill: #1a1c22; }
+.roulette-legend { display: grid; gap: var(--space-1); font-size: var(--fs-sm); width: 100%; max-width: 340px; }
+.roulette-legend li { display: flex; align-items: center; gap: var(--space-2); }
+.rl-dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; }
+.roulette-q { min-width: 0; }
+
+@media (max-width: 800px) {
+  .roulette-layout { grid-template-columns: minmax(0, 1fr); gap: var(--space-5); }
+  .mg-shell { padding-block: var(--space-5); }
+  .mg-game-head .eyebrow { display: none; }
+  .mg-q__situation { font-size: var(--fs-base); padding: var(--space-3) var(--space-4); }
+  .mg-q__text { font-size: var(--fs-md); }
+}
+@media (max-width: 480px) {
+  .mem-board { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-2); }
+  .mem-card { height: 128px; }
+  .mem-card--concept .mem-face--front { font-size: var(--fs-base); }
+  .mg-q__actions .btn, .mg-intro__actions .btn { width: 100%; }
+  .mg-intro__actions { width: 100%; flex-direction: column-reverse; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mg-stage.is-active { animation: none; }
+  .mem-card__inner { transition: none; }
+}
+
+/* Al desplazarse hacia la pregunta o el botón, que no queden bajo la barra de navegación */
+.roulette-q, #rl-btn-girar, .mg-q__actions { scroll-margin-top: calc(var(--navbar-height) + var(--space-3)); }

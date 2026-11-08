@@ -37,7 +37,7 @@ function renderNavbar() {
           <li><a class="navbar__link" data-page="index.html" href="${base}index.html">Inicio</a></li>
           <li><a class="navbar__link" data-page="aprender.html" href="${base}pages/aprender.html">Aprender</a></li>
           <li><a class="navbar__link" data-page="quiz.html" href="${base}pages/quiz.html">Quiz</a></li>
-          <li><a class="navbar__link" data-page="juegos.html|crucigrama.html|relacionar.html|sopa.html" href="${base}pages/juegos.html">Juegos</a></li>
+          <li><a class="navbar__link" data-page="juegos.html|crucigrama.html|relacionar.html|sopa.html|situaciones.html|memoria.html|ruleta.html" href="${base}pages/juegos.html">Juegos</a></li>
         </ul>
 
         <div class="navbar__actions">

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ruleta de preguntas · Participación Ciudadana · I.E. José Antonio Aguilera</title>
+  <meta name="description" content="Gira la ruleta y responde preguntas de seis categorías sobre participación ciudadana, democracia y la Constitución." />
+  <link rel="icon" type="image/png" href="../assets/logo/favicon.png" />
+  <link rel="icon" href="../assets/logo/favicon.ico" sizes="any" />
+  <link rel="apple-touch-icon" href="../assets/logo/favicon.png" />
+
+  <link rel="stylesheet" href="../css/variables.css" />
+  <link rel="stylesheet" href="../css/main.css" />
+  <link rel="stylesheet" href="../css/navbar.css" />
+  <link rel="stylesheet" href="../css/sections.css" />
+  <link rel="stylesheet" href="../css/quiz.css" />
+  <link rel="stylesheet" href="../css/modal.css" />
+  <link rel="stylesheet" href="../css/game-shell.css" />
+  <link rel="stylesheet" href="../css/minigames.css" />
+  <link rel="stylesheet" href="../css/responsive.css" />
+  <link rel="stylesheet" href="../css/student.css" />
+  <link rel="stylesheet" href="../css/themes.css" />
+</head>
+<body>
+
+  <div id="navbar-root" data-base="../"></div>
+
+  <main class="mg-shell" id="ruleta-shell">
+    <div class="container">
+
+      <!-- ============ ETAPA 1: INTRODUCCIÓN E INSTRUCCIONES ============ -->
+      <section class="mg-stage is-active" data-stage="intro">
+        <div class="mg-intro reveal is-visible">
+          <span class="mg-intro__icon">🎡</span>
+          <h1>Ruleta de preguntas</h1>
+          <p class="mg-intro__lead">Gira la ruleta y responde la pregunta de la categoría que salga.</p>
+          <div class="mg-rules">
+            <h2>Cómo se juega</h2>
+            <ul>
+              <li>Pulsa «Girar la ruleta»: se detiene al azar en una de las 6 categorías.</li>
+              <li>Responde la pregunta de selección múltiple de esa categoría.</li>
+              <li>Después de responder verás si acertaste y una breve explicación.</li>
+              <li>En una misma partida no se repiten preguntas mientras haya disponibles.</li>
+              <li>Al final recibes una calificación de 1.0 a 5.0.</li>
+            </ul>
+          </div>
+          <div class="mg-intro__actions">
+            <a class="btn btn-ghost" href="juegos.html">← Volver a Juegos</a>
+            <button class="btn btn-primary btn-lg" id="mg-btn-comenzar" data-sound="confirm">Comenzar</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ ETAPA 2: MODO (alumno / maestro) ============ -->
+      <section class="mg-stage" data-stage="role" aria-labelledby="mg-role-title">
+        <div class="section-head" style="margin-bottom: var(--space-6);">
+          <span class="eyebrow">🎡 Ruleta de preguntas</span>
+          <h1 id="mg-role-title">¿Cómo quieres participar?</h1>
+          <p class="text-muted">Elige el modo antes de iniciar el juego.</p>
+        </div>
+
+        <div class="role-grid" id="mg-role-grid">
+          <button type="button" class="role-card" data-role="alumno" data-sound="start">
+            <span class="role-card__icon" aria-hidden="true">🎓</span>
+            <span class="role-card__title">Soy alumno</span>
+            <span class="role-card__text">Juega directamente: la partida empieza de inmediato.</span>
+            <ul class="role-card__list">
+              <li>10 giros por partida</li>
+              <li>Sin límite de tiempo</li>
+              <li>Seis categorías distintas</li>
+            </ul>
+            <span class="role-card__cta">Jugar como alumno →</span>
+          </button>
+
+          <button type="button" class="role-card" data-role="maestro" data-sound="confirm">
+            <span class="role-card__icon" aria-hidden="true">🧑‍🏫</span>
+            <span class="role-card__title">Soy maestro</span>
+            <span class="role-card__text">Prepara y dirige la actividad frente a la clase.</span>
+            <ul class="role-card__list">
+              <li>Elige cuántos giros se juegan</li>
+              <li>Define el tiempo de la actividad</li>
+              <li>Pausar y reanudar el juego</li>
+              <li>Terminar y calificar cuando decida</li>
+            </ul>
+            <span class="role-card__cta">Continuar como maestro →</span>
+          </button>
+        </div>
+
+        <p class="role-note text-muted">
+          El modo organiza la actividad en esta página; no es un inicio de sesión ni una medida de seguridad.
+        </p>
+        <p class="student-note text-muted" data-student-note hidden></p>
+        <p class="mg-back"><a class="link-btn" href="juegos.html">← Volver al menú de juegos</a></p>
+      </section>
+
+      <!-- ============ IDENTIFICACIÓN DEL ALUMNO (sistema existente) ============ -->
+      <section class="mg-stage" data-stage="ident" aria-labelledby="student-title">
+        <div id="student-mount"></div>
+      </section>
+
+      <!-- ============ ETAPA 3: CONFIGURACIÓN (solo maestro) ============ -->
+      <section class="mg-stage" data-stage="config">
+        <div class="section-head" style="margin-bottom: var(--space-6);">
+          <span class="eyebrow">🧑‍🏫 Modo maestro</span>
+          <h1>Configura la actividad</h1>
+        </div>
+
+        <div class="config-card">
+          <div class="config-group">
+            <p class="config-group__title"><span class="step-badge">1</span> Número de giros</p>
+            <div class="pill-group" id="mg-config-cantidad"></div>
+          </div>
+          <div class="config-group">
+            <p class="config-group__title"><span class="step-badge">2</span> Tiempo</p>
+            <div class="pill-group" id="mg-config-tiempo"></div>
+            <p class="text-muted" style="font-size: var(--fs-sm); margin-top: var(--space-2);">Cada categoría tiene su propio conjunto de preguntas. Las no respondidas cuentan como no acertadas.</p>
+          </div>
+
+          <div class="config-launch">
+            <button class="btn btn-ghost" id="mg-btn-cambiar-rol" type="button">← Cambiar de modo</button>
+            <button class="btn btn-primary btn-lg" id="mg-btn-iniciar" data-sound="start">🚀 Iniciar juego</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ ETAPA 4: JUEGO ============ -->
+      <section class="mg-stage" data-stage="game">
+        <div class="game-toolbar">
+          <button type="button" class="btn btn-ghost game-exit-btn" id="mg-btn-salir" data-sound="none">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 4h4a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-4M10 8l-4 4 4 4M6 12h11" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Salir
+          </button>
+          <div class="mg-game-head">
+            <span class="eyebrow" style="justify-content:center;">🎡 Ruleta de preguntas</span>
+            <h2>Gira y responde</h2>
+          </div>
+          <span class="game-toolbar__spacer" aria-hidden="true"></span>
+        </div>
+
+        <div class="mg-stats">
+          <span class="mg-stat" id="mg-timer">⏱️ --:--</span>
+          <span class="mg-stat" id="mg-progreso">—</span>
+          <span class="mg-stat" id="mg-puntaje">—</span>
+          <span class="mg-stat" id="mg-role-badge">🎓 Alumno</span>
+        </div>
+
+        <div class="teacher-panel" id="mg-teacher-panel" hidden></div>
+
+        <div class="mg-playarea" id="mg-playarea-wrap">
+          <div class="mg-playarea__content" id="mg-playarea">
+            <div class="roulette-layout">
+              <div class="roulette-col">
+                <div class="roulette-wrap">
+                  <div class="roulette-pointer" aria-hidden="true"></div>
+                  <div class="roulette-disc">
+                    <svg class="roulette-wheel" id="rl-wheel" viewBox="0 0 220 220" role="img" aria-label="Ruleta con seis categorías"></svg>
+                  </div>
+                </div>
+                <button type="button" class="btn btn-primary btn-lg" id="rl-btn-girar" data-sound="none">🎡 Girar la ruleta</button>
+                <p class="mg-status" id="rl-status" aria-live="polite"></p>
+                <ul class="roulette-legend" id="rl-legend"></ul>
+              </div>
+              <div class="roulette-q" id="rl-pregunta"></div>
+            </div>
+          </div>
+          <div class="pause-veil" id="mg-pause-veil" hidden>
+            <p>⏸️ Actividad en pausa</p>
+            <span>El maestro la reanudará.</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ ETAPA 5: RESULTADOS ============ -->
+      <section class="mg-stage result-stage" data-stage="result">
+        <div class="result-badge" id="mg-result-badge">🎉</div>
+        <h2 id="mg-result-title">Resultados</h2>
+        <p class="text-muted" id="mg-result-note"></p>
+        <div class="student-card" id="mg-student-result" hidden></div>
+
+        <div class="result-stats" id="mg-result-stats"></div>
+        <div class="mg-review" id="mg-review" hidden></div>
+
+        <div class="question-actions">
+          <a class="btn btn-secondary" href="juegos.html">🏠 Volver a Juegos</a>
+          <button class="btn btn-primary" id="mg-btn-nuevo" data-sound="start">🔄 Jugar de nuevo</button>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <div class="footer__brand">
+        <img class="navbar__logo" src="../assets/logo/logo-colegio.png" alt="" onerror="this.style.display='none'" />
+        <div class="footer__brand-text">
+          <b>Institución Educativa José Antonio Aguilera</b>
+          <span>Proyecto educativo — SENA · Mecanismos de Participación Ciudadana</span>
+        </div>
+      </div>
+      <div class="footer__meta">San Pedro, Valle del Cauca</div>
+    </div>
+  </footer>
+
+  <script src="../js/components/icons.js"></script>
+  <script src="../js/components/navbar.js"></script>
+  <script src="../js/components/animations.js"></script>
+
+  <!-- Núcleo (el mismo de los demás juegos) -->
+  <script src="../js/sound.js"></script>
+  <script src="../js/student.js"></script>
+  <script src="../js/theme.js"></script>
+  <script src="../js/navigation.js"></script>
+  <script src="../js/game-shell.js"></script>
+  <script src="../js/grading.js"></script>
+  <script src="../js/minigames/mini-core.js"></script>
+
+  <!-- Ruleta de preguntas -->
+  <script src="../data/roulette/ruleta-data.js"></script>
+  <script src="../js/roulette/ruleta.js"></script>
+</body>
+</html>
